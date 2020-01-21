@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="General">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main_Windows.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="TileDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="NpcTurret.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="NpcTank.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Boulder.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Explosion.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="AirStrikePlane.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="AirStrike.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCommon.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.hpp" />
+    <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="Map.hpp" />
+    <ClInclude Include="World.hpp" />
+    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="TileDefinition.hpp" />
+    <ClInclude Include="Boulder.hpp" />
+    <ClInclude Include="Bullet.hpp" />
+    <ClInclude Include="NpcTank.hpp" />
+    <ClInclude Include="NpcTurret.hpp" />
+    <ClInclude Include="EngineBuildPreferences.hpp" />
+    <ClInclude Include="Explosion.hpp" />
+    <ClInclude Include="AirStrikePlane.hpp" />
+    <ClInclude Include="AirStrike.hpp" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+<MapDefinitions>
+
+	<MapDefinition name="Island" fillTile="Grass" edgeTile="Stone" width="20" height="20">
+	<GenerationSteps>
+		<Mutate iterations="1,1" ifTile="Grass" setTile="Stone" chanceToMutate="0.3,0.3" chancePerTile ="0.1,0.2"/>
+		<CellularAutomata chanceToRun="1,1" iterations="1,1" ifTile="Stone" neighbourTileType ="Grass" setTile="Lava" numNeighbours="1,8" chancePerTile ="0.5,0.5"/>
+		<Worms iterations ="1,1" ifTile ="Stone" setTile ="Wood" wormLength ="2,6" numWorms ="6,8" />
+	</GenerationSteps>	
+	</MapDefinition>
+
+</MapDefinitions>
+
+

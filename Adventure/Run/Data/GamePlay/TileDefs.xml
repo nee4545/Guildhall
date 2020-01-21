@@ -1,0 +1,44 @@
+<TileDefinitions spriteSheet="Terrain_32x32.png" spriteLayout="32,32">
+	<TileDefinition
+		name="Grass"
+		colorInMap="0,255,0"
+		spriteCoords="1,0"
+		allowsSight="true"
+		allowsWalking="true"
+		allowsSwimming="false"
+		allowsFlying="false"
+	/>
+
+      <TileDefinition
+		name="Stone"
+		colorInMap="0,255,0"
+		spriteCoords="0,10"
+		allowsSight="true"
+		allowsWalking="false"
+		allowsSwimming="false"
+		allowsFlying="false"
+	/>
+
+	<TileDefinition
+		name="Lava"
+		colorInMap="0,255,0"
+		spriteCoords="23,3"
+		allowsSight="true"
+		allowsWalking="true"
+		allowsSwimming="false"
+		allowsFlying="false"
+	/>
+
+
+	<TileDefinition
+		name="Wood"
+		colorInMap="0,255,0"
+		spriteCoords="30,0"
+		allowsSight="true"
+		allowsWalking="false"
+		allowsSwimming="false"
+		allowsFlying="false"
+	/>
+
+
+</TileDefinitions>

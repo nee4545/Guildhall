@@ -1,0 +1,83 @@
+#include "Game/Explosion.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Renderer/SpriteAnimDefinition.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Renderer/SpriteDefinition.hpp"
+
+Explosion::Explosion( Game* game, Vec2 position ):Entity(game,position)
+{
+
+	m_vertices[0]=Vertex_PCU( Vec3( -0.4f, -0.4f, 0.f ), Rgba8( 255, 255, 255 ), uvMins );
+	m_vertices[1]=Vertex_PCU( Vec3( 0.4f, -0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMaxs.x, uvMins.y ) );
+	m_vertices[2]=Vertex_PCU( Vec3( -0.4f, 0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMins.x, uvMaxs.y ) );
+
+	m_vertices[3]=Vertex_PCU( Vec3( 0.4f, -0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMaxs.x, uvMins.y ) );
+	m_vertices[4]=Vertex_PCU( Vec3( 0.4f, 0.4f, 0.f ), Rgba8( 255, 255, 255 ), uvMaxs );
+	m_vertices[5]=Vertex_PCU( Vec3( -0.4f, 0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMins.x, uvMaxs.y ) );
+
+	m_vertices_original[0]=Vertex_PCU( Vec3( -0.4f, -0.4f, 0.f ), Rgba8( 255, 255, 255 ), uvMins );
+	m_vertices_original[1]=Vertex_PCU( Vec3( 0.4f, -0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMaxs.x, uvMins.y ) );
+	m_vertices_original[2]=Vertex_PCU( Vec3( -0.4f, 0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMins.x, uvMaxs.y ) );
+
+	m_vertices_original[3]=Vertex_PCU( Vec3( 0.4f, -0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMaxs.x, uvMins.y ) );
+	m_vertices_original[4]=Vertex_PCU( Vec3( 0.4f, 0.4f, 0.f ), Rgba8( 255, 255, 255 ), uvMaxs );
+	m_vertices_original[5]=Vertex_PCU( Vec3( -0.4f, 0.4f, 0.f ), Rgba8( 255, 255, 255 ), Vec2( uvMins.x, uvMaxs.y ) );
+
+	m_orientationDegrees = 0.f;
+}
+
+void Explosion::Update( float deltaSeconds )
+{
+	timeElapsedInSeconds += deltaSeconds;
+
+	if( timeElapsedInSeconds > timeToLive )
+	{
+		Die();
+	}
+}
+
+void Explosion::Render()
+{
+	
+	Texture* texture = render->GetOrCreateTextureFromFile( "Data/Images/Explosion_5x5.png" );
+	SpriteSheet* spriteSheet = new SpriteSheet( *texture, IntVec2( 5, 5 ) );
+	SpriteAnimDefinition anim = SpriteAnimDefinition(*spriteSheet,0,24,timeToLive);
+	const SpriteDefinition& expl = anim.GetSpriteDefAtTime(timeElapsedInSeconds);
+	
+	expl.GetUVs(uvMins,uvMaxs);
+	ResetUvs();
+
+	render->TransformVertexArray( 6, m_vertices, explosionSize, m_orientationDegrees, m_position );
+	render->BindTexture( texture );
+	render->SetBlendMode(BlendMode::ADDITIVE);
+	render->DrawVertexArray( 6, m_vertices );
+	render->BindTexture(nullptr);
+	render->SetBlendMode(BlendMode::ALPHA);
+	ResetVertices();
+
+	delete spriteSheet;
+}
+
+void Explosion::Die()
+{
+	m_isGarbage = true;
+}
+
+void Explosion::ResetVertices()
+{
+	for( int index =0; index<6; index++ )
+	{
+		m_vertices[index] = m_vertices_original[index];
+	}
+}
+
+void Explosion::ResetUvs()
+{
+	m_vertices[0].m_uvTexCoords = uvMins;
+	m_vertices[1].m_uvTexCoords = Vec2( uvMaxs.x, uvMins.y );
+	m_vertices[2].m_uvTexCoords = Vec2( uvMins.x, uvMaxs.y );
+	m_vertices[3].m_uvTexCoords = Vec2( uvMaxs.x, uvMins.y );
+	m_vertices[4].m_uvTexCoords = uvMaxs;
+	m_vertices[5].m_uvTexCoords = Vec2( uvMins.x, uvMaxs.y );
+
+}
