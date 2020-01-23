@@ -43,6 +43,7 @@
     <ClCompile Include="Math\IntVec2.cpp" />
     <ClCompile Include="Math\Mat44.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
+    <ClCompile Include="Math\Poly2D.cpp" />
     <ClCompile Include="Math\RandomNumberGenerator.cpp" />
     <ClCompile Include="Math\RawNoise.cpp" />
     <ClCompile Include="Math\SmoothNoise.cpp" />
@@ -84,6 +85,7 @@
     <ClInclude Include="Math\IntVec2.hpp" />
     <ClInclude Include="Math\Mat44.hpp" />
     <ClInclude Include="Math\MathUtils.hpp" />
+    <ClInclude Include="Math\Poly2D.hpp" />
     <ClInclude Include="Math\RandomNumberGenerator.hpp" />
     <ClInclude Include="Math\RawNoise.hpp" />
     <ClInclude Include="Math\SmoothNoise.hpp" />

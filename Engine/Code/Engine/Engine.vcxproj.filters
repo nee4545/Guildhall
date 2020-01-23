@@ -133,6 +133,9 @@
     <ClCompile Include="Vec4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Poly2D.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">
@@ -276,5 +279,6 @@
     <ClInclude Include="Math\SmoothNoise.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="Math\Poly2D.hpp" />
   </ItemGroup>
 </Project>
