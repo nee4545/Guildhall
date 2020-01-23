@@ -17,6 +17,9 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{2d7cc2f6-d9c7-4da8-b642-79101c130c03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{fe3749a6-2434-47c2-84ef-2fbe7dd090b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -135,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="Math\Poly2D.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Window.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,5 +286,8 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Math\Poly2D.hpp" />
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
