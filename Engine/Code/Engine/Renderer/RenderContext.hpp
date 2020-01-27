@@ -7,11 +7,14 @@
 #include <string>
 #include <vector>
 
+
+
 class BitmapFont;
 class Window;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
+class SwapChain;
 
 enum class BlendMode
 {
@@ -30,6 +33,7 @@ public:
 
 	ID3D11Device* m_device = nullptr;
 	ID3D11DeviceContext* m_context = nullptr;
+	SwapChain* m_swapChain = nullptr;
 
 	
 public:

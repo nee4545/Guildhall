@@ -57,12 +57,14 @@
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\SpriteDefinition.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
+    <ClCompile Include="Renderer\SwapChain.cpp" />
     <ClCompile Include="ThirdParty\tinyxml2.cpp" />
     <ClCompile Include="Vec4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Core\AABB2.hpp" />
+    <ClInclude Include="Core\D3D11Common.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
     <ClInclude Include="Core\ErrorWarningAssert.hpp" />
     <ClInclude Include="Core\EventSystem.hpp" />
@@ -101,6 +103,7 @@
     <ClInclude Include="Renderer\SpriteAnimSet.hpp" />
     <ClInclude Include="Renderer\SpriteDefinition.hpp" />
     <ClInclude Include="Renderer\SpriteSheet.hpp" />
+    <ClInclude Include="Renderer\SwapChain.hpp" />
     <ClInclude Include="ThirdParty\fmod\fmod.h" />
     <ClInclude Include="ThirdParty\fmod\fmod.hpp" />
     <ClInclude Include="ThirdParty\fmod\fmod_codec.h" />

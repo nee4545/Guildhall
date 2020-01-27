@@ -7,23 +7,12 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #define UNUSED(x) (void)(x);
 
-#if !defined(WIN32_LEAN_AND_MEAN) 
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define INITGUID
-#include <d3d11.h>  // d3d11 specific objects
-#include <dxgi.h>   // shared library used across multiple dx graphical interfaces
-#include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
-
-#pragma comment( lib, "d3d11.lib" )         // needed a01
-#pragma comment( lib, "dxgi.lib" )          // needed a01
-#pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shader
+#include "Engine/Core/D3D11Common.hpp"
 
 #define RENDER_DEBUG
-#define  DX_SAFE_RELEASE(ptr) if(nullptr!=ptr) {ptr->Release(); ptr = nullptr;}
 
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
@@ -256,7 +245,7 @@ void RenderContext::Startup( Window* window )
 	memset( &swapchainDesc , 0 , sizeof( swapchainDesc ) );
 	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
 	swapchainDesc.BufferCount = 2;
-	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapchainDesc.Flags = 0;
 	
 	HWND hwnd = ( HWND ) window->m_hwnd;
@@ -271,7 +260,9 @@ void RenderContext::Startup( Window* window )
 	D3D11CreateDeviceAndSwapChain( nullptr , D3D_DRIVER_TYPE_HARDWARE, nullptr ,
 		flags , nullptr , 0 , D3D11_SDK_VERSION , &swapchainDesc , &swapchain , &m_device , nullptr , &m_context );
 
-	swapchain->Release();
+	m_swapChain = new SwapChain( this , swapchain );
+
+	//swapchain->Release();
 }
 
 void RenderContext::Shutdown()
@@ -283,6 +274,9 @@ void RenderContext::Shutdown()
 		m_context->Release();
 		m_context = nullptr;
 	}
+
+	delete m_swapChain;
+	m_swapChain = nullptr;
 }
 
 void RenderContext::BeginFrame()
@@ -293,7 +287,7 @@ void RenderContext::BeginFrame()
 
 void RenderContext::EndFrame()
 {
-
+	m_swapChain->Present();
 }
 
 void RenderContext::BeginCamera(const Camera &camera)
