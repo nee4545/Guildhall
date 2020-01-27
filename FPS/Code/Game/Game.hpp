@@ -13,7 +13,7 @@ class Game
 
 public:
 
-	World* world;
+	World* world = nullptr;
 	Game();
 
 	bool toggleCamera = false;

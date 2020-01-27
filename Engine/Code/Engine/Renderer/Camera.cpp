@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "Engine/Core/Rgba8.hpp"
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {
@@ -22,4 +23,10 @@ void Camera::Translate2D( Vec2 translation2D )
 {
 	bottom_Left+=translation2D;
 	top_Right+=translation2D;
+}
+
+void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*=0.f */ , unsigned int stencil/*=0.f */ )
+{
+	m_clearColor = color;
+	m_clearMode = clearFlags;
 }

@@ -6,6 +6,7 @@
 #include "GameCommon.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Platform/Window.hpp"
 
 RenderContext* render = nullptr;
 //InputSystem* input=nullptr;
@@ -18,6 +19,7 @@ void App:: Startup()
 	render = new RenderContext();
 	render->Startup(g_theWindow);
 	render->BeginFrame();
+	g_theWindow->SetInputSysten( input );
 	/*if(thegame==nullptr )
 	{ 
 	thegame =new Game();
@@ -54,7 +56,7 @@ void App::Update(float deltaSeconds)
 		m_isQuitting=true;
 	}
 
-	HandleQuitRequested();
+	//HandleQuitRequested();
 	
 	//if( input->WasKeyJustPressed( 0x77 ) )
 	//{
