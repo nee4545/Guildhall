@@ -28,8 +28,8 @@ class RenderContext
 
 public:
 
-	ID3D11Device* m_device;
-	ID3D11DeviceContext* m_context;
+	ID3D11Device* m_device = nullptr;
+	ID3D11DeviceContext* m_context = nullptr;
 
 	
 public:
