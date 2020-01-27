@@ -126,7 +126,7 @@ void RunFrame()
 	g_theapp->Update((float)deltaseconds);	
 	g_theapp->Render(); 
 	g_theapp->EndFrame();
-	TheApp_EndFrame();		// can't change to g_app->EndFrame() right now as we use swap buffers which requires variables used in main
+	//TheApp_EndFrame();		// can't change to g_app->EndFrame() right now as we use swap buffers which requires variables used in main
 }
 
 
@@ -144,7 +144,7 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE
 	g_theWindow->Open( APP_NAME , CLIENT_ASPECT , 0.90f ); // feed from blackBoard
 		
 	
-	CreateRenderContext();
+	//CreateRenderContext();
 
 	//TheApp_Startup( applicationInstanceHandle, commandLineString );		// #SD1ToDo: ...becomes:  g_theApp = new App();  AND  g_theApp->Startup();
 	input= new InputSystem();

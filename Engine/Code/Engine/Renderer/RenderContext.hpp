@@ -8,6 +8,10 @@
 #include <vector>
 
 class BitmapFont;
+class Window;
+
+struct ID3D11Device;
+struct ID3D11DeviceContext;
 
 enum class BlendMode
 {
@@ -21,11 +25,17 @@ class RenderContext
 
 	std::map<std::string,Texture*> m_LoadedTextures;
 	std::map<std::string,BitmapFont*> m_LoadedFonts;
+
+public:
+
+	ID3D11Device* m_device;
+	ID3D11DeviceContext* m_context;
+
 	
 public:
 	
 
-	void Startup();
+	void Startup(Window* window);
 	void Shutdown();
 	void BeginFrame();
 	void EndFrame();

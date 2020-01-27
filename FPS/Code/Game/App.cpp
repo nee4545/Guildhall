@@ -16,18 +16,18 @@ RenderContext* render = nullptr;
 void App:: Startup()
 {
 	render = new RenderContext();
-	render->Startup();
+	render->Startup(g_theWindow);
 	render->BeginFrame();
-	if(thegame==nullptr )
+	/*if(thegame==nullptr )
 	{ 
 	thegame =new Game();
-	}
+	}*/
 	
 }
 
 void App::Shutdown() //Not used right now
 {
-	
+	render->Shutdown();
 }
 
 
@@ -47,19 +47,19 @@ void App::Update(float deltaSeconds)
 
 	
 	
-	thegame->Update(deltaSeconds);
+	//thegame->Update(deltaSeconds);
 
 	if( input->WasKeyJustPressed( VK_ESCAPE ) )
 	{
 		m_isQuitting=true;
 	}
 
+	HandleQuitRequested();
 	
-	
-	if( input->WasKeyJustPressed( 0x77 ) )
-	{
-		ResetGame();
-	}
+	//if( input->WasKeyJustPressed( 0x77 ) )
+	//{
+	//	ResetGame();
+	//}
 
 }
 
@@ -77,8 +77,8 @@ void App::EndFrame() //Not used right now
 void App::Render() const
 {
 
-	render->ClaerScreen(Rgba8(0,0,0,1));
-	thegame->Render();
+	/*render->ClaerScreen(Rgba8(0,0,0,1));
+	thegame->Render();*/
 }
 
 
@@ -102,8 +102,8 @@ bool App::HandleQuitRequested()
 
 void App::ResetGame()
 {
-	delete(thegame);
+	/*delete(thegame);
 	thegame=nullptr;
-	thegame=new Game();
+	thegame=new Game();*/
 }
 

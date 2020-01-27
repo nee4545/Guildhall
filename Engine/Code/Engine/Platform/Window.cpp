@@ -150,6 +150,9 @@ bool Window::Open( std::string const& title , float clientAspect , float ratioOf
 	HCURSOR cursor = LoadCursor( NULL , IDC_ARROW );
 	SetCursor( cursor );
 
+	m_width = (int)clientWidth;
+	m_height = (int)clientHeight;
+	m_hwnd = ( void* ) hWnd;
 	return true;
 }
 

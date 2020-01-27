@@ -3,9 +3,12 @@
 #include "Game/App.hpp"
 #include "Engine/Input/InputSystem.hpp"
 
+class Window;
+
 constexpr float CLIENT_ASPECT = 16.f/9.f; // We are requesting a 2:1 aspect (square) window area
 extern RenderContext* render;
 extern App* g_theapp;
+extern Window* g_theWindow;
 extern InputSystem* input;
 
 constexpr int NUM_STARTING_ASTEROIDS = 6;

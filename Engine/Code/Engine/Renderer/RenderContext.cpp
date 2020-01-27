@@ -6,7 +6,25 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Platform/Window.hpp"
 #define UNUSED(x) (void)(x);
+
+#if !defined(WIN32_LEAN_AND_MEAN) 
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#define INITGUID
+#include <d3d11.h>  // d3d11 specific objects
+#include <dxgi.h>   // shared library used across multiple dx graphical interfaces
+#include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
+
+#pragma comment( lib, "d3d11.lib" )         // needed a01
+#pragma comment( lib, "dxgi.lib" )          // needed a01
+#pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shader
+
+#define RENDER_DEBUG
+#define  DX_SAFE_RELEASE(ptr) if(nullptr!=ptr) {ptr->Release(); ptr = nullptr;}
+
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
@@ -223,14 +241,48 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 	return temp;
 }
 
-void RenderContext::Startup()
+void RenderContext::Startup( Window* window )
 {
+	//Instance - singleton
+	IDXGISwapChain* swapchain = nullptr; 
+
+	UINT flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+
+	 #if defined(RENDER_DEBUG)
+	 flags |= D3D11_CREATE_DEVICE_DEBUG;
+	 #endif
+
+	DXGI_SWAP_CHAIN_DESC swapchainDesc;
+	memset( &swapchainDesc , 0 , sizeof( swapchainDesc ) );
+	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
+	swapchainDesc.BufferCount = 2;
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapchainDesc.Flags = 0;
 	
+	HWND hwnd = ( HWND ) window->m_hwnd;
+	swapchainDesc.OutputWindow = hwnd;
+	swapchainDesc.SampleDesc.Count = 1;
+	swapchainDesc.Windowed = TRUE;
+	swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapchainDesc.BufferDesc.Width = window->GetClientWidth();
+	swapchainDesc.BufferDesc.Height = window->GetClientHeight();
+
+
+	D3D11CreateDeviceAndSwapChain( nullptr , D3D_DRIVER_TYPE_HARDWARE, nullptr ,
+		flags , nullptr , 0 , D3D11_SDK_VERSION , &swapchainDesc , &swapchain , &m_device , nullptr , &m_context );
+
+	swapchain->Release();
 }
 
 void RenderContext::Shutdown()
 {
-
+	if ( m_device != nullptr )
+	{
+		m_device->Release();
+		m_device = nullptr;
+		m_context->Release();
+		m_context = nullptr;
+	}
 }
 
 void RenderContext::BeginFrame()
