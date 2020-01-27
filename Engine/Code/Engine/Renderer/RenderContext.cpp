@@ -8,6 +8,7 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Renderer/TextureView.hpp"
 #define UNUSED(x) (void)(x);
 
 #include "Engine/Core/D3D11Common.hpp"
@@ -295,8 +296,10 @@ void RenderContext::BeginCamera(const Camera &camera)
 	//glLoadIdentity();
 	//glOrtho(camera.GetOrthoBottomLeft().x,camera.GetOrthoTopRight().x,camera.GetOrthoBottomLeft().y,camera.GetOrthoTopRight().y,0.f,1.f);
 	//
-	UNUSED( camera );
-	GUARANTEE_OR_DIE( false , "begin camera" );
+	//UNUSED( camera );
+
+	ClaerScreen(Rgba8(100,0,0,255));
+	//GUARANTEE_OR_DIE( false , "begin camera" );
 }
 
 void RenderContext::EndCamera( const Camera& camera )
@@ -356,8 +359,19 @@ void RenderContext::ClaerScreen( const Rgba8 clearColor )
 {
 	/*glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(float(clearColor.r),float(clearColor.g),float(clearColor.b),float(clearColor.a));*/
+	float clearFloats[ 4 ];
+	clearFloats[ 0 ] = ( float ) clearColor.r / 255.0f;
+	clearFloats[ 1 ] = ( float ) clearColor.g / 255.0f;
+	clearFloats[ 2 ] = ( float ) clearColor.b / 255.0f;
+	clearFloats[ 3 ] = ( float ) clearColor.a / 255.0f;
 
-	GUARANTEE_OR_DIE( false , "clrscr" );
+	Texture* backbuffer = m_swapChain->GetBackBuffer();
+	TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+
+	m_context->ClearRenderTargetView( rtv , clearFloats );
+
+	//GUARANTEE_OR_DIE( false , "clrscr" );
 
 }
 

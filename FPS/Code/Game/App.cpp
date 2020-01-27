@@ -20,10 +20,10 @@ void App:: Startup()
 	render->Startup(g_theWindow);
 	render->BeginFrame();
 	g_theWindow->SetInputSysten( input );
-	/*if(thegame==nullptr )
-	{ 
-	thegame =new Game();
-	}*/
+	if ( thegame == nullptr )
+	{
+		thegame = new Game();
+	}
 	
 }
 
@@ -79,8 +79,8 @@ void App::EndFrame() //Not used right now
 void App::Render() const
 {
 
-	/*render->ClaerScreen(Rgba8(0,0,0,1));
-	thegame->Render();*/
+	/*render->ClaerScreen(Rgba8(0,0,0,1));*/
+	thegame->Render();
 }
 
 

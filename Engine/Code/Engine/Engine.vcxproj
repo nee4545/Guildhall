@@ -58,6 +58,7 @@
     <ClCompile Include="Renderer\SpriteDefinition.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
     <ClCompile Include="Renderer\SwapChain.cpp" />
+    <ClCompile Include="Renderer\TextureView.cpp" />
     <ClCompile Include="ThirdParty\tinyxml2.cpp" />
     <ClCompile Include="Vec4.cpp" />
   </ItemGroup>
@@ -104,6 +105,7 @@
     <ClInclude Include="Renderer\SpriteDefinition.hpp" />
     <ClInclude Include="Renderer\SpriteSheet.hpp" />
     <ClInclude Include="Renderer\SwapChain.hpp" />
+    <ClInclude Include="Renderer\TextureView.hpp" />
     <ClInclude Include="ThirdParty\fmod\fmod.h" />
     <ClInclude Include="ThirdParty\fmod\fmod.hpp" />
     <ClInclude Include="ThirdParty\fmod\fmod_codec.h" />

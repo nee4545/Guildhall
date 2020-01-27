@@ -9,11 +9,32 @@ SwapChain::SwapChain( RenderContext* owner , IDXGISwapChain* handle ):m_owner(ow
 
 SwapChain::~SwapChain()
 {
+	delete m_backbuffer;
+	m_backbuffer = nullptr;
+
 	DX_SAFE_RELEASE( m_handle );
+	delete m_owner;
+	m_owner = nullptr;
 }
 
 void SwapChain::Present( int vsync /*= 0 */ )
 {
 	m_handle->Present( 0 , 0 );
+}
+
+Texture* SwapChain::GetBackBuffer()
+{
+	if ( m_backbuffer != nullptr )
+	{
+		return m_backbuffer;
+	}
+
+	ID3D11Texture2D* texHandle = nullptr;
+
+	m_handle->GetBuffer( 0 , __uuidof( ID3D11Texture2D ) , ( void** ) & texHandle );
+
+	m_backbuffer = new Texture( m_owner , texHandle );
+
+	return m_backbuffer;
 }
 
