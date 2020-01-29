@@ -285,9 +285,6 @@
     <ClInclude Include="Renderer\SpriteAnimSet.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Math\SmoothNoise.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Poly2D.hpp" />
     <ClInclude Include="Platform\Window.hpp">
       <Filter>Platform</Filter>
@@ -302,6 +299,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\TextureView.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\SmoothNoise.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>

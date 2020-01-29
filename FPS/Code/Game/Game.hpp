@@ -10,6 +10,8 @@ class Game
 {
 	RandomNumberGenerator rng;
 	Camera* m_camera = nullptr;
+	float m_rColorValue = 0.f;
+	
 
 public:
 

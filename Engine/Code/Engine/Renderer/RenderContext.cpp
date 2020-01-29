@@ -298,7 +298,7 @@ void RenderContext::BeginCamera(const Camera &camera)
 	//
 	//UNUSED( camera );
 
-	ClaerScreen(Rgba8(100,0,0,255));
+	ClaerScreen(camera.GetClearColor());
 	//GUARANTEE_OR_DIE( false , "begin camera" );
 }
 

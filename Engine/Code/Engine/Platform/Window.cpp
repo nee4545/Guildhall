@@ -18,7 +18,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	{
 		//make window do it
 		//g_theapp->HandleQuitRequested();
-
+		window->QuitWindow();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
@@ -157,6 +157,9 @@ bool Window::Open( std::string const& title , float clientAspect , float ratioOf
 	HCURSOR cursor = LoadCursor( NULL , IDC_ARROW );
 	SetCursor( cursor );
 
+	//SetWindowLong( hWnd , GWL_EXSTYLE , WS_EX_LAYERED );
+	//SetLayeredWindowAttributes( hWnd , RGB( 0 , 0 , 0 ) , 128,LWA_ALPHA );
+
 	m_width = (int)clientWidth;
 	m_height = (int)clientHeight;
 	m_hwnd = ( void* ) hWnd;
@@ -178,6 +181,11 @@ void Window::Close()
 void Window::SetInputSysten( InputSystem* input )
 {
 	m_input = input;
+}
+
+void Window::QuitWindow()
+{
+	m_quitRequested = true;
 }
 
 void Window::BeginFrame()

@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#define UNUSED(x) (void)(x);
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {
@@ -29,4 +30,11 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*
 {
 	m_clearColor = color;
 	m_clearMode = clearFlags;
+	UNUSED( depth );
+	UNUSED( stencil );
+}
+
+Rgba8 Camera::GetClearColor() const
+{
+	return m_clearColor;
 }

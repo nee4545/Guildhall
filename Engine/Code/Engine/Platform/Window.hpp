@@ -7,9 +7,10 @@ class Window
 {
 public:
 	void* m_hwnd = nullptr;
-	InputSystem* m_input;
+	InputSystem* m_input = nullptr;
 	int m_width=0;
 	int m_height=0;
+	bool m_quitRequested = false;
 
 	explicit Window();
 	~Window();
@@ -17,6 +18,9 @@ public:
 	bool Open( std::string const& title , float aspectRatio , float ratioOfHeight );
 	void Close();
 	void SetInputSysten( InputSystem* input );
+	void QuitWindow();
+
+
 	InputSystem* GetInputSystem() const { return m_input; }
 
 	inline int GetClientWidth() const { return m_width; }

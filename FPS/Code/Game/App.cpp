@@ -47,13 +47,18 @@ void App::Update(float deltaSeconds)
 		deltaSeconds*=0.1f;
 	}
 
-	
+	thegame->Update( deltaSeconds );
 	
 	//thegame->Update(deltaSeconds);
 
 	if( input->WasKeyJustPressed( VK_ESCAPE ) )
 	{
 		m_isQuitting=true;
+	}
+
+	if ( g_theWindow->m_quitRequested == true )
+	{
+		HandleQuitRequested();
 	}
 
 	//HandleQuitRequested();

@@ -1,6 +1,7 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/D3D11Common.hpp"
+#define UNUSED(x) (void)(x);
 
 SwapChain::SwapChain( RenderContext* owner , IDXGISwapChain* handle ):m_owner(owner),m_handle(handle)
 {
@@ -20,6 +21,7 @@ SwapChain::~SwapChain()
 void SwapChain::Present( int vsync /*= 0 */ )
 {
 	m_handle->Present( 0 , 0 );
+	UNUSED( vsync );
 }
 
 Texture* SwapChain::GetBackBuffer()

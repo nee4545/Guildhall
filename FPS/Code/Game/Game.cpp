@@ -22,8 +22,18 @@ Game::Game()
 
 void Game::Update( float deltaseconds )
 {
+	m_rColorValue += deltaseconds;
+
+	if ( m_rColorValue > 1.0f )
+	{
+		m_rColorValue = 0.f;
+	}
+
+
+	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( (unsigned char)(100 * m_rColorValue) , 0 , 0 , 0 ) , 0.f , 0 );
+
+	//render->ClaerScreen( Rgba8( 100 , 0 , 0 , 0 ) );
 	
-	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( 100 , 0 , 0 , 255 ) , 0.f , 0 );
 }
 
 void Game::Render()
