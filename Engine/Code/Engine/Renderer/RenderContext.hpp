@@ -11,6 +11,7 @@
 
 class BitmapFont;
 class Window;
+class Shader;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -34,6 +35,7 @@ public:
 	ID3D11Device* m_device = nullptr;
 	ID3D11DeviceContext* m_context = nullptr;
 	SwapChain* m_swapChain = nullptr;
+	Shader* m_currentShader = nullptr;
 
 	
 public:
@@ -43,6 +45,8 @@ public:
 	void Shutdown();
 	void BeginFrame();
 	void EndFrame();
+
+	void Draw( int numVertexes , int vertexOffset );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray(const std::vector<Vertex_PCU> &verts);
 

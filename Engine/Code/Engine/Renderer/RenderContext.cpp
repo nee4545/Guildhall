@@ -9,6 +9,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #define UNUSED(x) (void)(x);
 
 #include "Engine/Core/D3D11Common.hpp"
@@ -263,6 +264,9 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
+	m_currentShader = new Shader();
+	m_currentShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
+
 	//swapchain->Release();
 }
 
@@ -289,6 +293,11 @@ void RenderContext::BeginFrame()
 void RenderContext::EndFrame()
 {
 	m_swapChain->Present();
+}
+
+void RenderContext::Draw( int numVertexes , int vertexOffset )
+{
+	m_context->Draw( numVertexes , vertexOffset );
 }
 
 void RenderContext::BeginCamera(const Camera &camera)
