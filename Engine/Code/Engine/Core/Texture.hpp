@@ -15,7 +15,8 @@ private:
 	RenderContext* m_owner = nullptr;
 	ID3D11Texture2D* m_handle = nullptr;
 	TextureView* m_renderTargetView = nullptr;
-	IntVec2 dimensions;
+	IntVec2 m_texelSizeCoords;
+	IntVec2 m_dimensions;
 	
 
 public:
@@ -25,5 +26,7 @@ public:
 	Texture( RenderContext* ctx , ID3D11Texture2D* handle );
 	TextureView* GetRenderTargetView();
 	unsigned int GetTextureID()const;
-	const IntVec2 GetDimensions() const { return dimensions;}
+	const IntVec2 GetDimensions() const { return m_dimensions;}
+
+	IntVec2 GetTexelSizeCoords() const;
 };

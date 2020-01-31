@@ -4,7 +4,7 @@
 #include "Engine/Renderer/TextureView.hpp"
 
 
-Texture::Texture( const char* filePath, unsigned int texID, IntVec2 size ):imageFilePath(filePath),textureID(texID),dimensions(size)
+Texture::Texture( const char* filePath, unsigned int texID, IntVec2 size ):imageFilePath(filePath),textureID(texID),m_dimensions(size)
 {
 	
 }
@@ -13,7 +13,10 @@ Texture::Texture( const char* filePath, unsigned int texID, IntVec2 size ):image
 
 Texture::Texture( RenderContext* ctx , ID3D11Texture2D* handle ):m_owner(ctx),m_handle(handle)
 {
+	D3D11_TEXTURE2D_DESC desc;
+	handle->GetDesc( &desc );
 
+	m_texelSizeCoords = IntVec2( desc.Width , desc.Height );
 }
 
 TextureView* Texture::GetRenderTargetView()
@@ -51,4 +54,9 @@ Texture::~Texture()
 unsigned int Texture::GetTextureID() const
 {
 	return textureID;
+}
+
+IntVec2 Texture::GetTexelSizeCoords() const
+{
+	return m_texelSizeCoords;
 }

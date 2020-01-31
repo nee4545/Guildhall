@@ -41,6 +41,7 @@ void Game::Render()
 	
 	render->BeginCamera(*m_camera);
 	
+	render->Draw( 3 , 0 );
 	//world->Render();
 	render->EndCamera(*m_camera);
 	

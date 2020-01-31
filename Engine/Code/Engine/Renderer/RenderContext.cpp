@@ -264,7 +264,7 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	m_currentShader = new Shader();
+	m_currentShader = new Shader(this);
 	m_currentShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
 
 	//swapchain->Release();
@@ -272,6 +272,12 @@ void RenderContext::Startup( Window* window )
 
 void RenderContext::Shutdown()
 {
+
+	if ( m_currentShader != nullptr )
+	{
+		delete m_currentShader;
+		m_currentShader = nullptr;
+	}
 	if ( m_device != nullptr )
 	{
 		m_device->Release();
@@ -297,6 +303,28 @@ void RenderContext::EndFrame()
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
+	Texture* texture = m_swapChain->GetBackBuffer();
+	TextureView* view = texture->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+
+	IntVec2 textureDimensions = texture->GetTexelSizeCoords();
+
+	D3D11_VIEWPORT viewport;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = textureDimensions.x;
+	viewport.Height = textureDimensions.y;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	//This is temporary
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->RSSetViewports( 1 , &viewport );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
+	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
 	m_context->Draw( numVertexes , vertexOffset );
 }
 
