@@ -51,6 +51,31 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 	//input->HandleKeyPressed((unsigned char)wParam);
 	switch( wmMessageCode )
 	{
+
+	case WM_LBUTTONUP:
+		{
+			g_theInput->HandleLeftMouseButtonReleased();
+			break;
+		}
+	
+	case WM_LBUTTONDOWN:
+	{
+		g_theInput->HandleLeftMouseButtonPressed();
+		break;
+	}
+
+	case WM_RBUTTONDOWN:
+	{
+		g_theInput->HandelRightMouseButtonPressed();
+		break;
+	}
+
+	case WM_RBUTTONUP:
+	{
+		g_theInput->HandleRightMouseButtonReleased();
+		break;
+	}
+
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 		case WM_CLOSE:
 		{

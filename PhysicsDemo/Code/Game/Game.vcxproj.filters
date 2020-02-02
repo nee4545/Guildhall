@@ -16,6 +16,9 @@
     <ClCompile Include="Game.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -26,5 +29,6 @@
     </ClInclude>
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
+    <ClInclude Include="GameObject.hpp" />
   </ItemGroup>
 </Project>

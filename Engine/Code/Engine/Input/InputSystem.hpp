@@ -47,6 +47,7 @@ private:
 	KeyButtonState m_leftMousebutton;
 	KeyButtonState m_rightMousebutton;
 
+
 	XboxController m_Cotrollers[MAX_XBOX_CONTROLLERS] =
 	{
 		XboxController(0),
