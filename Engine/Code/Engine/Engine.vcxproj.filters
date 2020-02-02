@@ -17,6 +17,9 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{2d7cc2f6-d9c7-4da8-b642-79101c130c03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{2d077640-7b77-4e34-8547-dd1410927d55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -132,6 +135,18 @@
     </ClCompile>
     <ClCompile Include="Vec4.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\RigidBody2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\DiscCollider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Physics2D.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +290,18 @@
     </ClInclude>
     <ClInclude Include="Math\SmoothNoise.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Physics2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\RigidBody2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\DiscCollider2D.hpp">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
