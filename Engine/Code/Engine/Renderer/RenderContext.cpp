@@ -312,8 +312,8 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 	D3D11_VIEWPORT viewport;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
-	viewport.Width = textureDimensions.x;
-	viewport.Height = textureDimensions.y;
+	viewport.Width = (float)textureDimensions.x;
+	viewport.Height = (float)textureDimensions.y;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
