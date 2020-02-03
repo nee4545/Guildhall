@@ -5,6 +5,7 @@
 void Rigidbody2D::Destroy()
 {
 	m_isGarbage = true;
+	m_collider->Destroy();
 }
 
 void Rigidbody2D::TakeCollider( Collider2D* collider )
