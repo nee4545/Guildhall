@@ -25,7 +25,9 @@ DiscCollider2D::~DiscCollider2D()
 
 void DiscCollider2D::UpdateWorldShape()
 {
-	m_worldPosition = m_rigidbody->m_worldPosition+m_localPosition;
+	//m_worldPosition = m_rigidbody->m_worldPosition+m_localPosition;
+	Vec2 worldPos = m_rigidbody->GetWorldPosition();
+	m_worldPosition = worldPos + m_localPosition;
 }
 
 Vec2 DiscCollider2D::GetClosestPoint( Vec2 pos ) const
@@ -52,6 +54,6 @@ bool DiscCollider2D::Intersects( Collider2D const* other ) const
 
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
+	ctx->DrawRing( m_worldPosition , m_radius , borderColor , 0.3f );
 	ctx->DrawDisc( m_worldPosition , m_radius , fillColor );
-	ctx->DrawRing( m_worldPosition , m_radius , borderColor , 0.2f );
 }

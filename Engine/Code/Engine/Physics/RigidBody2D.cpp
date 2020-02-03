@@ -10,6 +10,7 @@ void Rigidbody2D::Destroy()
 void Rigidbody2D::TakeCollider( Collider2D* collider )
 {
 	m_collider = collider;
+	m_collider->m_rigidbody = this;
 }
 
 void Rigidbody2D::SetCollider( Collider2D* collider )

@@ -15,7 +15,6 @@ class DiscCollider2D : public Collider2D
 public:
 	DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType , Vec2 localPosition , float radius = 1.f );
 	DiscCollider2D( Vec2 localPosition , float radius );
-	virtual ~DiscCollider2D() override;
 
 	virtual void UpdateWorldShape() override; // UpdateShape world location when the rigidbody moves.
 
@@ -29,6 +28,10 @@ public:
 	Vec2	m_localPosition = Vec2(0.f,0.f); // my local offset from my parent
 	Vec2	m_worldPosition = Vec2(0.f,0.f); // calculated from local position and owning rigidbody if present
 	float	m_radius =0;
+
+protected:
+	virtual ~DiscCollider2D() override;
+	
 };
 
 //---------------

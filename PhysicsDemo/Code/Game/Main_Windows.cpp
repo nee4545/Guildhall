@@ -52,6 +52,12 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 	switch( wmMessageCode )
 	{
 
+	case WM_MOUSEWHEEL:
+	{
+		g_theInput->SetMouseWheelData( (int) GET_WHEEL_DELTA_WPARAM( wParam ) );
+		break;
+	}
+
 	case WM_LBUTTONUP:
 		{
 			g_theInput->HandleLeftMouseButtonReleased();

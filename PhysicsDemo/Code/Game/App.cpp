@@ -73,6 +73,7 @@ void App::EndFrame() //Not used right now
 {
 	g_theInput->EndFrame();
 	g_theRenderer->EndFrame();
+	thegame->EndFrame();
 }
 
 void App::Render() const

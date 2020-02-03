@@ -15,11 +15,14 @@ public:
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
 	void SetOutputsize( Vec2 size );
+	float GetCameraHeight();
 	void SetPosition( Vec2 position );
+	Vec2 GetPosition() { return m_pos; }
+	Vec2 GetOutputSize() { return m_outpitsize; }
 	void SetOrthoViewForCameraPosition();
 	void SetProjectionOrthographic( float height , float nearZ = -1.f , float farZ = 1.f );
 	float GetAspectRatio() const;
-	void ClientToWorldPosition( Vec2 clientPos );
+	Vec2 ClientToWorldPosition( Vec2 clientPos );
 
 	void Translate2D(Vec2 translation2D);
 

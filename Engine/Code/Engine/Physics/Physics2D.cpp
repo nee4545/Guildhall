@@ -17,7 +17,35 @@ void Physics2D::Update()
 
 void Physics2D::EndFrame()
 {
+	for ( int index = 0; index < m_colliders2D.size(); index++ )
+	{
+		if ( m_colliders2D[ index ] == nullptr )
+		{
+			continue;
+		}
+		if ( m_colliders2D[ index ]->m_isGarbage )
+		{
+			delete m_colliders2D[ index ];
+			m_colliders2D[ index ] = nullptr;
+		}
+	}
 
+	for ( int index = 0; index < m_rigidBodies2D.size(); index++ )
+	{
+		if ( m_rigidBodies2D[ index ] == nullptr )
+		{
+			continue;
+		}
+		if ( m_rigidBodies2D[ index ]->m_isGarbage )
+		{
+			if ( m_rigidBodies2D[ index ]->m_collider != nullptr )
+			{
+				m_rigidBodies2D[ index ]->m_collider->Destroy();
+			}
+			delete m_rigidBodies2D[ index ];
+			m_rigidBodies2D[ index ] = nullptr;
+		}
+	}
 }
 
 Rigidbody2D* Physics2D::CreateRigidbody()

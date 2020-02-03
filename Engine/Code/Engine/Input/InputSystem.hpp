@@ -40,6 +40,8 @@ public:
 	Vec2 GetCurrentMousePosition() { return m_mouseNormalizedClientPos; }
 
 	void UpdateMouse();
+	int GetMouseWheelData();
+	void SetMouseWheelData( int data );
 
 private:
 
@@ -57,6 +59,7 @@ private:
 	};
 
 	Vec2 m_mouseNormalizedClientPos;
+	int m_mouseWheelData = 0;
 	
 
 
