@@ -12,6 +12,7 @@
 class BitmapFont;
 class Window;
 class Shader;
+class VertexBuffer;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -36,6 +37,8 @@ public:
 	ID3D11DeviceContext* m_context = nullptr;
 	SwapChain* m_swapChain = nullptr;
 	Shader* m_currentShader = nullptr;
+	Shader* m_defaultShader = nullptr;
+	VertexBuffer* m_immediateVBO = nullptr;
 
 	
 public:
@@ -55,6 +58,9 @@ public:
 	void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2 centre, float radius, Rgba8 color, float thickness );
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
+
+	void BindShader( Shader* shader );
+	void BindVertexInput( VertexBuffer* vbo );
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);

@@ -10,6 +10,9 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
+
+
 #define UNUSED(x) (void)(x);
 
 #include "Engine/Core/D3D11Common.hpp"
@@ -19,21 +22,21 @@
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
-	/*glBegin(GL_TRIANGLES);
-	{
-		for( int vertIndex=0; vertIndex<numVertexes; vertIndex++ )
-		{
-			const Vertex_PCU& vert = vertexes[ vertIndex ];
-			glTexCoord2f(vert.m_uvTexCoords.x,vert.m_uvTexCoords.y);
-			glColor4ub(vert.m_color.r,vert.m_color.g,vert.m_color.b,vert.m_color.a);
-			glVertex3f(vert.m_position.x,vert.m_position.y,vert.m_position.z);
-		}
+	//RenderBuffer* m_immediateVBO;
 
-	}
-	glEnd();*/
-	UNUSED( vertexes );
-	UNUSED( numVertexes );
-	GUARANTEE_OR_DIE( false , "DrawVertexArray" );
+	//Update a vertex buffer
+	size_t bufferByteSize = numVertexes * sizeof( Vertex_PCU );
+	size_t elementSize = sizeof( Vertex_PCU );
+	m_immediateVBO->Update( vertexes , bufferByteSize , elementSize );
+
+	//Bind 
+
+		BindVertexInput( m_immediateVBO );
+
+
+		Draw( numVertexes , 0 );
+
+
 }
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU> &verts )
@@ -169,6 +172,25 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
+void RenderContext::BindShader( Shader* shader )
+{
+	m_currentShader = shader;
+
+	if ( m_currentShader == nullptr )
+	{
+		m_currentShader = m_defaultShader;
+	}
+}
+
+void RenderContext::BindVertexInput( VertexBuffer* vbo )
+{
+	ID3D11Buffer* vboHandle = vbo->m_handle;
+	unsigned int stride = sizeof( Vertex_PCU );
+	unsigned int offset = 0;
+
+	m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
+}
+
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 {
 	UNUSED( imageFilePath );
@@ -264,19 +286,23 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	m_currentShader = new Shader(this);
-	m_currentShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
+	m_defaultShader = new Shader(this);
+	m_defaultShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
 
+	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	//swapchain->Release();
 }
 
 void RenderContext::Shutdown()
 {
 
-	if ( m_currentShader != nullptr )
+	delete m_immediateVBO;
+	m_immediateVBO = nullptr;
+
+	if ( m_defaultShader != nullptr )
 	{
-		delete m_currentShader;
-		m_currentShader = nullptr;
+		delete m_defaultShader;
+		m_defaultShader = nullptr;
 	}
 	if ( m_device != nullptr )
 	{
@@ -337,6 +363,8 @@ void RenderContext::BeginCamera(const Camera &camera)
 
 	ClaerScreen(camera.GetClearColor());
 	//GUARANTEE_OR_DIE( false , "begin camera" );
+
+	BindShader( nullptr );
 }
 
 void RenderContext::EndCamera( const Camera& camera )

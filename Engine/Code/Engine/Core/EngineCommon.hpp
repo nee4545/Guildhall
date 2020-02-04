@@ -14,3 +14,5 @@ extern HWND g_hWnd;
 
 const Vec2 ALIGN_CENTERED = Vec2( 0.5f, 0.5f );
 const Vec2 ALIGN_BOTTOM_LEFT = Vec2( 0.0f, 0.0f );
+
+

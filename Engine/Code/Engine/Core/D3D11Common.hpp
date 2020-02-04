@@ -13,3 +13,4 @@
 #pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shader
 
 #define  DX_SAFE_RELEASE(ptr) if(nullptr!=ptr) {ptr->Release(); ptr = nullptr;}
+

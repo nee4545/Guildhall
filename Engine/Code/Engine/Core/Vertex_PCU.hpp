@@ -11,14 +11,12 @@ struct Vertex_PCU
 	Vec3 m_position;
     Rgba8 m_color;
 	Vec2 m_uvTexCoords;
-	Vec2 m_pos;
 
 	Vertex_PCU() = default;
 	~Vertex_PCU(){};
 
 	 explicit Vertex_PCU( const Vec3& position, const Rgba8& tint, const Vec2& uvTexCoords );
 	
-	 explicit  Vertex_PCU( const Vec2& position, const Rgba8& tint, const Vec2 uvTexCoords);
 
 };
 

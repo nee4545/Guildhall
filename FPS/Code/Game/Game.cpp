@@ -38,10 +38,13 @@ void Game::Update( float deltaseconds )
 
 void Game::Render()
 {
+	Vertex_PCU* temp = new Vertex_PCU();
+	
 	
 	render->BeginCamera(*m_camera);
 	
 	render->Draw( 3 , 0 );
+	render->DrawVertexArray( 3 , temp );
 	//world->Render();
 	render->EndCamera(*m_camera);
 	

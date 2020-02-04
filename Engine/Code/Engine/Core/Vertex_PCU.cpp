@@ -10,12 +10,7 @@ m_uvTexCoords=uvTexCoords;
 }
 
 
- Vertex_PCU::Vertex_PCU( const Vec2& position, const Rgba8& tint, const Vec2 uvTexCoords )
- {
-	 m_pos=position;
-	 m_color=tint;
-	 m_uvTexCoords=uvTexCoords;
- }
+ 
 
  void AppendAABB2( std::vector<Vertex_PCU>& verts, AABB2& aabb, const Rgba8& tint )
  {
