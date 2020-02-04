@@ -29,6 +29,11 @@ void Rigidbody2D::SetPosition( Vec2 position )
 	m_worldPosition = position;
 }
 
+void Rigidbody2D::MarkForDestroy()
+{
+	m_isGarbage = true;
+}
+
 Rigidbody2D::~Rigidbody2D()
 {
 

@@ -57,3 +57,8 @@ void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor 
 	ctx->DrawRing( m_worldPosition , m_radius , borderColor , 0.3f );
 	ctx->DrawDisc( m_worldPosition , m_radius , fillColor );
 }
+
+void DiscCollider2D::MarkForDestroy()
+{
+	m_isGarbage = true;
+}

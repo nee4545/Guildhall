@@ -35,13 +35,15 @@ public:
 
 protected:
 	virtual ~Collider2D() {}; // private - make sure this is virtual so correct deconstructor gets called
+	bool				m_isGarbage = false;
 
 public:
+
+	virtual void MarkForDestroy() =0;
 
 public:
 	COLLIDER2D_TYPE		m_colliderType;				// keep track of the type - will help with collision later
 	Physics2D* m_system;                   // system who created or destr
 	Rigidbody2D* m_rigidbody = nullptr;		// owning rigidbody, used for calculating world shape
-	bool				m_isGarbage = false;
 };
 

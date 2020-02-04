@@ -59,12 +59,21 @@ void Physics2D::DestroyRigidbody( Rigidbody2D* rigidbody )
 {
 	for ( int index = 0; index < m_rigidBodies2D.size(); index++ )
 	{
+		if ( m_rigidBodies2D[ index ] == nullptr )
+		{
+			continue;
+		}
+
 		if ( rigidbody == m_rigidBodies2D[ index ] )
 		{
-			delete m_rigidBodies2D[ index ];
-			m_rigidBodies2D[ index ] = nullptr;
-			break;
+			if ( m_rigidBodies2D[ index ]->m_collider != nullptr )
+			{
+				m_rigidBodies2D[ index ]->m_collider->MarkForDestroy();
+			}
+
+			m_rigidBodies2D[ index ]->MarkForDestroy();
 		}
+
 	}
 }
 
@@ -81,11 +90,14 @@ void Physics2D::DestroyCollider( Collider2D* collider )
 {
 	for ( int index = 0; index < m_colliders2D.size(); index++ )
 	{
+
+		if ( m_colliders2D[ index ] == nullptr )
+		{
+			continue;
+		}
 		if ( collider == m_colliders2D[ index ] )
 		{
-			delete m_colliders2D[ index ];
-			m_colliders2D[ index ] = nullptr;
-			break;
+			m_colliders2D[ index ]->MarkForDestroy();
 		}
 	}
 }
