@@ -159,4 +159,26 @@ Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , unsigned int pointCo
 
 }
 
+//Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , unsigned int pointCount )
+//{
+//	//Get rightmost point on the point cloud
+//	//Get bottom most point on the point cloud
+//	//make an edge out of it
+//	//From that make all edges on the point cloud and choose the one that has max 
+//
+//	Vec2 rightMostVertex = points[ 0 ];
+//	Vec2 downMostVertex = points[ 1 ];
+//
+//	for ( int index = 0; index < pointCount; index++ )
+//	{
+//		if ( points[ index ].x > rightMostVertex.x )
+//		{
+//			rightMostVertex = points[ index ];
+//		}
+//	}
+//
+//	
+//	
+//
+//}
 
