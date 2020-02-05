@@ -31,6 +31,7 @@ int GetTaxicabDistance2D(const IntVec2& positionA, const IntVec2& positionB);
 bool DoDiscsOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB);
 bool DoSpheresOverlap(const Vec3& centerA, float radiusA, const Vec3& centerB, float radiusB);
 bool DoOBBAndOBBOverlap2D( const OBB2& box1 , const OBB2& box2 );
+//bool DoDiscAndPolygonOverlap( const Vec2& discCenter , float discRadius , const Polygon2D& polygon );
 
 
 //SRT functions
@@ -90,7 +91,6 @@ float SmoothStop3( float t );
 float SmoothStop4( float t );
 float SmoothStop5( float t );
 float SmoothStep3( float t );
-
 
 
 

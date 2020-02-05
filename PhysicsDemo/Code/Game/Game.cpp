@@ -10,7 +10,7 @@
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/RigidBody2D.hpp"
-
+#include "Engine/Core/Polygon2D.hpp"
 
 
 
@@ -26,6 +26,8 @@ Game::Game()
 	m_rng = RandomNumberGenerator();
 	StartUp();
 	PopulateInitialObjects();
+
+
 }
 
 void Game::StartUp()
@@ -307,6 +309,7 @@ void Game::Update( float deltaseconds )
 void Game::Render()
 {
 	g_theRenderer->BeginCamera( *m_camera );
+
 
 	for ( int index = 0; index < m_gameObjects.size(); index++ )
 	{

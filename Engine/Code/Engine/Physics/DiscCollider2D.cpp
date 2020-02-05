@@ -16,6 +16,7 @@ DiscCollider2D::DiscCollider2D( Vec2 localPosition , float radius )
 {
 	m_localPosition = localPosition;
 	m_radius = radius;
+	m_colliderType = COLLIDER2D_DISC;
 }
 
 DiscCollider2D::~DiscCollider2D()

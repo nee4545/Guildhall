@@ -6,8 +6,7 @@
 
 struct AABB2;
 
-struct Vertex_PCU
-{
+struct Vertex_PCU{
 	Vec3 m_position;
     Rgba8 m_color;
 	Vec2 m_uvTexCoords;

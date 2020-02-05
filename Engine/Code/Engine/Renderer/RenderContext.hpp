@@ -8,6 +8,7 @@
 #include <vector>
 
 class BitmapFont;
+class Polygon2D;
 
 enum class BlendMode
 {
@@ -37,6 +38,8 @@ public:
 	void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2 centre, float radius, Rgba8 color, float thickness );
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
+	void DrawPolygonUnfilled(const Polygon2D& polygon, const Rgba8& color, float thickness );
+	void DrawPolygonFilled(const Polygon2D& polygon, const Rgba8& color);
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);
