@@ -1,6 +1,9 @@
+
+Solution folder: PhysicsDemo/PhysicsDemo.sln
+
 ## Checklist
 - [x] *05pts*: Insantiate a physic system into the game.
-- [x] *10pts*: Be able to create game objects with a collider based on button press,
+- [x] *10pts*: Be able to create game objects with a collider based on button press(Right Mouse Button),
     - [x] `1` should create random radius disc centered at cursor
 - [x] *10pts*: Camera changes implemented
 - [x] *05pts*: Can move around using `WASD` or equivalent (if different, make note in readme)
