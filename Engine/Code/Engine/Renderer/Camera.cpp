@@ -1,5 +1,7 @@
 #include "Camera.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Core/Texture.hpp"
 #define UNUSED(x) (void)(x);
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
@@ -18,6 +20,16 @@ Vec2 Camera::GetOrthoBottomLeft() const
 Vec2 Camera::GetOrthoTopRight() const
 {
 	return top_Right;
+}
+
+Texture* Camera::GetColorTarget() const
+{
+	if ( m_texture != nullptr )
+	{
+		return m_texture;
+	}
+
+	return nullptr;
 }
 
 void Camera::Translate2D( Vec2 translation2D )

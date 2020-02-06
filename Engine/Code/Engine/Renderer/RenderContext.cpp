@@ -174,12 +174,23 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 
 void RenderContext::BindShader( Shader* shader )
 {
+	ASSERT_OR_DIE( m_isDrawing!= true , "Camera has not been set" );
+
 	m_currentShader = shader;
 
 	if ( m_currentShader == nullptr )
 	{
 		m_currentShader = m_defaultShader;
 	}
+
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
+}
+
+void RenderContext::BindShader( std::string filename )
+{
+	m_currentShader->CreateFromFile( filename );
 }
 
 void RenderContext::BindVertexInput( VertexBuffer* vbo )
@@ -187,8 +198,12 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 	ID3D11Buffer* vboHandle = vbo->m_handle;
 	unsigned int stride = sizeof( Vertex_PCU );
 	unsigned int offset = 0;
-
-	m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
+	
+	if ( m_lastBoundVBO != vboHandle )
+	{
+		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
+		m_lastBoundVBO = vboHandle;
+	}
 }
 
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
@@ -329,28 +344,16 @@ void RenderContext::EndFrame()
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
-	Texture* texture = m_swapChain->GetBackBuffer();
-	TextureView* view = texture->GetRenderTargetView();
-	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+	
 
-	IntVec2 textureDimensions = texture->GetTexelSizeCoords();
-
-	D3D11_VIEWPORT viewport;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = (float)textureDimensions.x;
-	viewport.Height = (float)textureDimensions.y;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
+	/*TextureView* view = m_texture->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();*/
+	
 	//This is temporary
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState );
-	m_context->RSSetViewports( 1 , &viewport );
-	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
-	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
+	
+	
 	//Describe vertex format to shader
 
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
@@ -361,20 +364,56 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 
 void RenderContext::BeginCamera(const Camera &camera)
 {
-	//glLoadIdentity();
-	//glOrtho(camera.GetOrthoBottomLeft().x,camera.GetOrthoTopRight().x,camera.GetOrthoBottomLeft().y,camera.GetOrthoTopRight().y,0.f,1.f);
-	//
-	//UNUSED( camera );
+	#if defined(RENDER_DEBUG)
+		m_context->ClearState();
+	#endif
+
+	Texture* colorTarget = camera.GetColorTarget();
+	{
+		if ( colorTarget == nullptr )
+		{
+			colorTarget = m_swapChain->GetBackBuffer();
+		}
+	}
+
+	TextureView* view = colorTarget->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+
+	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
+
+	if ( camera.m_texture != nullptr )
+	{
+		m_texture = camera.m_texture;
+	} else
+	{
+		m_texture = m_swapChain->GetBackBuffer();
+	}
+
+	IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
+
+	D3D11_VIEWPORT viewport;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = ( float ) textureDimensions.x;
+	viewport.Height = ( float ) textureDimensions.y;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	m_context->RSSetViewports( 1 , &viewport );
 
 	ClaerScreen(camera.GetClearColor());
-	//GUARANTEE_OR_DIE( false , "begin camera" );
-
 	BindShader( nullptr );
+
+	m_lastBoundVBO = nullptr;
+
+	m_isDrawing = true;
 }
 
 void RenderContext::EndCamera( const Camera& camera )
 {
 	 UNUSED(camera);
+	 m_isDrawing = false;
 }
 
 void RenderContext::TransformVertexArray( int numVertices, Vertex_PCU* vertices, float scale, float rotationDegrees, const Vec2& translation )

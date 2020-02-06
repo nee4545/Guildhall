@@ -143,7 +143,7 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	ID3D11Device* device = m_owner->m_device;
 
 	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = dataByteSize;
+	desc.ByteWidth = (unsigned int)dataByteSize;
 	desc.Usage = ToDXMemoryUsage( m_memHint );
 	desc.BindFlags = ToDXUsage( m_usage );
 
@@ -157,7 +157,7 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	}
 
 	desc.MiscFlags =0;
-	desc.StructureByteStride = elementByteSize;
+	desc.StructureByteStride = (unsigned int)elementByteSize;
 
 	device->CreateBuffer( &desc , nullptr , &m_handle );
 

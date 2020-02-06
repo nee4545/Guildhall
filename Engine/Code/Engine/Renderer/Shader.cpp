@@ -93,35 +93,23 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t* attribute
 		return m_inputLayout;
 	}
 
-	D3D11_INPUT_ELEMENT_DESC vertexDescription[ 3 ];
+	D3D11_INPUT_ELEMENT_DESC vertexDescription[3];
 
-	//position
-	vertexDescription[ 0 ].SemanticName = (LPSTR)attribute[0].name.c_str();
-	vertexDescription[ 0 ].SemanticIndex = 0;
-	vertexDescription[ 0 ].Format = (DXGI_FORMAT)attribute[0].type;
-	vertexDescription[ 0 ].InputSlot = 0;
-	vertexDescription[ 0 ].AlignedByteOffset = attribute[0].offset;
-	vertexDescription[ 0 ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vertexDescription[ 0 ].InstanceDataStepRate = 0;
+	buffer_attribute_t *current_ele = &attribute[ 0 ];
+	int i = 0;
+	while (current_ele->name!="")
+	{
+		vertexDescription[ i ].SemanticName = ( LPSTR ) current_ele->name.c_str();
+		vertexDescription[ i ].SemanticIndex = 0;
+		vertexDescription[ i ].Format = ( DXGI_FORMAT ) current_ele->type;
+		vertexDescription[ i ].InputSlot = 0;
+		vertexDescription[ i ].AlignedByteOffset = current_ele->offset;
+		vertexDescription[ i ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		vertexDescription[ i ].InstanceDataStepRate = 0;
 
-	//color			   
-	vertexDescription[ 1 ].SemanticName = ( LPSTR ) attribute[ 1 ].name.c_str();
-	vertexDescription[ 1 ].SemanticIndex = 0;
-	vertexDescription[ 1 ].Format = ( DXGI_FORMAT ) attribute[ 1 ].type;
-	vertexDescription[ 1 ].InputSlot = 0;
-	vertexDescription[ 1 ].AlignedByteOffset = attribute[ 1 ].offset;
-	vertexDescription[ 1 ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vertexDescription[ 1 ].InstanceDataStepRate = 0;
-
-	//uv
-	vertexDescription[ 2 ].SemanticName = ( LPSTR ) attribute[ 2 ].name.c_str();
-	vertexDescription[ 2 ].SemanticIndex = 0;
-	vertexDescription[ 2 ].Format = ( DXGI_FORMAT ) attribute[ 2 ].type;
-	vertexDescription[ 2 ].InputSlot = 0;
-	vertexDescription[ 2 ].AlignedByteOffset = attribute[ 2 ].offset;
-	vertexDescription[ 2 ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vertexDescription[ 2 ].InstanceDataStepRate = 0;
-
+		i++;
+		current_ele = &attribute[ i ];
+	}
 
 
 	ID3D11Device* device = m_owner->m_device;
@@ -143,8 +131,7 @@ static char const* GetDefaultEntryPointForStage( eShaderType type )
 		return "FragmentFunction";
 		break;
 	default: ERROR_AND_DIE( "invalid Format" );
-		return "";
-		break;
+		//return "";
 	}
 }
 
@@ -160,8 +147,7 @@ static char const* GetDefaultEntryModelForStage( eShaderType stage )
 		return "ps_5_0";
 		break;
 	default: ERROR_AND_DIE( "invalid Format" );
-		return "";
-		break;
+		//return "";
 	}
 }
 

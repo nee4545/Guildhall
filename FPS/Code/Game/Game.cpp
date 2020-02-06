@@ -5,6 +5,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/World.hpp"
 #include "Game/Entity.hpp"
+#define UNUSED(x) (void)(x);
 
 
 
@@ -15,35 +16,25 @@ Game::Game()
 	m_camera=new Camera();
 	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(53.33f,30.f));
    
-	//world=new World(this);
-
+	
 	
 }
 
 void Game::Update( float deltaseconds )
 {
-	/*m_rColorValue += deltaseconds;
 
-	if ( m_rColorValue > 1.0f )
-	{
-		m_rColorValue = 0.f;
-	}*/
+	UNUSED( deltaseconds );
+	
 	m_rColorValue = 1.f;
 
 
 	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( (unsigned char)(100 * m_rColorValue) , 0 , 0 , 0 ) , 0.f , 0 );
 
-	//render->ClaerScreen( Rgba8( 100 , 0 , 0 , 0 ) );
 	
 }
 
 void Game::Render()
 {
-	Vertex_PCU* temp = new Vertex_PCU[ 1 ];
-	temp[ 0 ] = Vertex_PCU( Vec3( 0.5f , 0.5f , 0.f ), Rgba8( 255 , 255 , 255 , 255 ), Vec2( 0.f , 0.f ) );
-	
-	
-	
 	render->BeginCamera(*m_camera);
 	
 	//render->Draw( 3 , 0 );

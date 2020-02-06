@@ -16,6 +16,7 @@ class VertexBuffer;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
+struct ID3D11Buffer;
 class SwapChain;
 
 enum class BlendMode
@@ -39,6 +40,9 @@ public:
 	Shader* m_currentShader = nullptr;
 	Shader* m_defaultShader = nullptr;
 	VertexBuffer* m_immediateVBO = nullptr;
+	ID3D11Buffer* m_lastBoundVBO = nullptr;
+	Texture* m_texture;
+	bool m_isDrawing = false;
 
 	
 public:
@@ -60,6 +64,7 @@ public:
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
 
 	void BindShader( Shader* shader );
+	void BindShader( std::string filename );
 	void BindVertexInput( VertexBuffer* vbo );
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
