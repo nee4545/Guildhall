@@ -46,6 +46,7 @@ Shader::Shader( RenderContext* context ) :m_owner( context )
 Shader::~Shader()
 {
 	DX_SAFE_RELEASE( m_rasterState );
+	DX_SAFE_RELEASE( m_inputLayout );
 }
 
 bool Shader::CreateFromFile( std::string const& filename )
@@ -85,6 +86,52 @@ void Shader::CreateRasterState()
 	device->CreateRasterizerState( &desc , &m_rasterState );
 }
 
+ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t* attribute/*=Vertex_PCU::LAYOUT*/ )
+{
+	if ( m_inputLayout!=nullptr )
+	{
+		return m_inputLayout;
+	}
+
+	D3D11_INPUT_ELEMENT_DESC vertexDescription[ 3 ];
+
+	//position
+	vertexDescription[ 0 ].SemanticName = (LPSTR)attribute[0].name.c_str();
+	vertexDescription[ 0 ].SemanticIndex = 0;
+	vertexDescription[ 0 ].Format = (DXGI_FORMAT)attribute[0].type;
+	vertexDescription[ 0 ].InputSlot = 0;
+	vertexDescription[ 0 ].AlignedByteOffset = attribute[0].offset;
+	vertexDescription[ 0 ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	vertexDescription[ 0 ].InstanceDataStepRate = 0;
+
+	//color			   
+	vertexDescription[ 1 ].SemanticName = ( LPSTR ) attribute[ 1 ].name.c_str();
+	vertexDescription[ 1 ].SemanticIndex = 0;
+	vertexDescription[ 1 ].Format = ( DXGI_FORMAT ) attribute[ 1 ].type;
+	vertexDescription[ 1 ].InputSlot = 0;
+	vertexDescription[ 1 ].AlignedByteOffset = attribute[ 1 ].offset;
+	vertexDescription[ 1 ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	vertexDescription[ 1 ].InstanceDataStepRate = 0;
+
+	//uv
+	vertexDescription[ 2 ].SemanticName = ( LPSTR ) attribute[ 2 ].name.c_str();
+	vertexDescription[ 2 ].SemanticIndex = 0;
+	vertexDescription[ 2 ].Format = ( DXGI_FORMAT ) attribute[ 2 ].type;
+	vertexDescription[ 2 ].InputSlot = 0;
+	vertexDescription[ 2 ].AlignedByteOffset = attribute[ 2 ].offset;
+	vertexDescription[ 2 ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	vertexDescription[ 2 ].InstanceDataStepRate = 0;
+
+
+
+	ID3D11Device* device = m_owner->m_device;
+	device->CreateInputLayout( vertexDescription , 3 , m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() , &m_inputLayout );
+
+	return m_inputLayout;
+}
+
+
+
 static char const* GetDefaultEntryPointForStage( eShaderType type )
 {
 	switch ( type )
@@ -94,6 +141,9 @@ static char const* GetDefaultEntryPointForStage( eShaderType type )
 		break;
 	case SHADER_TYPE_FRAGMENT:
 		return "FragmentFunction";
+		break;
+	default: ERROR_AND_DIE( "invalid Format" );
+		return "";
 		break;
 	}
 }
@@ -109,7 +159,8 @@ static char const* GetDefaultEntryModelForStage( eShaderType stage )
 	case SHADER_TYPE_FRAGMENT:
 		return "ps_5_0";
 		break;
-	default:
+	default: ERROR_AND_DIE( "invalid Format" );
+		return "";
 		break;
 	}
 }
@@ -205,6 +256,16 @@ bool ShaderStage::IsValid()
 	}
 	else
 		return false;
+}
+
+void const* ShaderStage::GetByteCode() const
+{
+	return m_byteCode->GetBufferPointer();
+}
+
+size_t ShaderStage::GetByteCodeLength() const
+{
+	return m_byteCode->GetBufferSize();
 }
 
 ShaderStage::~ShaderStage()

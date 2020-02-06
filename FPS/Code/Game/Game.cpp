@@ -22,12 +22,13 @@ Game::Game()
 
 void Game::Update( float deltaseconds )
 {
-	m_rColorValue += deltaseconds;
+	/*m_rColorValue += deltaseconds;
 
 	if ( m_rColorValue > 1.0f )
 	{
 		m_rColorValue = 0.f;
-	}
+	}*/
+	m_rColorValue = 1.f;
 
 
 	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( (unsigned char)(100 * m_rColorValue) , 0 , 0 , 0 ) , 0.f , 0 );
@@ -38,13 +39,16 @@ void Game::Update( float deltaseconds )
 
 void Game::Render()
 {
-	Vertex_PCU* temp = new Vertex_PCU();
+	Vertex_PCU* temp = new Vertex_PCU[ 1 ];
+	temp[ 0 ] = Vertex_PCU( Vec3( 0.5f , 0.5f , 0.f ), Rgba8( 255 , 255 , 255 , 255 ), Vec2( 0.f , 0.f ) );
+	
 	
 	
 	render->BeginCamera(*m_camera);
 	
-	render->Draw( 3 , 0 );
-	render->DrawVertexArray( 3 , temp );
+	//render->Draw( 3 , 0 );
+	//render->DrawVertexArray( 1 , temp );
+	render->DrawAABB2D( AABB2( 0.5f , 0.5f , -0.5f , -0.5f ) , Rgba8( 255 , 255 , 255 , 255 ) );
 	//world->Render();
 	render->EndCamera(*m_camera);
 	
