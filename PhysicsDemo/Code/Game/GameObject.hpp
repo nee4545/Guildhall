@@ -19,5 +19,5 @@ public:
 
 	void UpdateColliderColors( Rgba8 borderColor , Rgba8 fillColor );
 	void UpdateColorsBasedOnStatus();
-
+	
 };

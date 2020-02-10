@@ -10,6 +10,7 @@
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/RigidBody2D.hpp"
+#include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Core/Polygon2D.hpp"
 
 
@@ -59,6 +60,24 @@ GameObject* Game::CreateDisc()
 
 	return obj;
 
+}
+
+GameObject* Game::CreatePolygon(Polygon2D& polygon)
+{
+	GameObject* obj = new GameObject();
+
+	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+
+	obj->m_rigidbody = m_physicsSystem->CreateRigidbody();
+	obj->m_rigidbody->SetPosition( mousePos );
+
+	PolygonCollider2D* collider = m_physicsSystem->CreatePolygonCollider( Vec2(mousePos) , &polygon );
+
+	obj->m_rigidbody->TakeCollider( collider );
+
+	m_gameObjects.push_back( obj );
+
+	return obj;
 }
 
 void Game::PopulateInitialObjects()
@@ -168,12 +187,39 @@ void Game::HandleDrag()
 	GetCurrentSelectedObject();
 	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
 
+	if ( isDrawing )
+	{
+		return;
+	}
+
 	if ( m_selectedObject != nullptr )
 	{
 		if ( g_theInput->IsLeftMouseButtonPressed() )
 		{
+			if ( !initialPointSet )
+			{
+				throwInitialPoint = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+				initialPointSet = true;
+			}
+
 			m_dragInProgress = true;
 			m_selectedObject->isBeingDragged = true;
+			m_selectedObject->m_rigidbody->enableSimulation = false;
+
+			if ( g_theInput->WasKeyJustPressed( '1' ) )
+			{
+				m_selectedObject->m_rigidbody->SetSimulationMode( STATIC );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( '2' ) )
+			{
+				m_selectedObject->m_rigidbody->SetSimulationMode( KINAMETIC );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( '3' ) )
+			{
+				m_selectedObject->m_rigidbody->SetSimulationMode( DYNAMIC );
+			}
 			
 			if ( !m_offsetSet )
 			{
@@ -182,6 +228,9 @@ void Game::HandleDrag()
 			}
 
 			m_selectedObject->m_rigidbody->SetPosition( mousePos-m_offset );
+
+
+			
 
 			if ( g_theInput->WasKeyJustPressed( 0x08 ) || g_theInput->WasKeyJustPressed( 0x2E ) )
 			{
@@ -199,11 +248,20 @@ void Game::HandleDrag()
 				}
 			}
 
+			
+
 		}
 		else
 		{
+			if ( !finalPointSet )
+			{
+				throwFinalPoint= m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+				finalPointSet = true;
+			}
+			HandleThrow();
 			m_dragInProgress = false;
 			m_selectedObject->isBeingDragged = false;
+			m_selectedObject->m_rigidbody->enableSimulation = true;
 			m_offsetSet = false;
 		}
 	}
@@ -211,12 +269,27 @@ void Game::HandleDrag()
 
 void Game::HandleObjectCreationRequests()
 {
+	
+
 	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
 
 	if ( g_theInput->WasRightMouseButtonJustPressed() )
 	{
 		CreateDisc();
 	}
+}
+
+void Game::HandleThrow()
+{
+	if ( !initialPointSet )
+	{
+		return;
+	}
+
+	Vec2 velocity = -throwFinalPoint+throwInitialPoint;
+	m_selectedObject->m_rigidbody->SetVelocity( velocity * 1.f );
+	initialPointSet = false;
+	finalPointSet = false;
 }
 
 void Game::ResetCamera()
@@ -270,9 +343,162 @@ void Game::ZoomOutCamera( float deltaSeconds )
 	m_camera->SetProjectionOrthographic( m_cameraHeight );
 }
 
+void Game::PolygonDrawMode()
+{
+	if ( !isDrawing )
+	{
+		return;
+	}
+
+	isDrawing = true;
+	
+	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		if ( drawModePoints.size() == 1 )
+		{
+			drawModePoints.push_back( m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() ) );
+			return;
+		}
+
+		Vec2 point = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+		if ( IsPolygonPotentiallyConvex( point ) )
+		{
+			drawModePoints.push_back( point );
+			isThereInvalidPoint = false;
+		}
+		else
+		{
+			invalidPoint = point;
+			isThereInvalidPoint = true;
+		}
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x08 ) || g_theInput->WasKeyJustPressed( 0x2E ) )
+	{
+		if ( isThereInvalidPoint )
+		{
+			isThereInvalidPoint = false;
+		}
+		else
+		{
+		drawModePoints.pop_back();
+		}
+	}
+
+	if ( g_theInput->WasRightMouseButtonJustPressed() )
+	{
+		if ( drawModePoints.size() < 3 || isThereInvalidPoint )
+		{
+			drawModePoints.clear();
+			isThereInvalidPoint = false;
+			isDrawing = false;
+			return;
+		}
+
+		Vec2* points = new Vec2[ drawModePoints.size() ];
+		for ( int index = 0; index < drawModePoints.size(); index++ )
+		{
+			points[ index ] = drawModePoints[ index ];
+		}
+		Polygon2D* poly = new Polygon2D();
+		*poly = Polygon2D::MakeFromLineLoop( points , drawModePoints.size() );
+
+		CreatePolygon( *poly );
+
+		isDrawing = false;
+		drawModePoints.clear();
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x1B ) )
+	{
+		isDrawing = false;
+		drawModePoints.clear();
+	}
+
+
+}
+
+bool Game::IsPolygonPotentiallyConvex( Vec2 newAddedPoint )
+{
+	Polygon2D polygon;
+	polygon.m_points = drawModePoints;
+	polygon.m_points.push_back( newAddedPoint );
+
+	return polygon.IsConvex();
+
+}
+
+void Game::HandlePolygonDrawMode()
+{
+	if ( m_dragInProgress )
+	{
+		return;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '2' ) )
+	{
+		isDrawing = true;
+		Vec2 point = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+		drawModePoints.clear();
+		isThereInvalidPoint = false;
+		drawModePoints.push_back( point );
+	}
+
+	PolygonDrawMode();
+
+}
+
+void Game::DrawModeRender()
+{
+	if ( !isDrawing )
+	{
+		return;
+	}
+
+	for ( int index = 0; index < drawModePoints.size(); index++ )
+	{
+		g_theRenderer->DrawDisc( drawModePoints[ index ] , 0.3f , Rgba8( 100 , 100 , 100 , 255 ));
+	}
+
+	if ( drawModePoints.size() > 1 )
+	{
+		for ( int index = 0; index < drawModePoints.size() - 1; index++ )
+		{
+			g_theRenderer->DrawLine( drawModePoints[ index ] , drawModePoints[ index + 1 ] , Rgba8( 0 , 0 , 100 , 128 ) , 0.15f );
+		}
+	}
+
+	if ( isThereInvalidPoint )
+	{
+		g_theRenderer->DrawLine( drawModePoints[ drawModePoints.size() - 1 ] , invalidPoint , Rgba8( 100 , 0 , 0 , 128 ) , 0.15f );
+	}
+}
+
 void Game::Update( float deltaseconds )
 {
 	UpdateCameraMovement( deltaseconds );
+
+	m_physicsSystem->Update( deltaseconds );
+	if ( !isDrawing )
+	{
+		HandleObjectCreationRequests();
+	}
+	
+	HandlePolygonDrawMode();
+	
+
+	for ( int index = 0; index < m_gameObjects.size(); index++ )
+	{
+		if ( m_gameObjects[ index ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.y < m_camera->GetOrthoBottomLeft().y )
+		{
+			m_gameObjects[ index ]->m_rigidbody->ReverseVelocityYAxis();
+		}
+	}
 
 	if ( g_theInput->GetMouseWheelData()>0 )
 	{
@@ -283,7 +509,8 @@ void Game::Update( float deltaseconds )
 	{
 		ZoomOutCamera( deltaseconds );
 	}
-	HandleObjectCreationRequests();
+
+
 	HandleMouseInsideObjects();
 	HandleDrag();
 
@@ -308,9 +535,11 @@ void Game::Update( float deltaseconds )
 
 void Game::Render()
 {
+
+	
 	g_theRenderer->BeginCamera( *m_camera );
-
-
+	
+	DrawModeRender();
 	for ( int index = 0; index < m_gameObjects.size(); index++ )
 	{
 		if ( m_gameObjects[ index ] == nullptr )

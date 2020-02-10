@@ -34,7 +34,7 @@ public:
 	float	m_radius =0;
 
 protected:
-	virtual ~DiscCollider2D() override;
+	 ~DiscCollider2D();
 	
 };
 

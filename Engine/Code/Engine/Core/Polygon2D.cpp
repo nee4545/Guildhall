@@ -44,7 +44,7 @@ bool Polygon2D::IsConvex() const
 		currentNormal.Normalize();
 
 		counter++;
-		vertexStrtNum = ( vertexEndNum + 1 ) % m_points.size();
+		vertexEndNum = ( vertexEndNum + 1 ) % m_points.size();
 		vertexStrtNum = ( vertexStrtNum + 1 ) % m_points.size();
 
 	}
@@ -55,15 +55,31 @@ bool Polygon2D::IsConvex() const
 
 bool Polygon2D::Contains( Vec2 point ) const
 {
-	for ( int index = 0; index < m_points.size(); index++ )
-	{
-		if ( m_points[ index ] == point )
-		{
-			return true;
-		}
-	}
 
-	return false;
+	int startVert = 0;
+	int endVert = 1;
+	int counter = 0;
+
+	while ( counter<m_points.size() )
+	{
+
+		Vec2 currentEdge = m_points[ endVert ] - m_points[ startVert ];
+		Vec2 pointVec = point - m_points[ startVert ];
+		Vec2 normal = currentEdge.GetRotated90Degrees();
+		normal.Normalize();
+
+		if ( DotProduct2D( pointVec , normal ) <= 0 )
+		{
+			return false;
+		}
+
+		startVert = ( startVert + 1 ) % m_points.size();
+		endVert = ( endVert + 1 ) % m_points.size();
+		counter++;
+
+	}
+	
+	return true;
 }
 
 float Polygon2D::GetDistance( Vec2 point ) const
@@ -75,6 +91,11 @@ float Polygon2D::GetDistance( Vec2 point ) const
 
 Vec2 Polygon2D::GetClosestPoint( Vec2 point ) const
 {
+	if ( Contains( point ) )
+	{
+		return point;
+	}
+
 	std::vector<Vec2> closestPointsOnEachEdge;
 
 	Vec2 currentEdgeStart = m_points[ 0 ];
@@ -139,6 +160,8 @@ void Polygon2D::GetPoints( Vec2* outPoints ) const
 	}
 }
 
+
+
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , unsigned int pointCount )
 {
 	Polygon2D toReturn;
@@ -147,6 +170,16 @@ Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , unsigned int pointCo
 	{
 		toReturn.m_points.push_back( points[ index ]);
 	}
+
+	Vec2 centre = Vec2( 0.f , 0.f );
+
+	for ( int index = 0; index < toReturn.m_points.size(); index++ )
+	{
+		centre += points[ index ];
+	}
+
+	toReturn.m_centre = centre / (float)toReturn.m_points.size();
+
 
 	if ( toReturn.IsValid() )
 	{
@@ -159,26 +192,159 @@ Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , unsigned int pointCo
 
 }
 
-//Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , unsigned int pointCount )
-//{
-//	//Get rightmost point on the point cloud
-//	//Get bottom most point on the point cloud
-//	//make an edge out of it
-//	//From that make all edges on the point cloud and choose the one that has max 
-//
-//	Vec2 rightMostVertex = points[ 0 ];
-//	Vec2 downMostVertex = points[ 1 ];
-//
-//	for ( int index = 0; index < pointCount; index++ )
-//	{
-//		if ( points[ index ].x > rightMostVertex.x )
-//		{
-//			rightMostVertex = points[ index ];
-//		}
-//	}
-//
-//	
-//	
-//
-//}
+Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , int pointCount )
+{
+	if ( pointCount < 3 )
+	{
+		ERROR_AND_DIE( "Not enough points to construct" );
+	}
+
+	Polygon2D toReturn;
+
+	Vec2 rightMostVertex = points[ 0 ];
+	Vec2 nextVertex = points[ 1 ];
+
+	for ( int index = 0; index < pointCount; index++ )
+	{
+		if ( points[ index ].x > rightMostVertex.x )
+		{
+			rightMostVertex = points[ index ];
+		}
+	}
+
+	for ( int index = 0; index < pointCount; index++ )
+	{
+		if ( points[ index ].y < nextVertex.y && points[ index ] != rightMostVertex )
+		{
+			nextVertex = points[ index ];
+		}
+	}
+
+	toReturn.m_points.push_back( rightMostVertex );
+	toReturn.m_points.push_back( nextVertex );
+
+	bool constructionDone = false;
+	Vec2 nextPoint;
+	Vec2 checkingVec = rightMostVertex - nextVertex;
+	Vec2 endVertex = nextVertex;
+
+	std::vector<Vec2> edgesToSort;
+
+	while ( !constructionDone )
+	{
+
+		for ( int index = 0; index < pointCount; index++ )
+		{
+			if ( !Polygon2D::IsPointPartOfPolygon( points[ index ] , toReturn ) )
+			{
+				edgesToSort.push_back( points[ index ] );
+			}
+		}
+
+		Vec2* nextVec = Polygon2D::GetNextPointToAddFromPointClound( checkingVec , endVertex , edgesToSort );
+
+		if ( nextVec == nullptr )
+		{
+			constructionDone = true;
+			break;
+		}
+
+		nextPoint = *nextVec;
+		toReturn.m_points.push_back( nextPoint );
+		checkingVec = endVertex - nextPoint;
+		endVertex = nextPoint;
+		edgesToSort.clear();
+
+	}
+
+	return toReturn;
+	
+	
+}
+
+bool Polygon2D::IsPointPartOfPolygon( Vec2 point, Polygon2D &polygon )
+{
+
+	for ( int index = 0; index < polygon.m_points.size(); index++ )
+	{
+		if ( polygon.m_points[ index ] == point )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+Vec2* Polygon2D::GetNextPointToAddFromPointClound( Vec2 checkingEdge, Vec2 checkingVertex , std::vector<Vec2> points )
+{
+	Vec2 normal = checkingEdge.GetRotated90Degrees();
+
+	Vec2* toReturn = nullptr;
+
+	std::vector<Vec2> pointsToConsider;
+
+	for ( int index = 0; index < points.size(); index++ )
+	{
+		if ( DotProduct2D( checkingEdge , points[ index ] )>0 )
+		{
+			pointsToConsider.push_back( points[ index ] );
+		}
+	}
+
+	if ( pointsToConsider.size() == 0 )
+	{
+		return nullptr;
+	}
+
+	toReturn = &(pointsToConsider[ 0 ]);
+
+	for ( int index = 0; index < pointsToConsider.size(); index++ )
+	{
+		if ( *toReturn == pointsToConsider[ index ] )
+		{
+			continue;
+		}
+
+		if ( GetAngleDegreesBetweenVectors2D( normal , ( *toReturn - checkingVertex )) > GetAngleDegreesBetweenVectors2D( normal , ( pointsToConsider[ index ] - checkingVertex ) ))
+		{
+			toReturn = &pointsToConsider[ index ];
+		}
+	}
+
+	return toReturn;
+}
+
+void Polygon2D::Translate2D( Vec2 translation2D )
+{
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		m_points[ index ] += translation2D-m_localPos;
+	}
+
+	//m_centre += translation2D;
+}
+
+
+
+void Polygon2D::SetCenter( Vec2 newCentre )
+{
+	m_centre = newCentre;
+}
+
+Vec2 Polygon2D::GetCentre()
+{
+	return m_centre;
+}
+
+void Polygon2D::SetPosition(Vec2 pos)
+{
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		m_points[ index ] = m_points[index]+ pos - m_localPos;
+	}
+
+	m_localPos = pos;
+}
 

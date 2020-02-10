@@ -1,4 +1,5 @@
 #include "Engine/Physics/DiscCollider2D.hpp"
+#include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Physics/RigidBody2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
@@ -49,8 +50,25 @@ bool DiscCollider2D::Contains( Vec2 pos ) const
 
 bool DiscCollider2D::Intersects( Collider2D const* other ) const
 {
-	DiscCollider2D* temp = ( DiscCollider2D* ) other;
-	return DoDiscsOverlap( m_worldPosition , m_radius , temp->m_worldPosition , temp->m_radius );
+	
+
+	switch ( other->m_colliderType )
+	{
+	case COLLIDER2D_DISC:
+	{
+		DiscCollider2D* temp = ( DiscCollider2D* ) other;
+		return DoDiscsOverlap( m_worldPosition , m_radius , temp->m_worldPosition , temp->m_radius );
+	}
+
+	case  COLLIDER2D_POLYGON:
+	{
+		PolygonCollider2D* temp = ( PolygonCollider2D* ) other;
+		return DoDiscAndPolygonOverlap( m_worldPosition , m_radius , *temp->m_polygonLocal );
+	}
+	default:
+		return false;
+		break;
+	}
 }
 
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )

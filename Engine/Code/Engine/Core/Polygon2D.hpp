@@ -18,6 +18,8 @@ public:
 	int GetEdgeCount() const;
 	void GetEdge( int idx , Vec2* outStart , Vec2* outEnd );
 	void GetPoints( Vec2* outPoints ) const;
+	std::vector<Vec2> m_points;
+	Vec2 m_localPos;
 
 public: // static constructors (feel free to just use a constructor - I just like descriptive names)
 		// in this case, these two take the same parameters but behave differently
@@ -26,8 +28,14 @@ public: // static constructors (feel free to just use a constructor - I just lik
 	static Polygon2D MakeFromLineLoop( Vec2 const* points , unsigned int pointCount );
 
 	// create a convex wrapping of a collection of points;  
-	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points , unsigned int pointCount );
+	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points , int pointCount );
+	static bool IsPointPartOfPolygon(Vec2 point, Polygon2D &polygon);
+	static Vec2* GetNextPointToAddFromPointClound( Vec2 checkingEdge, Vec2 checkingVertex , std::vector<Vec2> points );
+	void Translate2D( Vec2 translation2D );
+	void SetCenter(Vec2 newCentre);
+	Vec2 GetCentre();
+	void SetPosition(Vec2 pos);
 
 private:
-	std::vector<Vec2> m_points;
+	Vec2 m_centre;
 };
