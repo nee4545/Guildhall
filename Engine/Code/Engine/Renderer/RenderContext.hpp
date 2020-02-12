@@ -18,11 +18,34 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 class SwapChain;
+class RenderBuffer;
 
 enum class BlendMode
 {
 	ALPHA,
 	ADDITIVE
+};
+
+enum eBufferSlot
+{
+	UBO_FRAME_SLOT=0,
+	UBO_CAMERA_SLOT=1,
+};
+
+//Data for frame ubo
+struct  frameData_t
+{
+	float systemTime;
+	float systemDeltaTime;
+
+	float padding[ 2 ];
+};
+
+struct cameraData_t
+{
+	Vec2 orthoMin;
+	Vec2 orthoMax;
+
 };
 
 class RenderContext
@@ -41,6 +64,7 @@ public:
 	Shader* m_defaultShader = nullptr;
 	VertexBuffer* m_immediateVBO = nullptr;
 	ID3D11Buffer* m_lastBoundVBO = nullptr;
+	RenderBuffer* m_frameUBO = nullptr;
 	Texture* m_texture;
 	bool m_isDrawing = false;
 
@@ -67,13 +91,17 @@ public:
 	void BindShader( std::string filename );
 	void BindVertexInput( VertexBuffer* vbo );
 
+	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
+
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);
 	void BindTexture( const Texture* texture);
 
 	void ClaerScreen(const Rgba8 clearColor);
-	void BeginCamera(const Camera &camera);
+	void BeginCamera(Camera &camera);
 	void EndCamera(const Camera &camera);
+
+	void UpdateFrameTime( float deltaTime );
 
 	void TransformVertexArray(int numVertices, Vertex_PCU* vertices, float scale, float rotationDegrees, const Vec2& translation );
 	void SetBlendMode(BlendMode blendMode);

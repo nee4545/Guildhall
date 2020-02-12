@@ -39,6 +39,7 @@ public:
 
 private:
 	bool Create( size_t dataByteSize , size_t elementByteSize );
+	
 
 
 public:

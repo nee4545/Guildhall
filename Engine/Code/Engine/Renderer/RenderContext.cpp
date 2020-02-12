@@ -11,6 +11,7 @@
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Core/Time.hpp"
 
 
 #define UNUSED(x) (void)(x);
@@ -206,6 +207,14 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 	}
 }
 
+void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
+{
+	ID3D11Buffer* uboHandle = ubo->m_handle;
+
+	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
+	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
+}
+
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 {
 	UNUSED( imageFilePath );
@@ -306,6 +315,7 @@ void RenderContext::Startup( Window* window )
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	//swapchain->Release();
+	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 }
 
 void RenderContext::Shutdown()
@@ -327,6 +337,12 @@ void RenderContext::Shutdown()
 		m_context = nullptr;
 	}
 
+	if ( m_frameUBO != nullptr )
+	{
+		delete m_frameUBO;
+		m_frameUBO = nullptr;
+	}
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 }
@@ -334,6 +350,7 @@ void RenderContext::Shutdown()
 void RenderContext::BeginFrame()
 {
 	
+
 
 }
 
@@ -362,7 +379,7 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 	m_context->Draw( numVertexes , vertexOffset );
 }
 
-void RenderContext::BeginCamera(const Camera &camera)
+void RenderContext::BeginCamera( Camera &camera)
 {
 	#if defined(RENDER_DEBUG)
 		m_context->ClearState();
@@ -407,6 +424,9 @@ void RenderContext::BeginCamera(const Camera &camera)
 
 	m_lastBoundVBO = nullptr;
 
+	BindUniformBuffer( 0 , m_frameUBO );
+	BindUniformBuffer( 1 , camera.UpdateAndGetUBO( this ) );
+
 	m_isDrawing = true;
 }
 
@@ -414,6 +434,15 @@ void RenderContext::EndCamera( const Camera& camera )
 {
 	 UNUSED(camera);
 	 m_isDrawing = false;
+}
+
+void RenderContext::UpdateFrameTime( float deltaTime )
+{
+	frameData_t frameData;
+	frameData.systemTime = GetCurrentTimeSeconds();
+	frameData.systemDeltaTime = deltaTime;
+
+	m_frameUBO->Update( &frameData , sizeof( frameData ) , sizeof( frameData ) );
 }
 
 void RenderContext::TransformVertexArray( int numVertices, Vertex_PCU* vertices, float scale, float rotationDegrees, const Vec2& translation )

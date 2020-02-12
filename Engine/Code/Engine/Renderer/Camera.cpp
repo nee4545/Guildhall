@@ -2,6 +2,8 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Core/Texture.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 #define UNUSED(x) (void)(x);
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
@@ -50,3 +52,26 @@ Rgba8 Camera::GetClearColor() const
 {
 	return m_clearColor;
 }
+
+RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
+{
+	if ( m_cameraUBO == nullptr )
+	{
+		m_cameraUBO = new RenderBuffer( ctx , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	cameraData_t cameraData;
+	cameraData.orthoMin = bottom_Left;
+	cameraData.orthoMax = top_Right;
+
+	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ));
+
+	return m_cameraUBO;
+}
+
+Camera::~Camera()
+{
+	delete m_cameraUBO;
+	m_cameraUBO = nullptr;
+}
+

@@ -4,6 +4,8 @@
 
 class Texture;
 class TextureView;
+class RenderBuffer;
+class RenderContext;
 
 enum  eCameraClearBitFlag : unsigned int
 {
@@ -20,6 +22,7 @@ private:
 	Vec2 top_Right;
 	unsigned int m_clearMode = 0;
 	Rgba8 m_clearColor;
+	RenderBuffer* m_cameraUBO = nullptr;
 	
 public:
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
@@ -30,12 +33,16 @@ public:
 	void Translate2D(Vec2 translation2D);
 	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth=0.f , unsigned int stencil=0.f );
 	Rgba8 GetClearColor() const;
+	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
+	
 
 	Camera()
 	{
 		bottom_Left=Vec2(0.0f,0.0f);
 		top_Right=Vec2(0.0f,0.0f);
 	}
+
+	~Camera();
 
 	Texture* m_texture = nullptr;
 };

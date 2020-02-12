@@ -35,7 +35,7 @@ void DevConsole::PrintString( const Rgba8& textColor, const std::string& devCons
 
 }
 
-void DevConsole::Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const
+void DevConsole::Render( RenderContext& renderer,  Camera& camera, float lineHeight ) const
 {
 	renderer.BeginCamera(camera);
 	AABB2 consoleBox = AABB2(camera.GetOrthoBottomLeft(),camera.GetOrthoTopRight());

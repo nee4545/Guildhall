@@ -22,6 +22,26 @@ struct vs_input_t
 }; 
 
 
+cbuffer time_constants:register( b0 )
+{
+	float SYSTEM_TIME_SECONDS;
+	float SYSTEM_TIME_DELTASECONDS;
+};
+
+cbuffer camera_constants: register( b1 )
+{
+	float2 MIN;
+	float2 MAX;
+};
+
+
+float RangeMap( float val , float inMin , float inMax , float outMin , float outMax )
+{
+	float domain = inMax - inMin;
+	float range = outMax - outMin;
+	return( ( val - inMin ) / domain ) * range + outMin;
+}
+
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
 //--------------------------------------------------------------------------------------
@@ -45,6 +65,18 @@ v2f_t VertexFunction( vs_input_t input )
    v2f.position = float4( input.position, 1.0f ); 
    v2f.color = input.color; 
    v2f.uv = input.uv; 
+
+   float4 worldPos = float4( input.position , 1 );
+   worldPos.x += cos( SYSTEM_TIME_SECONDS );
+   worldPos.y -= sin( SYSTEM_TIME_SECONDS );
+
+   float4 clipPos;
+   clipPos.x = RangeMap( worldPos.x , MIN.x , MAX.x , -1.0f , 1.0f );
+   clipPos.y = RangeMap( worldPos.y , MIN.y , MAX.y , -1.0f , 1.0f );
+   clipPos.z = 0.0f;
+   clipPos.w = 1.0f;
+
+   v2f.position = clipPos;
     
    return v2f;
 }

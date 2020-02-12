@@ -20,6 +20,11 @@ Game::Game()
 	
 }
 
+Game::~Game()
+{
+	delete m_camera;
+}
+
 void Game::Update( float deltaseconds )
 {
 
@@ -39,7 +44,7 @@ void Game::Render()
 	
 	//render->Draw( 3 , 0 );
 	//render->DrawVertexArray( 1 , temp );
-	render->DrawAABB2D( AABB2( 0.5f , 0.5f , -0.5f , -0.5f ) , Rgba8( 255 , 255 , 255 , 255 ) );
+	render->DrawAABB2D( AABB2( 10.5f , 10.5f , 20.5f , 20.5f ) , Rgba8( 255 , 255 , 255 , 255 ) );
 	//world->Render();
 	render->EndCamera(*m_camera);
 	

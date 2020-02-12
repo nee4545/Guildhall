@@ -17,6 +17,7 @@ public:
 
 	World* world = nullptr;
 	Game();
+	~Game();
 
 	bool toggleCamera = false;
 	bool paused = false;

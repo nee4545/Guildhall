@@ -21,7 +21,7 @@ public:
 	void Shutdown();
 
 	void PrintString( const Rgba8& textColor, const std::string& devConsolePrintString );
-	void Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const;
+	void Render( RenderContext& renderer,  Camera& camera, float lineHeight ) const;
 
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const;

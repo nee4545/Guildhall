@@ -30,12 +30,15 @@ void App:: Startup()
 void App::Shutdown() //Not used right now
 {
 	render->Shutdown();
+	delete thegame;
 }
 
 
 
 void App::Update(float deltaSeconds)
 {
+
+	render->UpdateFrameTime( deltaSeconds );
 
 	if( input->IsKeyPressed( 'Y' ) )
 	{
@@ -58,6 +61,7 @@ void App::Update(float deltaSeconds)
 
 	if ( g_theWindow->m_quitRequested == true )
 	{
+		
 		HandleQuitRequested();
 	}
 
