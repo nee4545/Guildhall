@@ -45,7 +45,7 @@ public:
 	Physics2D* m_system=nullptr;						// which scene created/owns this object
 	Collider2D* m_collider=nullptr;
 	Vec2 m_velocity = Vec2(0.f,0.f);
-	eSimulationMode m_mode = STATIC;
+	eSimulationMode m_mode = DYNAMIC;
 	float m_mass=1.f;
 	Vec2 m_gravityDirection = Vec2( 0.f , -1.f );
 	Vec2 m_gravityVector = Vec2( 0.f , 0.f );

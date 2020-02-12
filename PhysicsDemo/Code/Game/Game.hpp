@@ -8,10 +8,12 @@ class BitmapFont;
 class Physics2D;
 class GameObject;
 class Poygon2D;
+class BitmapFont;
 
 class Game
 {
 	RandomNumberGenerator m_rng;
+	BitmapFont* m_BitmapFont = nullptr;
 	Camera* m_camera=nullptr;
 	Physics2D* m_physicsSystem = nullptr;
 	std::vector<GameObject*> m_gameObjects;
@@ -24,6 +26,7 @@ class Game
 	bool isDrawing = false;
 	Vec2 invalidPoint;
 	bool isThereInvalidPoint = false;
+	int m_frameCounter = 0;
 
 public:
 	
@@ -49,6 +52,11 @@ public:
 	bool IsPolygonPotentiallyConvex(Vec2 newAddedPoint);
 	void HandlePolygonDrawMode();
 	void DrawModeRender();
+	void HandleBounceAndWrapAround();
+	void DisplayGravityInfo();
+	void DisplayX();
+	void HandleGravityModification();
+	void UpdateFramePositions();
 
 	void Update(float deltaseconds);
 	void Render();

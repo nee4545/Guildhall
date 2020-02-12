@@ -20,7 +20,7 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 void PolygonCollider2D::UpdateWorldShape()
 {
 	Vec2 worldPos = m_rigidbody->GetWorldPosition();
-	m_worldPosition = worldPos /*+ m_localPosition*/;
+	m_worldPosition = worldPos/*+m_localPosition*/;
 	m_polygonLocal->SetPosition( m_worldPosition );
 }
 

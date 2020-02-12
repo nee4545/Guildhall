@@ -1,5 +1,6 @@
 #include "Game/Game.hpp"
 #include "Game/GameObject.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -27,6 +28,7 @@ Game::Game()
 	m_rng = RandomNumberGenerator();
 	StartUp();
 	PopulateInitialObjects();
+	m_BitmapFont = g_theRenderer->CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
 
 }
@@ -69,11 +71,11 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
 
 	obj->m_rigidbody = m_physicsSystem->CreateRigidbody();
-	obj->m_rigidbody->SetPosition( mousePos );
 
-	PolygonCollider2D* collider = m_physicsSystem->CreatePolygonCollider( Vec2(mousePos) , &polygon );
+	PolygonCollider2D* collider = m_physicsSystem->CreatePolygonCollider( mousePos , &polygon );
 
 	obj->m_rigidbody->TakeCollider( collider );
+	obj->m_rigidbody->SetPosition( mousePos );
 
 	m_gameObjects.push_back( obj );
 
@@ -86,7 +88,7 @@ void Game::PopulateInitialObjects()
 	obj1->m_rigidbody = m_physicsSystem->CreateRigidbody();
 	obj1->m_rigidbody->SetPosition( Vec2( 20.f , 20.f ) );
 
-	DiscCollider2D* collider1 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 2.f );
+	DiscCollider2D* collider1 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 4.f );
 	obj1->m_rigidbody->TakeCollider( collider1 );
 
 	m_gameObjects.push_back( obj1 );
@@ -95,12 +97,10 @@ void Game::PopulateInitialObjects()
 	obj2->m_rigidbody = m_physicsSystem->CreateRigidbody();
 	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
 
-	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 1.f );
+	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
 	obj2->m_rigidbody->TakeCollider( collider2 );
 
 	m_gameObjects.push_back( obj2 );
-
-
 
 }
 
@@ -196,11 +196,7 @@ void Game::HandleDrag()
 	{
 		if ( g_theInput->IsLeftMouseButtonPressed() )
 		{
-			if ( !initialPointSet )
-			{
-				throwInitialPoint = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
-				initialPointSet = true;
-			}
+			
 
 			m_dragInProgress = true;
 			m_selectedObject->isBeingDragged = true;
@@ -248,17 +244,11 @@ void Game::HandleDrag()
 				}
 			}
 
-			
+			HandleThrow();
 
 		}
 		else
 		{
-			if ( !finalPointSet )
-			{
-				throwFinalPoint= m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
-				finalPointSet = true;
-			}
-			HandleThrow();
 			m_dragInProgress = false;
 			m_selectedObject->isBeingDragged = false;
 			m_selectedObject->m_rigidbody->enableSimulation = true;
@@ -281,13 +271,13 @@ void Game::HandleObjectCreationRequests()
 
 void Game::HandleThrow()
 {
-	if ( !initialPointSet )
+	if ( !initialPointSet || !finalPointSet )
 	{
 		return;
 	}
 
 	Vec2 velocity = -throwFinalPoint+throwInitialPoint;
-	m_selectedObject->m_rigidbody->SetVelocity( velocity * 1.f );
+	m_selectedObject->m_rigidbody->SetVelocity( velocity * 25.f );
 	initialPointSet = false;
 	finalPointSet = false;
 }
@@ -381,7 +371,10 @@ void Game::PolygonDrawMode()
 		}
 		else
 		{
-		drawModePoints.pop_back();
+			if ( drawModePoints.size() > 0 )
+			{
+				drawModePoints.pop_back();
+			}
 		}
 	}
 
@@ -474,8 +467,208 @@ void Game::DrawModeRender()
 	}
 }
 
+void Game::HandleBounceAndWrapAround()
+{
+	for ( int index = 0; index < m_gameObjects.size(); index++ )
+	{
+		if ( m_gameObjects[ index ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_DISC )
+		{
+			DiscCollider2D* temp = ( DiscCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
+
+			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.y - temp->m_radius < m_camera->GetOrthoBottomLeft().y )
+			{
+				m_gameObjects[ index ]->m_rigidbody->ReverseVelocityYAxis();
+			}
+
+			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x - temp->m_radius > m_camera->GetOrthoTopRight().x )
+			{
+				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoBottomLeft().x - temp->m_radius;
+			}
+
+			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x + temp->m_radius < m_camera->GetOrthoBottomLeft().x )
+			{
+				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoTopRight().x + temp->m_radius;
+			}
+		}
+
+		if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
+		{
+			PolygonCollider2D* temp = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
+
+			if ( temp->m_polygonLocal->GetBottomMostEdge().y < m_camera->GetOrthoBottomLeft().y )
+			{
+				m_gameObjects[ index ]->m_rigidbody->ReverseVelocityYAxis();
+			}
+
+			if ( temp->m_polygonLocal->GetLeftMostEdge().x > m_camera->GetOrthoTopRight().x )
+			{
+				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoBottomLeft().x - ( temp->m_polygonLocal->GetRightMostEdge().x - temp->m_polygonLocal->m_localPos.x );
+			}
+
+			if ( temp->m_polygonLocal->GetRightMostEdge().x < m_camera->GetOrthoBottomLeft().x )
+			{
+				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoTopRight().x - ( temp->m_polygonLocal->GetLeftMostEdge().x - temp->m_polygonLocal->m_localPos.x );
+			}
+		}
+
+	}
+}
+
+void Game::DisplayGravityInfo()
+{
+	AABB2 aabb = AABB2( m_camera->GetOrthoBottomLeft() , m_camera->GetOrthoTopRight() );
+	aabb.CarveBoxOffTop( 0.2f );
+
+
+	std::string data = "Current Gravity: ";
+	std::string gravity = "";
+	gravity =data + std::to_string(m_physicsSystem->m_gravityMultiplier);
+
+	std::vector<Vertex_PCU> textVerts;
+
+	m_BitmapFont->AddVertsForTextInBox2D( textVerts , aabb , 2.f , gravity , Rgba8( 0 , 0 , 100 , 255 ) , 1.f , Vec2( 0.9f , 0.9f ));
+	
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( nullptr );
+
+}
+
+
+
+void Game::DisplayX()
+{
+	std::string x = "X";
+	std::vector<Vertex_PCU> textVerts;
+	Vec2 offset = Vec2( .9f , 0.f );
+	offset.RotateDegrees(45.f);
+	
+
+
+	for ( int index = 0; index < m_gameObjects.size(); index++ )
+	{
+		if ( m_gameObjects[ index ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_gameObjects[ index ]->m_rigidbody->enableSimulation )
+		{
+			if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_DISC )
+			{
+				DiscCollider2D* temp = ( DiscCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
+				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_worldPosition-offset , 1.f , x , Rgba8( 0 , 0 , 255 , 255 ) );
+
+				g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+				g_theRenderer->DrawVertexArray( textVerts );
+				g_theRenderer->BindTexture( nullptr );
+			}
+
+			if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
+			{
+				PolygonCollider2D* temp = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
+				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_polygonLocal->GetCentre() , 1.f , x , Rgba8( 0 , 0 , 255 , 255 ) );
+
+				g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+				g_theRenderer->DrawVertexArray( textVerts );
+				g_theRenderer->BindTexture( nullptr );
+			}
+			
+		}
+		else
+		{
+			if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_DISC )
+			{
+				DiscCollider2D* temp = ( DiscCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
+				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_worldPosition-offset , 1.f , x , Rgba8( 100 , 0 , 0 , 255 ) );
+
+				g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+				g_theRenderer->DrawVertexArray( textVerts );
+				g_theRenderer->BindTexture( nullptr );
+			}
+
+			if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
+			{
+				PolygonCollider2D* temp = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
+				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_polygonLocal->GetCentre() , 1.f , x , Rgba8( 100 , 0 , 0 , 255 ) );
+
+				g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+				g_theRenderer->DrawVertexArray( textVerts );
+				g_theRenderer->BindTexture( nullptr );
+			}
+		}
+	}
+}
+
+void Game::HandleGravityModification()
+{
+	if ( g_theInput->WasKeyJustPressed( 0x6B ) )
+	{
+		m_physicsSystem->m_gravityMultiplier += 0.1f;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x6D ) )
+	{
+		m_physicsSystem->m_gravityMultiplier -= 0.1f;
+	}
+}
+
+void Game::UpdateFramePositions( )
+{
+
+	m_frameCounter++;
+	if ( m_frameCounter > 30 )
+	{
+		m_frameCounter = 0;
+	}
+
+	if ( m_selectedObject == nullptr )
+	{
+		throwInitialPoint = Vec2( 0.f , 0.f );
+		throwFinalPoint = Vec2( 0.f , 0.f );
+		initialPointSet = false;
+		finalPointSet = false;
+		return;
+	}
+	
+	if ( m_frameCounter == 0 )
+	{
+		if ( m_selectedObject != nullptr  )
+		{
+			
+				throwInitialPoint = m_selectedObject->m_rigidbody->m_worldPosition;
+				initialPointSet = true;
+		}
+	}
+
+	if ( m_frameCounter == 30 )
+	{
+		if ( m_selectedObject != nullptr )
+		{
+				throwFinalPoint = m_selectedObject->m_rigidbody->m_worldPosition;
+				finalPointSet = true;
+		}
+	}
+
+
+}
+
 void Game::Update( float deltaseconds )
 {
+
+	if ( !isDrawing )
+	{
+		if ( g_theInput->WasKeyJustPressed( 0x1B ) )
+		{
+			g_theapp->HandleQuitRequested();
+		}
+	}
+
 	UpdateCameraMovement( deltaseconds );
 
 	m_physicsSystem->Update( deltaseconds );
@@ -486,19 +679,6 @@ void Game::Update( float deltaseconds )
 	
 	HandlePolygonDrawMode();
 	
-
-	for ( int index = 0; index < m_gameObjects.size(); index++ )
-	{
-		if ( m_gameObjects[ index ] == nullptr )
-		{
-			continue;
-		}
-
-		if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.y < m_camera->GetOrthoBottomLeft().y )
-		{
-			m_gameObjects[ index ]->m_rigidbody->ReverseVelocityYAxis();
-		}
-	}
 
 	if ( g_theInput->GetMouseWheelData()>0 )
 	{
@@ -513,6 +693,7 @@ void Game::Update( float deltaseconds )
 
 	HandleMouseInsideObjects();
 	HandleDrag();
+	UpdateFramePositions();
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
@@ -529,7 +710,12 @@ void Game::Update( float deltaseconds )
 		m_gameObjects[ index ]->UpdateColorsBasedOnStatus();
 	}
 
+	HandleGravityModification();
 	HandleCollissions();
+	HandleBounceAndWrapAround();
+
+	
+	
 	
 }
 
@@ -548,6 +734,9 @@ void Game::Render()
 		}
 		m_gameObjects[ index ]->m_rigidbody->m_collider->DebugRender( g_theRenderer , m_gameObjects[index]->m_borderColor , m_gameObjects[index]->m_fillColor  );
 	}
+
+	DisplayGravityInfo();
+	DisplayX();
 	
 	g_theRenderer->EndCamera( *m_camera );
 

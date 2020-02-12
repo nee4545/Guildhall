@@ -15,7 +15,7 @@ void Physics2D::Update( float deltaSeconds )
 {
 	ApplyAffectors( deltaSeconds );
 	MoveRigidBodies( deltaSeconds );
-
+	CleanUp();
 }
 
 
@@ -94,6 +94,7 @@ PolygonCollider2D* Physics2D::CreatePolygonCollider( Vec2 localPosition , Polygo
 {
 	PolygonCollider2D* collider = new PolygonCollider2D( localPosition , polygon );
 	m_colliders2D.push_back( collider );
+	collider->m_colliderType = COLLIDER2D_POLYGON;
 	return collider;
 }
 
@@ -175,5 +176,38 @@ void Physics2D::MoveRigidBodies( float deltaSeconds )
 void Physics2D::SetSceneGravity( float gravity )
 {
 	m_gravityMultiplier = gravity;
+}
+
+void Physics2D::CleanUp()
+{
+	for ( int index = 0; index < m_colliders2D.size(); index++ )
+	{
+		if ( m_colliders2D[ index ] == nullptr )
+		{
+			continue;
+		}
+		if ( m_colliders2D[ index ]->m_isGarbage )
+		{
+			delete m_colliders2D[ index ];
+			m_colliders2D[ index ] = nullptr;
+		}
+	}
+
+	for ( int index = 0; index < m_rigidBodies2D.size(); index++ )
+	{
+		if ( m_rigidBodies2D[ index ] == nullptr )
+		{
+			continue;
+		}
+		if ( m_rigidBodies2D[ index ]->m_isGarbage )
+		{
+			if ( m_rigidBodies2D[ index ]->m_collider != nullptr )
+			{
+				m_rigidBodies2D[ index ]->m_collider->Destroy();
+			}
+			delete m_rigidBodies2D[ index ];
+			m_rigidBodies2D[ index ] = nullptr;
+		}
+	}
 }
 

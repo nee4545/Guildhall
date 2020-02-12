@@ -50,10 +50,6 @@ void App::Update(float deltaSeconds)
 	
 	thegame->Update(deltaSeconds);
 
-	if( g_theInput->WasKeyJustPressed( VK_ESCAPE ) )
-	{
-		m_isQuitting=true;
-	}
 
 	
 	

@@ -31,6 +31,7 @@ public:
 	void ApplyAffectors( float deltaSeconds );
 	void MoveRigidBodies( float deltaSeconds );
 	void SetSceneGravity( float gravity );
+	void CleanUp();
 
 public:
 	// add members you may need to store these
@@ -38,7 +39,7 @@ public:
 	std::vector<Rigidbody2D*>	m_rigidBodies2D;
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;
-	float m_gravityMultiplier = 8.2f;
+	float m_gravityMultiplier = 9.8f;
 
 
 };

@@ -152,6 +152,51 @@ void Polygon2D::GetEdge( int idx , Vec2* outStart , Vec2* outEnd )
 	*outEnd = m_points[ (size_t) idx + 1 ];
 }
 
+Vec2 Polygon2D::GetBottomMostEdge()
+{
+	Vec2 toReturn = m_points[ 0 ];
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		if ( m_points[ index ].y < toReturn.y )
+		{
+			toReturn = m_points[ index ];
+		}
+	}
+
+	return toReturn;
+}
+
+Vec2 Polygon2D::GetRightMostEdge()
+{
+	Vec2 toReturn = m_points[ 0 ];
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		if ( m_points[ index ].x > toReturn.x )
+		{
+			toReturn = m_points[ index ];
+		}
+	}
+
+	return toReturn;
+}
+
+Vec2 Polygon2D::GetLeftMostEdge()
+{
+	Vec2 toReturn = m_points[ 0 ];
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		if ( m_points[ index ].x < toReturn.x )
+		{
+			toReturn = m_points[ index ];
+		}
+	}
+
+	return toReturn;
+}
+
 void Polygon2D::GetPoints( Vec2* outPoints ) const
 {
 	for ( int index = 0; index < m_points.size(); index++ )
@@ -327,14 +372,19 @@ void Polygon2D::Translate2D( Vec2 translation2D )
 
 
 
-void Polygon2D::SetCenter( Vec2 newCentre )
-{
-	m_centre = newCentre;
-}
 
 Vec2 Polygon2D::GetCentre()
 {
-	return m_centre;
+	Vec2 centre = Vec2(0.f,0.f);
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		centre += m_points[ index ];
+	}
+
+	centre = centre / ( float ) m_points.size();
+
+	return centre;
 }
 
 void Polygon2D::SetPosition(Vec2 pos)

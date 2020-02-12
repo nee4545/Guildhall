@@ -29,7 +29,7 @@ void DiscCollider2D::UpdateWorldShape()
 {
 	//m_worldPosition = m_rigidbody->m_worldPosition+m_localPosition;
 	Vec2 worldPos = m_rigidbody->GetWorldPosition();
-	m_worldPosition = worldPos + m_localPosition;
+	m_worldPosition = worldPos /*+ m_localPosition*/;
 }
 
 Vec2 DiscCollider2D::GetClosestPoint( Vec2 pos ) const
