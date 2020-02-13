@@ -19,6 +19,9 @@ struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 class SwapChain;
 class RenderBuffer;
+struct Mat44;
+struct ID3D11BlendState;
+class Sampler;
 
 enum class BlendMode
 {
@@ -43,9 +46,8 @@ struct  frameData_t
 
 struct cameraData_t
 {
-	Vec2 orthoMin;
-	Vec2 orthoMax;
-
+	Mat44 projection;
+	Mat44 view;
 };
 
 class RenderContext
@@ -62,10 +64,15 @@ public:
 	SwapChain* m_swapChain = nullptr;
 	Shader* m_currentShader = nullptr;
 	Shader* m_defaultShader = nullptr;
+	Sampler* m_defaultSampler = nullptr;
+	Texture* m_defaultColor = nullptr; //white
 	VertexBuffer* m_immediateVBO = nullptr;
 	ID3D11Buffer* m_lastBoundVBO = nullptr;
 	RenderBuffer* m_frameUBO = nullptr;
 	Texture* m_texture;
+
+	ID3D11BlendState* m_alphaBlendState;
+	ID3D11BlendState* m_additiveBlendState;
 	bool m_isDrawing = false;
 
 	
@@ -95,7 +102,11 @@ public:
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);
-	void BindTexture( const Texture* texture);
+
+	Texture* CreateTextureFromColor( Rgba8 color );
+
+	void BindTexture(  const Texture* texture);
+	void BindSampler( const Sampler* sampler );
 
 	void ClaerScreen(const Rgba8 clearColor);
 	void BeginCamera(Camera &camera);
@@ -108,4 +119,14 @@ public:
 
 	BitmapFont* CreateBitMapFontFromFile(std::string filePath);
 	BitmapFont* GetOrCreateBitMapFontFromFile(std::string filePath);
+
+private:
+
+
+	
+
+	void CreateBlendStates();
+
+
+
 };

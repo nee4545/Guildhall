@@ -14,8 +14,6 @@ SwapChain::~SwapChain()
 	m_backbuffer = nullptr;
 
 	DX_SAFE_RELEASE( m_handle );
-	delete m_owner;
-	m_owner = nullptr;
 }
 
 void SwapChain::Present( int vsync /*= 0 */ )

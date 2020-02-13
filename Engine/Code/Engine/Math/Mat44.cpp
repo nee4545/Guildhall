@@ -380,6 +380,28 @@ const Mat44 Mat44::CreateNonUniformScale3D( const Vec3& scaleFactorsXYZ )
 	return matrix;
 }
 
+const Mat44 Mat44::CreateOrthographicProjection( const Vec3& min , const Vec3& max )
+{
+	//think of x
+	//min.x,max.x->(-1,1)
+
+	//ndc.x = x / ( max.x - min.x ) - ( min.x / ( max.x - min.x ) ) * 2.0f + 1.0f
+	//a= 1/(max.x-min.x)
+	//b = (-2.f*min.x- max.x+min.x)/(max.x-min.x)
+
+	Vec3 diff = max - min;
+	Vec3 sum = max + min;
+
+	float mat[] = { 2.0f / diff.x ,    0.f,         0.f,             0.f,
+					0.f,               2.0f/diff.y, 0.f,             0.f,
+					0.f,               0.f,         1.0f/diff.z,     0.f,
+					-sum.x/diff.x,    -sum.y/diff.y,-min.x/diff.z,   1.f };
+
+
+	return Mat44( mat );
+
+}
+
 void Mat44::RotateXDegrees( float degreesAboutX )
 {
 	Mat44 rotationMatrix = CreateXRotationDegrees(degreesAboutX);

@@ -4,6 +4,7 @@
 #include "Engine/Core/Texture.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Math/Mat44.hpp"
 #define UNUSED(x) (void)(x);
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
@@ -12,6 +13,8 @@ void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 	this->bottom_Left.y=bottomLeft.y;
 	this->top_Right.x=topRight.x;
 	this->top_Right.y=topRight.y;
+
+	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottom_Left,0.f),Vec3(topRight,1.f));
 }
 
 Vec2 Camera::GetOrthoBottomLeft() const
@@ -48,6 +51,16 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*
 	UNUSED( stencil );
 }
 
+void Camera::SetPosition( const Vec3& position )
+{
+	m_position = position;
+}
+
+void Camera::Translate( const Vec3& translation )
+{
+	m_position += translation;
+}
+
 Rgba8 Camera::GetClearColor() const
 {
 	return m_clearColor;
@@ -61,8 +74,10 @@ RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
 	}
 
 	cameraData_t cameraData;
-	cameraData.orthoMin = bottom_Left;
-	cameraData.orthoMax = top_Right;
+	cameraData.projection = m_projection;
+
+	cameraData.view = Mat44::CreateTranslation3D( m_position );
+
 
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ));
 

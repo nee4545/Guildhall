@@ -22,6 +22,14 @@ Vec3::Vec3( float initialX, float initialY, float initialZ )
 }
 
 
+Vec3::Vec3(const Vec2& vec , float zValue )
+{
+	x = vec.x;
+	y = vec.y;
+	z = zValue;
+	
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec3 Vec3::operator + ( const Vec3& vecToAdd ) const
 {

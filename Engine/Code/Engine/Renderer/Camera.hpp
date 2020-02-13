@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Math/Mat44.hpp"
 
 class Texture;
 class TextureView;
@@ -23,6 +24,10 @@ private:
 	unsigned int m_clearMode = 0;
 	Rgba8 m_clearColor;
 	RenderBuffer* m_cameraUBO = nullptr;
+
+	Mat44 m_projection;
+	Mat44 m_view;
+	Vec3 m_position;
 	
 public:
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
@@ -32,6 +37,10 @@ public:
 
 	void Translate2D(Vec2 translation2D);
 	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth=0.f , unsigned int stencil=0.f );
+
+	void SetPosition( const Vec3& position );
+	void Translate( const Vec3& translation );
+
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
 	

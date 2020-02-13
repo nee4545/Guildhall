@@ -30,9 +30,12 @@ cbuffer time_constants:register( b0 )
 
 cbuffer camera_constants: register( b1 )
 {
-	float2 MIN;
-	float2 MAX;
+	float4x4 PROJECTION; //CAMERA_TO_CLIP_TRANSFORM
+	float4x4 VIEW;
 };
+
+Texture2D <float4> tDiffuse : register( t0 );
+SamplerState sSampler : register( s0 );
 
 
 float RangeMap( float val , float inMin , float inMax , float outMin , float outMax )
@@ -67,14 +70,10 @@ v2f_t VertexFunction( vs_input_t input )
    v2f.uv = input.uv; 
 
    float4 worldPos = float4( input.position , 1 );
-   worldPos.x += cos( SYSTEM_TIME_SECONDS );
-   worldPos.y -= sin( SYSTEM_TIME_SECONDS );
+   float4 cameraPos = mul( VIEW , worldPos );
 
    float4 clipPos;
-   clipPos.x = RangeMap( worldPos.x , MIN.x , MAX.x , -1.0f , 1.0f );
-   clipPos.y = RangeMap( worldPos.y , MIN.y , MAX.y , -1.0f , 1.0f );
-   clipPos.z = 0.0f;
-   clipPos.w = 1.0f;
+   clipPos = mul( PROJECTION , cameraPos );
 
    v2f.position = clipPos;
     
@@ -88,12 +87,7 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-   // we'll outoupt our UV coordinates as color here
-   // to make sure they're being passed correctly.
-   // Very common rendering debugging method is to 
-   // use color to portray information; 
-   float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
-   float4 finalColor = uvAsColor * input.color; 
+	float4 color= tDiffuse.Sample( sSampler,input.uv );
+	return color * input.color;
 
-   return finalColor; 
 }

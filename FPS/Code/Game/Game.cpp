@@ -35,6 +35,18 @@ void Game::Update( float deltaseconds )
 
 	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( (unsigned char)(100 * m_rColorValue) , 0 , 0 , 0 ) , 0.f , 0 );
 
+	if ( input->IsKeyPressed( 'W' ) )
+	{
+		movement.y += deltaseconds;
+	}
+
+	if ( input->IsKeyPressed( 'S' ) )
+	{
+		movement.y -= deltaseconds;
+	}
+
+	m_camera->SetPosition( movement );
+
 	
 }
 

@@ -16,6 +16,7 @@ class Game
 public:
 
 	World* world = nullptr;
+	Vec3 movement;
 	Game();
 	~Game();
 
