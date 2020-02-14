@@ -394,7 +394,7 @@ void Game::PolygonDrawMode()
 			points[ index ] = drawModePoints[ index ];
 		}
 		Polygon2D* poly = new Polygon2D();
-		*poly = Polygon2D::MakeFromLineLoop( points , drawModePoints.size() );
+		*poly = Polygon2D::MakeFromLineLoop( points , (unsigned int)drawModePoints.size() );
 
 		CreatePolygon( *poly );
 
