@@ -22,6 +22,9 @@
 #define RENDER_DEBUG
 
 
+BitmapFont* g_theBitMapFont = nullptr;
+
+
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
 	//RenderBuffer* m_immediateVBO;
@@ -43,19 +46,9 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU> &verts )
 {
-	/*glBegin( GL_TRIANGLES );
-	{
-		for( int vertIndex=0; vertIndex<verts.size(); vertIndex++ )
-		{
-			glTexCoord2f( verts[vertIndex].m_uvTexCoords.x, verts[vertIndex].m_uvTexCoords.y );
-			glColor4ub( verts[vertIndex].m_color.r, verts[vertIndex].m_color.g, verts[vertIndex].m_color.b,verts[vertIndex].m_color.a );
-			glVertex3f( verts[vertIndex].m_position.x, verts[vertIndex].m_position.y, verts[vertIndex].m_position.z );
-		}
 
-	}
-	glEnd();*/
-	UNUSED( verts );
-	GUARANTEE_OR_DIE( false , "Draw function" );
+	DrawVertexArray( (int)verts.size() , &verts[0] );
+
 }
 
 void RenderContext::DrawAABB2D( const AABB2& aabb, const Rgba8& color )
@@ -176,7 +169,7 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 
 void RenderContext::BindShader( Shader* shader )
 {
-	ASSERT_OR_DIE( m_isDrawing!= true , "Camera has not been set" );
+	ASSERT_OR_DIE( m_isDrawing == true , "Camera has not been set" );
 
 	m_currentShader = shader;
 
@@ -185,14 +178,19 @@ void RenderContext::BindShader( Shader* shader )
 		m_currentShader = m_defaultShader;
 	}
 
-	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState );
-	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
+	
 }
 
 void RenderContext::BindShader( std::string filename )
 {
-	m_currentShader->CreateFromFile( filename );
+	Shader* temp = nullptr;
+	if ( filename == "" )
+	{
+		BindShader( temp );
+		return;
+	}
+
+	m_currentShader=GetOrCreateShader( filename.c_str() );
 }
 
 void RenderContext::BindVertexInput( VertexBuffer* vbo )
@@ -206,6 +204,19 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
 		m_lastBoundVBO = vboHandle;
 	}
+}
+
+Shader* RenderContext::GetOrCreateShader( char const* filename )
+{
+	Shader* temp = m_loadedShaders[ filename ];
+	if ( temp == nullptr )
+	{
+		temp = new Shader( this );
+		temp->CreateFromFile( filename );
+		m_loadedShaders[ filename ] = temp;
+	}
+
+	return m_loadedShaders[ filename ];
 }
 
 void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
@@ -225,7 +236,7 @@ Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 	int imageTexelSizeY = 0; // This will be filled in for us to indicate image height
 	int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
 	int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
-	stbi_set_flip_vertically_on_load( 0 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT
+	stbi_set_flip_vertically_on_load( 1 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT
 	unsigned char* imageData = stbi_load( imageFilePath, &imageTexelSizeX, &imageTexelSizeY, &numComponents, numComponentsRequested );
 	// Check if the load was successful
 	GUARANTEE_OR_DIE( imageData, Stringf( "Failed to load image \"%s\"", imageFilePath ) );
@@ -273,6 +284,8 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 	return temp;
 }
 
+
+
 Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 {
 	UNUSED( color );
@@ -281,6 +294,10 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 
 void RenderContext::Startup( Window* window )
 {
+
+	/*#if defined(RENDER_DEBUG)
+	  CreateDebugModule();
+	#endif*/
 	//Instance - singleton
 	IDXGISwapChain* swapchain = nullptr; 
 
@@ -311,8 +328,10 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	m_defaultShader = new Shader(this);
-	m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
+	//m_defaultShader = new Shader(this);
+	//m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
+
+	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	//swapchain->Release();
@@ -322,10 +341,25 @@ void RenderContext::Startup( Window* window )
 	m_defaultColor = CreateTextureFromFile( "Data/Images/white.png" );
 
 	CreateBlendStates();
+
+	g_theBitMapFont = CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
+
 }
 
 void RenderContext::Shutdown()
 {
+	
+	delete g_theBitMapFont;
+
+	for ( auto& x : m_loadedShaders )
+	{
+		if ( x.second != nullptr )
+		{
+			delete x.second;
+			x.second = nullptr;
+		}
+	}
+
 	if ( m_defaultColor != nullptr )
 	{
 		delete m_defaultColor;
@@ -335,25 +369,17 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
-	if ( m_defaultShader != nullptr )
+	/*if ( m_defaultShader != nullptr )
 	{
 		delete m_defaultShader;
 		m_defaultShader = nullptr;
-	}
-	if ( m_device != nullptr )
-	{
-		m_device->Release();
-		m_device = nullptr;
-		m_context->Release();
-		m_context = nullptr;
-	}
+	}*/
 
 	if ( m_frameUBO != nullptr )
 	{
 		delete m_frameUBO;
 		m_frameUBO = nullptr;
 	}
-
 
 	if ( m_defaultSampler != nullptr )
 	{
@@ -366,6 +392,15 @@ void RenderContext::Shutdown()
 
 	DX_SAFE_RELEASE( m_alphaBlendState );
 	DX_SAFE_RELEASE( m_additiveBlendState );
+
+
+	DX_SAFE_RELEASE( m_context );
+	DX_SAFE_RELEASE( m_device );
+
+	
+
+	/*ReportLiveObjects();
+	DestroyDebugModule();*/
 
 }
 
@@ -383,7 +418,9 @@ void RenderContext::EndFrame()
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
-	
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
 
 	/*TextureView* view = m_texture->GetRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetRTVHandle();*/
@@ -407,6 +444,7 @@ void RenderContext::BeginCamera( Camera &camera)
 		m_context->ClearState();
 	#endif
 
+	m_isDrawing = true;
 	Texture* colorTarget = camera.GetColorTarget();
 	{
 		if ( colorTarget == nullptr )
@@ -442,7 +480,7 @@ void RenderContext::BeginCamera( Camera &camera)
 	m_context->RSSetViewports( 1 , &viewport );
 
 	ClaerScreen(camera.GetClearColor());
-	BindShader( nullptr );
+	BindShader( "" );
 
 	m_lastBoundVBO = nullptr;
 
@@ -454,7 +492,6 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	SetBlendMode( BlendMode::ALPHA );
 
-	m_isDrawing = true;
 }
 
 void RenderContext::EndCamera( const Camera& camera )
@@ -466,7 +503,7 @@ void RenderContext::EndCamera( const Camera& camera )
 void RenderContext::UpdateFrameTime( float deltaTime )
 {
 	frameData_t frameData;
-	frameData.systemTime = GetCurrentTimeSeconds();
+	frameData.systemTime = (float)GetCurrentTimeSeconds();
 	frameData.systemDeltaTime = deltaTime;
 
 	m_frameUBO->Update( &frameData , sizeof( frameData ) , sizeof( frameData ) );
@@ -574,7 +611,17 @@ void RenderContext::ClaerScreen( const Rgba8 clearColor )
 
 void RenderContext::BindTexture(const Texture* texture )
 {
-	Texture* tex = const_cast< Texture* >( texture );
+	Texture* tex;
+	
+	if(texture!=nullptr )
+	{
+		tex = const_cast< Texture* >( texture );
+	}
+	else
+	{
+		tex = m_defaultColor;
+	}
+
 
 	TextureView* shaderResourceView= tex->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetSRV();
@@ -585,5 +632,49 @@ void RenderContext::BindSampler( const Sampler* sampler )
 {
 	ID3D11SamplerState* samplerHandle = sampler->m_handle;
 	m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+}
+
+
+
+void RenderContext::CreateDebugModule()
+{
+	// load the dll
+	m_debugModule = ::LoadLibraryA( "Dxgidebug.dll" );
+	if ( m_debugModule == nullptr )
+	{
+		DebuggerPrintf( "gfx" , "Failed to find dxgidebug.dll.  No debug features enabled." );
+	}
+	else
+	{
+		// find a function in the loaded dll
+		typedef HRESULT( WINAPI * GetDebugModuleCB )( REFIID , void** );
+		GetDebugModuleCB cb = ( GetDebugModuleCB ) ::GetProcAddress( (HMODULE)m_debugModule , "DXGIGetDebugInterface" );
+
+		// create our debug object
+		HRESULT hr = cb( __uuidof( IDXGIDebug ) , ( void** ) & m_debug );
+		ASSERT_OR_DIE( SUCCEEDED( hr ),"Failed debug" );
+	}
+}
+
+// cleanup after ourselves
+void RenderContext::DestroyDebugModule()
+{
+	if ( nullptr != m_debug )
+	{
+		DX_SAFE_RELEASE( m_debug );   // release our debug object
+		FreeLibrary((HMODULE) m_debugModule ); // unload the dll
+
+		m_debug = nullptr;
+		m_debugModule = nullptr;
+	}
+}
+
+// This method will list all current live D3D objects, types, and reference counts
+void RenderContext::ReportLiveObjects()
+{
+	if ( nullptr != m_debug )
+	{
+		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
+	}
 }
 

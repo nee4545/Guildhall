@@ -22,6 +22,14 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
+	case WM_CHAR:
+	{
+		char character = ( char ) wParam;
+		InputSystem* ip = window->GetInputSystem();
+		ip->PushCharacter( character );
+		break;
+	}
+
 	// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)
 	case WM_KEYDOWN:
 	{

@@ -29,6 +29,11 @@ void InputSystem::EndFrame()
 
 	m_leftMousebutton.m_wasPressedLastFrame = m_leftMousebutton.m_isPressed;
 	m_rightMousebutton.m_wasPressedLastFrame = m_rightMousebutton.m_isPressed;
+
+	for ( int index = 0; index < m_characters.size(); index++ )
+	{
+		m_characters.pop();
+	}
 }
 
 void InputSystem::ShutDown()
@@ -119,6 +124,25 @@ bool InputSystem::HandleRightMouseButtonReleased()
 {
 	m_rightMousebutton.UpdateStatus( false );
 	return true;
+}
+
+void InputSystem::PushCharacter( char character )
+{
+	m_characters.push( character );
+}
+
+bool InputSystem::PopCharacter( char* outCharacter )
+{
+	if ( !m_characters.empty() )
+	{
+		*outCharacter = m_characters.front();
+		m_characters.pop();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 const XboxController& InputSystem::GetXboxController( int ControllerID )

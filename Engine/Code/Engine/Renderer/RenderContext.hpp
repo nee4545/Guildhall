@@ -22,6 +22,7 @@ class RenderBuffer;
 struct Mat44;
 struct ID3D11BlendState;
 class Sampler;
+struct IDXGIDebug;
 
 enum class BlendMode
 {
@@ -56,9 +57,13 @@ class RenderContext
 
 	std::map<std::string,Texture*> m_LoadedTextures;
 	std::map<std::string,BitmapFont*> m_LoadedFonts;
+	std::map<std::string , Shader*> m_loadedShaders;
 
 public:
 
+	//debug
+	void* m_debugModule = nullptr;
+	IDXGIDebug* m_debug = nullptr;
 	ID3D11Device* m_device = nullptr;
 	ID3D11DeviceContext* m_context = nullptr;
 	SwapChain* m_swapChain = nullptr;
@@ -70,10 +75,10 @@ public:
 	ID3D11Buffer* m_lastBoundVBO = nullptr;
 	RenderBuffer* m_frameUBO = nullptr;
 	Texture* m_texture;
-
 	ID3D11BlendState* m_alphaBlendState;
 	ID3D11BlendState* m_additiveBlendState;
 	bool m_isDrawing = false;
+	
 
 	
 public:
@@ -97,6 +102,7 @@ public:
 	void BindShader( Shader* shader );
 	void BindShader( std::string filename );
 	void BindVertexInput( VertexBuffer* vbo );
+	Shader* GetOrCreateShader( char const* filename );
 
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
 
@@ -123,8 +129,9 @@ public:
 private:
 
 
-	
-
+	void CreateDebugModule();
+	void DestroyDebugModule();
+	void ReportLiveObjects();
 	void CreateBlendStates();
 
 

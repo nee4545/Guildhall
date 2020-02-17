@@ -4,6 +4,11 @@
 #include "Engine/Core/Texture.hpp"
 #include <vector>
 
+SpriteSheet::~SpriteSheet()
+{
+	delete &m_texture;
+}
+
 SpriteSheet::SpriteSheet( const Texture& texture, const IntVec2 SimpleGridLayout ): m_texture(texture)
 {
 	m_dimensions = SimpleGridLayout;
@@ -25,27 +30,6 @@ SpriteSheet::SpriteSheet( const Texture& texture, const IntVec2 SimpleGridLayout
 		}
 	}
 
-
-	
-
-	/*IntVec2 dimensionsOfEachSprite;
-	dimensionsOfEachSprite.x = m_texture.GetDimensions().x / SimpleGrigLayout.x;
-	dimensionsOfEachSprite.y = m_texture.GetDimensions().y / SimpleGrigLayout.y;
-	for ( int spriteVerticalIndex = SimpleGrigLayout.y - 1; spriteVerticalIndex >= 0; spriteVerticalIndex-- )
-	{
-		for ( int spriteHorizontalIndex = 0; spriteHorizontalIndex < SimpleGrigLayout.x; spriteHorizontalIndex++ )
-		{
-			int spriteIndex = ( spriteVerticalIndex * SimpleGrigLayout.x ) + spriteHorizontalIndex;
-			Vec2 uvAtMins;
-			uvAtMins.x = ( float ) spriteHorizontalIndex * 1.f / SimpleGrigLayout.x;
-			uvAtMins.y = ( float ) spriteVerticalIndex   * 1.f / SimpleGrigLayout.y;
-			Vec2 uvAtMaxs;
-			uvAtMaxs.x = ( float ) ( spriteHorizontalIndex + 1 ) * 1.f / SimpleGrigLayout.x;
-			uvAtMaxs.y = ( float ) ( spriteVerticalIndex + 1 )	 * 1.f / SimpleGrigLayout.y;
-			SpriteDefinition tempSprtieDefinition = SpriteDefinition( *this , spriteIndex , uvAtMins, uvAtMaxs );
-			m_SpriteDefs.push_back( tempSprtieDefinition );
-		}
-	}*/
 }
 
 

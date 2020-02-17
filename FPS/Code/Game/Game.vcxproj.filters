@@ -19,18 +19,6 @@
     <ClCompile Include="Game.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="Tile.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="World.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -41,10 +29,6 @@
     </ClInclude>
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Entity.hpp" />
-    <ClInclude Include="Tile.hpp" />
-    <ClInclude Include="Map.hpp" />
-    <ClInclude Include="World.hpp" />
-    <ClInclude Include="Player.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
   </ItemGroup>
 </Project>

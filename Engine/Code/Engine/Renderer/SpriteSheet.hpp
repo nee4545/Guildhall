@@ -10,6 +10,9 @@ struct Vec2;
 class SpriteSheet
 {
 public:
+
+	~SpriteSheet();
+
 	explicit SpriteSheet(const Texture& texture, const IntVec2 SimpleGrigLayout);
 	const Texture& GetTexture() const { return m_texture;}
 	int GetNumSprites() const {return (int)m_SpriteDefs.size(); }

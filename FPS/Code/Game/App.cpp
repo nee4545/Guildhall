@@ -7,8 +7,9 @@
 #include "Game/Game.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
-RenderContext* render = nullptr;
+RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
 
 
@@ -16,21 +17,26 @@ RenderContext* render = nullptr;
 
 void App:: Startup()
 {
-	render = new RenderContext();
-	render->Startup(g_theWindow);
-	render->BeginFrame();
-	g_theWindow->SetInputSysten( input );
+	g_theRenderer = new RenderContext();
+	g_theRenderer->Startup(g_theWindow);
+	g_theRenderer->BeginFrame();
+	g_theWindow->SetInputSysten( g_theInput );
 	if ( thegame == nullptr )
 	{
 		thegame = new Game();
 	}
-	
+	g_theConsole.Startup();
+}
+
+App::~App()
+{
+	delete thegame;
+	thegame = nullptr;
 }
 
 void App::Shutdown() //Not used right now
 {
-	render->Shutdown();
-	delete thegame;
+	g_theRenderer->Shutdown();
 }
 
 
@@ -38,26 +44,25 @@ void App::Shutdown() //Not used right now
 void App::Update(float deltaSeconds)
 {
 
-	render->UpdateFrameTime( deltaSeconds );
+	g_theRenderer->UpdateFrameTime( deltaSeconds );
 
-	if( input->IsKeyPressed( 'Y' ) )
+	if( g_theInput->IsKeyPressed( 'Y' ) )
 	{
 		deltaSeconds*=4.f;
 	}
 
-	if( input->IsKeyPressed( 'T' ) )
+	if( g_theInput->IsKeyPressed( 'T' ) )
 	{
 		deltaSeconds*=0.1f;
 	}
 
+
 	thegame->Update( deltaSeconds );
 	
+	g_theConsole.Update( deltaSeconds );
 	//thegame->Update(deltaSeconds);
 
-	if( input->WasKeyJustPressed( VK_ESCAPE ) )
-	{
-		m_isQuitting=true;
-	}
+	
 
 	if ( g_theWindow->m_quitRequested == true )
 	{
@@ -81,8 +86,9 @@ void App::RunFrame() //Not used right now
 
 void App::EndFrame() //Not used right now
 {
-	input->EndFrame();
-	render->EndFrame();
+	g_theInput->EndFrame();
+	g_theRenderer->EndFrame();
+	g_theConsole.EndFrame();
 }
 
 void App::Render() const
@@ -92,16 +98,10 @@ void App::Render() const
 	thegame->Render();
 }
 
-
-
-
-
-
-
 void App::BeginFrame()
 {
-	input->BeginFrame();
-	render->BeginFrame();
+	g_theInput->BeginFrame();
+	g_theRenderer->BeginFrame();
 	
 }
 
@@ -113,8 +113,6 @@ bool App::HandleQuitRequested()
 
 void App::ResetGame()
 {
-	/*delete(thegame);
-	thegame=nullptr;
-	thegame=new Game();*/
+	
 }
 

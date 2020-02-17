@@ -1,8 +1,11 @@
 #pragma once
 #include "GameCommon.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Game/World.hpp"
 
+
+class BitMapFont;
+class Texture;
+class Shader;
 
 
 
@@ -10,12 +13,15 @@ class Game
 {
 	RandomNumberGenerator rng;
 	Camera* m_camera = nullptr;
+	Camera* m_devConsoleCamera = nullptr;
 	float m_rColorValue = 0.f;
-	
+	BitmapFont* m_font;
+	bool devConsoleOpen = false;
+	Texture* tex = nullptr;
+
 
 public:
 
-	World* world = nullptr;
 	Vec3 movement;
 	Game();
 	~Game();
@@ -30,7 +36,7 @@ public:
 	void UpdateCamera();
 
 	void ToggleDebugCamera();
-	void TogglePaused();
+	void ToggleDevConsole();
 	void ToggleDebugging();
 
 

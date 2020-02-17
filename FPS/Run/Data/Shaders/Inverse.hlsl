@@ -88,8 +88,6 @@ v2f_t VertexFunction( vs_input_t input )
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float4 color= tDiffuse.Sample( sSampler,input.uv );
-	return color * input.color;
-
-	//return (1-color.xyz,color.a);
-
+	
+	return float4( 1 - color.xyz , color.a );
 }

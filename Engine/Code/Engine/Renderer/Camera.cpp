@@ -88,5 +88,8 @@ Camera::~Camera()
 {
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
+
+	delete m_texture;
+	m_texture = nullptr;
 }
 
