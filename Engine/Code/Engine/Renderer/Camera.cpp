@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Core/Texture.hpp"
@@ -82,6 +83,16 @@ RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ));
 
 	return m_cameraUBO;
+}
+
+Vec2 Camera::ClientToWordPosition( Vec2 clientPos )
+{
+	Vec2 worldPosition;
+
+	worldPosition.x = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().x , GetOrthoTopRight().x , clientPos.x );
+	worldPosition.y = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().y , GetOrthoTopRight().y , clientPos.y );
+
+	return worldPosition;
 }
 
 Camera::~Camera()

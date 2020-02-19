@@ -43,6 +43,7 @@ public:
 
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
+	Vec2 ClientToWordPosition( Vec2 clientPos );
 	
 
 	Camera()

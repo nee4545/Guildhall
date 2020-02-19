@@ -56,6 +56,7 @@ void App::Update(float deltaSeconds)
 		deltaSeconds*=0.1f;
 	}
 
+	g_theInput->UpdateMouse();
 
 	thegame->Update( deltaSeconds );
 	

@@ -26,6 +26,13 @@ bool Quit( EventArgs& args )
 	return false;
 }
 
+bool Dummy( EventArgs& args )
+{
+	UNUSED( args );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "Ur a dummy for calling this!!" );
+	return false;
+}
+
 
 Game::Game()
 {
@@ -41,6 +48,7 @@ Game::Game()
 
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
+	g_theEventSystem.SubscribeToEvent( "dummy" , Dummy );
 
 }
 

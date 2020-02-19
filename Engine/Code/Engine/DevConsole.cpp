@@ -44,6 +44,7 @@ void DevConsole::Update(float deltaSeconds)
 	}
 
 	ProcessInput();
+	HandleCommandHistoryRequest();
 	HandleCarrotChanges();
 
 	m_carrotBlinkTime -= deltaSeconds;
@@ -133,9 +134,20 @@ void DevConsole::ProcessInput()
 
 		if ( g_theInput->m_characters.front() == 27 )
 		{
+			if ( m_input != "" )
+			{
+				m_input = "";
+				m_carrotOffest = 0;
+				return;
+			}
+			else
+			{
 			m_input = "";
 			SetIsOpen( false );
+			m_carrotOffest = 0;
 			return;
+
+			}
 		}
 
 		if ( g_theInput->m_characters.front() == '`' || g_theInput->m_characters.front() == '~' )
@@ -207,6 +219,22 @@ void DevConsole::ProcessInput()
 
 		}
 	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x23 ) )
+	{
+		if ( m_input != "" )
+		{
+			m_carrotOffest = 0;
+		}
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x24 ) )
+	{
+		if ( m_input != "" )
+		{
+			m_carrotOffest = ( m_input.size() )*-1;
+		}
+	}
 }
 
 void DevConsole::HandleCarrotChanges()
@@ -231,6 +259,77 @@ void DevConsole::HandleCarrotChanges()
 	}
 }
 
+void DevConsole::HandleCommandHistoryRequest()
+{
+	if ( m_commandHistory.size() <= 0 )
+	{
+		return;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x26 ) )
+	{
+		if ( m_commandHistoryIndex+1 <= m_commandHistory.size()-1 )
+		{
+			m_commandHistoryIndex++;
+		}
+
+		m_input = m_commandHistory[ m_commandHistoryIndex ];
+		m_carrotOffest = 0;
+
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x28 ) )
+	{
+
+		if ( m_commandHistoryIndex > 0 )
+		{
+			if ( m_commandHistory.size() > 1 )
+			{
+				m_commandHistoryIndex--;
+			}
+		}
+
+		m_input = m_commandHistory[ m_commandHistoryIndex ];
+		m_carrotOffest = 0;
+
+		if ( m_commandHistoryIndex - 1 >= 0 )
+		{
+			m_commandHistoryIndex--;
+		}
+	}
+}
+
+void DevConsole::SetCarrotUsingMouse()
+{
+	if ( m_input == "" )
+	{
+		return;
+	}
+
+	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition( g_theInput->GetCurrentMousePosition() );
+
+
+
+}
+
+bool DevConsole::IsCommandInHistory( std::string command )
+{
+	if ( m_commandHistory.size() <= 0 )
+	{
+		return false;
+	}
+
+	for ( int index = 0; index < m_commandHistory.size(); index++ )
+	{
+		if ( m_commandHistory[ index ] == command )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void DevConsole::ProcessCommand(std::string& command)
 {
 	for ( int index = 0; index < m_commands.size(); index++ )
@@ -238,8 +337,13 @@ void DevConsole::ProcessCommand(std::string& command)
 		if ( m_commands[ index ] == command )
 		{
 			g_theEventSystem.FireEvent( command , g_gameConfigBlackboard );
+			if ( !IsCommandInHistory( command ) )
+			{
+				m_commandHistory.push_back( command );
+			}
 			return;
 		}
+
 	}
 
 	PrintString( Rgba8( 100 , 0 , 0 , 255 ) , "Invalid command: " + command );
@@ -249,6 +353,7 @@ void DevConsole::InitializeCommands()
 {
 	m_commands.push_back( "quit" );
 	m_commands.push_back( "help" );
+	m_commands.push_back( "dummy" );
 }
 
 void DevConsole::SetIsOpen( bool isOpen )
@@ -259,4 +364,9 @@ void DevConsole::SetIsOpen( bool isOpen )
 bool DevConsole::IsOpen() const
 {
 	return isConsoleOpen;
+}
+
+void DevConsole::TakeCamera( Camera* camera )
+{
+	m_devConsoleCamera = camera;
 }

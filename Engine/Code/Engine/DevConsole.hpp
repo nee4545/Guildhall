@@ -29,6 +29,9 @@ public:
 	void Render( RenderContext& renderer,  Camera& camera,float textSize, float lineHeight ) const;
 	void ProcessInput();
 	void HandleCarrotChanges();
+	void HandleCommandHistoryRequest();
+	void SetCarrotUsingMouse();
+	bool IsCommandInHistory( std::string command );
 	void ProcessCommand(std::string& command);
 	void InitializeCommands();
 
@@ -36,11 +39,16 @@ public:
 	bool IsOpen() const;
 	float m_carrotBlinkTime = 1.f;
 	int m_carrotOffest = 0;
+	int m_commandHistoryIndex = 0;
+
+	void TakeCamera( Camera* camera );
 
 private:
 	bool isConsoleOpen = false;
 	std::vector<ColoredLine> m_lines;
 	std::string m_input = "";
 	std::vector<std::string> m_commands;
+	std::vector<std::string> m_commandHistory;
+	Camera* m_devConsoleCamera = nullptr;
 
 };
