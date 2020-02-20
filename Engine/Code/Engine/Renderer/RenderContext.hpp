@@ -27,7 +27,8 @@ struct IDXGIDebug;
 enum class BlendMode
 {
 	ALPHA,
-	ADDITIVE
+	ADDITIVE,
+	OPAQE,
 };
 
 enum eBufferSlot
@@ -77,6 +78,7 @@ public:
 	Texture* m_texture;
 	ID3D11BlendState* m_alphaBlendState;
 	ID3D11BlendState* m_additiveBlendState;
+	ID3D11BlendState* m_opaqueBlendState;
 	bool m_isDrawing = false;
 	
 

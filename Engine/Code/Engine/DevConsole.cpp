@@ -7,9 +7,11 @@
 #include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 extern BitmapFont* g_theBitMapFont;
 extern InputSystem* g_theInput;
+extern AudioSystem* g_theAudio;
 
 DevConsole::DevConsole()
 {
@@ -46,6 +48,8 @@ void DevConsole::Update(float deltaSeconds)
 	ProcessInput();
 	HandleCommandHistoryRequest();
 	HandleCarrotChanges();
+	SetCarrotUsingMouse();
+	HandleTextSelection();
 
 	m_carrotBlinkTime -= deltaSeconds;
 
@@ -73,7 +77,7 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 	renderer.BeginCamera(camera);
 	AABB2 consoleBox = AABB2(camera.GetOrthoBottomLeft(),camera.GetOrthoTopRight());
 	float dimensionOfBox = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
-	consoleBox.CarveBoxOffTop( 0.8f );
+	consoleBox.CarveBoxOffTop( 0.9f );
 	int numberOfLines = RoundDownToInt(dimensionOfBox/lineHeight);
 
 	Vec2 startMins = consoleBox.mins;
@@ -102,10 +106,10 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 	}
 
 	AABB2 textBox = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
-	textBox.CarveBoxOffBottom( 0.2f );
+	textBox.CarveBoxOffBottom( 0.1f );
 	renderer.DrawAABB2D( textBox,Rgba8(100,0,0,100) );
 
-	AABB2 carrot = AABB2( Vec2( 0.f , 0.2f ) , Vec2( 1.5f , textSize+0.5f ) );
+	AABB2 carrot = AABB2( Vec2( 0.f , 0.2f ) , Vec2( 0.5f , textSize+0.5f ) );
 	carrot.Translate( Vec2( (m_input.size()+m_carrotOffest)*textSize , 0.f ) );
 
 
@@ -123,6 +127,9 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 	{
 		renderer.DrawAABB2D( carrot , Rgba8( 100 , 0 , 0 , 100 ) );	
 	}
+
+	if(m_selectedText!=nullptr )
+	renderer.DrawAABB2D( *m_selectedText , Rgba8( 100 , 100 , 100 , 100 ) );
 	
 	renderer.EndCamera(camera);
 }
@@ -159,6 +166,7 @@ void DevConsole::ProcessInput()
 
 		if ( g_theInput->m_characters.front() == 13 )
 		{
+
 			if ( m_input.size() > 0 )
 			{
 				PrintString( Rgba8( 255 , 255 , 255 , 255 ) , m_input );
@@ -171,6 +179,18 @@ void DevConsole::ProcessInput()
 
 		if ( g_theInput->m_characters.front() == 8 )
 		{
+
+			if ( m_selectedText != nullptr )
+			{
+				m_input.erase( m_selectedTextStart ,(m_selectedTextEnd-m_selectedTextStart) );
+				m_selectedText = nullptr;
+				if ( m_carrotOffest < 0 )
+				{
+					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+				}
+				return;
+			}
+
 			if ( m_carrotOffest == 0 )
 			{
 				if ( m_input.size() > 0 )
@@ -202,22 +222,30 @@ void DevConsole::ProcessInput()
 
 	if ( g_theInput->WasKeyJustPressed( 0x2E ) )
 	{
-		if ( m_carrotOffest == 0 )
-		{
-			/*if ( m_input.size() > 0 )
+		
+			if ( m_selectedText != nullptr )
 			{
-				m_input.erase( m_input.size() - 1 , 1 );
-			}*/
-		}
-		else
-		{
+				m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
+				m_selectedText = nullptr;
+
+				if ( m_carrotOffest < 0 )
+				{
+					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+				}
+				return;
+			}
+
+			if ( m_carrotOffest == 0 )
+			{
+				return;
+			}
+
 			if ( m_input.size() + m_carrotOffest >= 0 )
 			{
 				m_input.erase( m_input.size() + m_carrotOffest , 1 );
 				m_carrotOffest++;
 			}
 
-		}
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 0x23 ) )
@@ -232,7 +260,7 @@ void DevConsole::ProcessInput()
 	{
 		if ( m_input != "" )
 		{
-			m_carrotOffest = ( m_input.size() )*-1;
+			m_carrotOffest =(int)( m_input.size() )*-1;
 		}
 	}
 }
@@ -308,7 +336,29 @@ void DevConsole::SetCarrotUsingMouse()
 
 	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition( g_theInput->GetCurrentMousePosition() );
 
+	AABB2 textBoc = AABB2( m_devConsoleCamera->GetOrthoBottomLeft() , m_devConsoleCamera->GetOrthoTopRight() );
+	textBoc.CarveBoxOffBottom( 0.1f );
 
+	if(textBoc.IsPointInside(mousePos) )
+	{
+		AABB2 actualTextBox = AABB2( textBoc.mins , Vec2( m_input.size() * m_textSize , 1.5f ) );
+
+		if ( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			if ( mousePos.x > actualTextBox.maxs.x )
+			{
+				m_carrotOffest = 0;
+			}
+		}
+
+		if ( actualTextBox.IsPointInside( mousePos ) )
+		{
+			if ( g_theInput->WasLeftMouseButtonJustPressed() )
+			{
+				m_carrotOffest = RoundToNearestInt( ( actualTextBox.maxs.x - mousePos.x ) / m_textSize ) * -1;
+			}
+		}
+	}
 
 }
 
@@ -336,6 +386,8 @@ void DevConsole::ProcessCommand(std::string& command)
 	{
 		if ( m_commands[ index ] == command )
 		{
+			SoundID s = g_theAudio->CreateOrGetSound( "Data/Sounds/Success.wav" );
+			g_theAudio->PlaySound( s );
 			g_theEventSystem.FireEvent( command , g_gameConfigBlackboard );
 			if ( !IsCommandInHistory( command ) )
 			{
@@ -346,6 +398,8 @@ void DevConsole::ProcessCommand(std::string& command)
 
 	}
 
+	SoundID s=g_theAudio->CreateOrGetSound( "Data/Sounds/Error.wav" );
+	g_theAudio->PlaySound( s );
 	PrintString( Rgba8( 100 , 0 , 0 , 255 ) , "Invalid command: " + command );
 }
 
@@ -353,7 +407,62 @@ void DevConsole::InitializeCommands()
 {
 	m_commands.push_back( "quit" );
 	m_commands.push_back( "help" );
-	m_commands.push_back( "dummy" );
+	m_commands.push_back( "close" );
+}
+
+void DevConsole::HandleTextSelection()
+{
+	if ( m_input == "" )
+	{
+		m_selectedText = nullptr;
+		return;
+	}
+
+	if ( g_theInput->WasRightMouseButtonJustPressed() )
+	{
+		m_selectedText = nullptr;
+		return;
+	}
+
+	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition( g_theInput->GetCurrentMousePosition() );
+
+	AABB2 textBoc = AABB2( m_devConsoleCamera->GetOrthoBottomLeft() , m_devConsoleCamera->GetOrthoTopRight() );
+	textBoc.CarveBoxOffBottom( 0.1f );
+
+	AABB2 actualTextBox = AABB2( textBoc.mins , Vec2( m_input.size() * m_textSize , 1.5f ) );
+
+	if ( actualTextBox.IsPointInside( mousePos ) )
+	{
+		
+		if ( g_theInput->IsLeftMouseButtonPressed() )
+		{
+			AABB2* selectedText = new AABB2( Vec2( mousePos.x , 0.2f ) , Vec2( ( m_input.size() + m_carrotOffest ) * m_textSize , 2.5f ) );
+			m_selectedText = selectedText;
+		}
+	}
+
+	if ( m_selectedText != nullptr )//Map index of aabb for the text to select
+	{
+		int textEndIndex = (int)m_input.size() + m_carrotOffest;
+		int textStartIndex = RoundToNearestInt( (m_selectedText->mins.x - m_selectedText->maxs.x)/m_textSize );
+		
+
+		if ( textStartIndex > 0 )
+		{
+			m_selectedTextStart = textEndIndex;
+			m_selectedTextEnd = m_selectedTextStart + textStartIndex;
+		}
+		else if(textStartIndex<0 )
+		{
+			m_selectedTextEnd = textEndIndex;
+			m_selectedTextStart = m_selectedTextEnd + textStartIndex;
+
+		}
+		else
+		{
+			m_selectedText = nullptr;
+		}
+	}
 }
 
 void DevConsole::SetIsOpen( bool isOpen )

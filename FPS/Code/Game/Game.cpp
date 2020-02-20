@@ -14,8 +14,9 @@ bool Help( EventArgs& args )
 {
 	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Currently Supported Commands" );
-	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "help" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "help");
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "quit" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "close" );
 	return false;
 }
 
@@ -26,10 +27,11 @@ bool Quit( EventArgs& args )
 	return false;
 }
 
-bool Dummy( EventArgs& args )
+
+bool Close( EventArgs& args )
 {
 	UNUSED( args );
-	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "Ur a dummy for calling this!!" );
+	g_theConsole.SetIsOpen( false );
 	return false;
 }
 
@@ -48,7 +50,10 @@ Game::Game()
 
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
-	g_theEventSystem.SubscribeToEvent( "dummy" , Dummy );
+	g_theEventSystem.SubscribeToEvent( "close" , Close);
+
+	g_theConsole.TakeCamera( m_devConsoleCamera );
+	g_theConsole.SetSize( 2.5f );
 
 }
 

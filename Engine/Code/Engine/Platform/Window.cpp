@@ -22,6 +22,34 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
+	case WM_LBUTTONUP:
+	{
+		InputSystem* ip = window->GetInputSystem();
+		ip->HandleLeftMouseButtonReleased();
+		break;
+	}
+
+	case WM_LBUTTONDOWN:
+	{
+		InputSystem* ip = window->GetInputSystem();
+		ip->HandleLeftMouseButtonPressed();
+		break;
+	}
+
+	case WM_RBUTTONDOWN:
+	{
+		InputSystem* ip = window->GetInputSystem();
+		ip->HandelRightMouseButtonPressed();
+		break;
+	}
+
+	case WM_RBUTTONUP:
+	{
+		InputSystem* ip = window->GetInputSystem();
+		ip->HandleRightMouseButtonReleased();
+		break;
+	}
+
 	case WM_CHAR:
 	{
 		char character = ( char ) wParam;

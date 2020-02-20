@@ -1,6 +1,11 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include"Engine/Input/InputSystem.hpp"
+#include "Engine/Platform/Window.hpp"
 #include "Engine/Core/AABB2.hpp"
+
+class Window;
+
+extern Window* g_theWindow;
 
 InputSystem::InputSystem()
 {
@@ -152,13 +157,14 @@ const XboxController& InputSystem::GetXboxController( int ControllerID )
 
 void InputSystem::UpdateMouse()
 {
+	HWND hwnd = (HWND)g_theWindow->m_hwnd;
 	POINT mousePos;
 	GetCursorPos( &mousePos );
-	ScreenToClient( g_hWnd, &mousePos );
+	ScreenToClient( hwnd, &mousePos );
 	Vec2 mouseClientPos = Vec2( (float)mousePos.x, (float)mousePos.y );
 
 	RECT clientRect;
-	GetClientRect( g_hWnd, &clientRect );
+	GetClientRect( hwnd, &clientRect );
 	AABB2 clientBounds = AABB2( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom );
 	m_mouseNormalizedClientPos = clientBounds.GetUVForPoint( mouseClientPos );
 	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y;

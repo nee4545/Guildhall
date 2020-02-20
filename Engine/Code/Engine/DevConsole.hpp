@@ -8,6 +8,7 @@
 class Camera;
 class RenderContext;
 class BitmapFont;
+struct AABB2;
 
 struct ColoredLine
 {
@@ -34,14 +35,21 @@ public:
 	bool IsCommandInHistory( std::string command );
 	void ProcessCommand(std::string& command);
 	void InitializeCommands();
+	void HandleTextSelection();
 
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const;
 	float m_carrotBlinkTime = 1.f;
 	int m_carrotOffest = 0;
 	int m_commandHistoryIndex = 0;
+	float m_textSize = 0;
+	int m_selectedTextStart = 0;
+	int m_selectedTextEnd = 0;
 
 	void TakeCamera( Camera* camera );
+	inline void SetSize( float size ) { m_textSize = size; }
+
+	AABB2* m_selectedText;
 
 private:
 	bool isConsoleOpen = false;

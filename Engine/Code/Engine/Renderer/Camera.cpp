@@ -10,10 +10,10 @@
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {
-	this->bottom_Left.x=bottomLeft.x;
-	this->bottom_Left.y=bottomLeft.y;
-	this->top_Right.x=topRight.x;
-	this->top_Right.y=topRight.y;
+	this->bottom_Left.x = bottomLeft.x;
+	this->bottom_Left.y = bottomLeft.y;
+	this->top_Right.x = topRight.x;
+	this->top_Right.y = topRight.y;
 
 	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottom_Left,0.f),Vec3(topRight,1.f));
 }

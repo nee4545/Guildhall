@@ -11,7 +11,7 @@
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
-
+AudioSystem* g_theAudio = nullptr;
 
 
 
@@ -21,6 +21,10 @@ void App:: Startup()
 	g_theRenderer->Startup(g_theWindow);
 	g_theRenderer->BeginFrame();
 	g_theWindow->SetInputSysten( g_theInput );
+	if ( g_theAudio == nullptr )
+	{
+		g_theAudio = new AudioSystem();
+	}
 	if ( thegame == nullptr )
 	{
 		thegame = new Game();
@@ -37,6 +41,7 @@ App::~App()
 void App::Shutdown() //Not used right now
 {
 	g_theRenderer->Shutdown();
+	
 }
 
 
@@ -103,6 +108,7 @@ void App::BeginFrame()
 {
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
+	g_theAudio->BeginFrame();
 	
 }
 
