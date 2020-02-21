@@ -31,6 +31,7 @@ class RenderContext
 
 	std::map<std::string,Texture*> m_LoadedTextures;
 	std::map<std::string,BitmapFont*> m_LoadedFonts;
+	std::map<std::string , Shader*> m_loadedShaders;
 
 public:
 
@@ -69,6 +70,7 @@ public:
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);
+	Shader* GetOrCreateShader( char const* filename );
 	void BindTexture( const Texture* texture);
 
 	void ClaerScreen(const Rgba8 clearColor);

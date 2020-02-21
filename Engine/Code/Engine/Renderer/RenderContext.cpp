@@ -190,7 +190,14 @@ void RenderContext::BindShader( Shader* shader )
 
 void RenderContext::BindShader( std::string filename )
 {
-	m_currentShader->CreateFromFile( filename );
+	Shader* temp = nullptr;
+	if ( filename == "" )
+	{
+		BindShader( temp );
+		return;
+	}
+
+	m_currentShader = GetOrCreateShader( filename.c_str() );
 }
 
 void RenderContext::BindVertexInput( VertexBuffer* vbo )
@@ -269,6 +276,19 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 	return temp;
 }
 
+Shader* RenderContext::GetOrCreateShader( char const* filename )
+{
+	Shader* temp = m_loadedShaders[ filename ];
+	if ( temp == nullptr )
+	{
+		temp = new Shader( this );
+		temp->CreateFromFile( filename );
+		m_loadedShaders[ filename ] = temp;
+	}
+
+	return m_loadedShaders[ filename ];
+}
+
 void RenderContext::Startup( Window* window )
 {
 	//Instance - singleton
@@ -301,8 +321,8 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	m_defaultShader = new Shader(this);
-	m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
+	
+	m_defaultShader=GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	//swapchain->Release();
@@ -314,10 +334,19 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
-	if ( m_defaultShader != nullptr )
+	//if ( m_defaultShader != nullptr )
+	//{
+	//	delete m_defaultShader;
+	//	m_defaultShader = nullptr;
+	//}
+
+	for ( auto& x : m_loadedShaders )
 	{
-		delete m_defaultShader;
-		m_defaultShader = nullptr;
+		if ( x.second != nullptr )
+		{
+			delete x.second;
+			x.second = nullptr;
+		}
 	}
 	if ( m_device != nullptr )
 	{
