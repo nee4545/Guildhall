@@ -107,7 +107,7 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 
 	AABB2 textBox = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
 	textBox.CarveBoxOffBottom( 0.1f );
-	renderer.DrawAABB2D( textBox,Rgba8(100,0,0,100) );
+	renderer.DrawAABB2D( textBox,Rgba8(0,0,100,100) );
 
 	AABB2 carrot = AABB2( Vec2( 0.f , 0.2f ) , Vec2( 0.5f , textSize+0.5f ) );
 	carrot.Translate( Vec2( (m_input.size()+m_carrotOffest)*textSize , 0.f ) );
@@ -125,7 +125,7 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 
 	if ( m_carrotBlinkTime > 0.5f )
 	{
-		renderer.DrawAABB2D( carrot , Rgba8( 100 , 0 , 0 , 100 ) );	
+		renderer.DrawAABB2D( carrot , Rgba8( 0 , 0 , 200 , 100 ) );	
 	}
 
 	if(m_selectedText!=nullptr )

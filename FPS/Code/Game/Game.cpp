@@ -131,6 +131,11 @@ void Game::ToggleDebugCamera()
 
 void Game::ToggleDevConsole()
 {
+	if ( !g_theConsole.IsOpen() )
+	{
+		devConsoleOpen = false;
+	}
+
 	if ( g_theInput->WasKeyJustPressed( 0xC0 ) )
 	{
 		devConsoleOpen = !devConsoleOpen;

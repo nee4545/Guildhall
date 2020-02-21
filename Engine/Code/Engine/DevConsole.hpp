@@ -42,14 +42,14 @@ public:
 	float m_carrotBlinkTime = 1.f;
 	int m_carrotOffest = 0;
 	int m_commandHistoryIndex = 0;
-	float m_textSize = 0;
+	float m_textSize = 0.f;
 	int m_selectedTextStart = 0;
 	int m_selectedTextEnd = 0;
 
 	void TakeCamera( Camera* camera );
 	inline void SetSize( float size ) { m_textSize = size; }
 
-	AABB2* m_selectedText;
+	AABB2* m_selectedText =nullptr;
 
 private:
 	bool isConsoleOpen = false;
