@@ -266,8 +266,8 @@ Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 	m_device->CreateTexture2D( &desc , &initialData , &texHandle );
 
 	stbi_image_free( imageData );
-	Texture* temp=new Texture(imageFilePath,this,texHandle);
-	m_LoadedTextures[imageFilePath]=temp;
+	Texture* temp = new Texture(imageFilePath,this,texHandle);
+	m_LoadedTextures[imageFilePath] = temp;
 	return temp;
 
 }
@@ -344,6 +344,8 @@ void RenderContext::Startup( Window* window )
 
 	g_theBitMapFont = CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
+	CreateDebugModule();
+
 }
 
 void RenderContext::Shutdown()
@@ -360,11 +362,16 @@ void RenderContext::Shutdown()
 		}
 	}
 
-	if ( m_defaultColor != nullptr )
+	for ( auto& x : m_LoadedTextures )
 	{
-		delete m_defaultColor;
-		m_defaultColor = nullptr;
+		if ( x.second != nullptr )
+		{
+			delete x.second; 
+			x.second = nullptr; 
+		}
 	}
+
+	m_defaultColor = nullptr; 
 
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
@@ -400,8 +407,8 @@ void RenderContext::Shutdown()
 
 	
 
-	/*ReportLiveObjects();
-	DestroyDebugModule();*/
+	ReportLiveObjects();
+	DestroyDebugModule();
 
 }
 

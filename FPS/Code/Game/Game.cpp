@@ -59,7 +59,6 @@ Game::Game()
 
 Game::~Game()
 {
-	delete tex;
 	delete m_devConsoleCamera;
 	delete m_camera;
 }

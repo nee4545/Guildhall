@@ -34,14 +34,18 @@ void App:: Startup()
 
 App::~App()
 {
-	delete thegame;
-	thegame = nullptr;
+//	delete thegame;
+//	thegame = nullptr;
 }
 
 void App::Shutdown() //Not used right now
 {
+
+	delete thegame;
+	thegame = nullptr; 
+
 	g_theRenderer->Shutdown();
-	
+
 }
 
 

@@ -76,7 +76,6 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 
 Texture::~Texture()
 {
-	
 	delete m_renderTargetView;
 	m_renderTargetView = nullptr;
 

@@ -6,7 +6,7 @@
 
 SpriteSheet::~SpriteSheet()
 {
-	delete &m_texture;
+	// delete &m_texture;
 }
 
 SpriteSheet::SpriteSheet( const Texture& texture, const IntVec2 SimpleGridLayout ): m_texture(texture)
