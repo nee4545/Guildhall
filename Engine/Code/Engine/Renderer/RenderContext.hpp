@@ -1,7 +1,6 @@
 #pragma once
 #include <Engine\Core\Vertex_PCU.hpp>
 #include <Engine\Renderer\Camera.hpp>
-#include "Engine\Core\AABB2.hpp"
 #include "Engine\Core\Texture.hpp"
 #include <map>
 #include <string>

@@ -20,7 +20,7 @@ public:
 
 	virtual Vec2 GetClosestPoint( Vec2 pos ) const override;
 	virtual bool Contains( Vec2 pos ) const override;
-	virtual bool Intersects( Collider2D const* other ) const override;
+	
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) override;
 

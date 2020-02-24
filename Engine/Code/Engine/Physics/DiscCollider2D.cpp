@@ -48,28 +48,28 @@ bool DiscCollider2D::Contains( Vec2 pos ) const
 
 }
 
-bool DiscCollider2D::Intersects( Collider2D const* other ) const
-{
-	
-
-	switch ( other->m_colliderType )
-	{
-	case COLLIDER2D_DISC:
-	{
-		DiscCollider2D* temp = ( DiscCollider2D* ) other;
-		return DoDiscsOverlap( m_worldPosition , m_radius , temp->m_worldPosition , temp->m_radius );
-	}
-
-	case  COLLIDER2D_POLYGON:
-	{
-		PolygonCollider2D* temp = ( PolygonCollider2D* ) other;
-		return DoDiscAndPolygonOverlap( m_worldPosition , m_radius , *temp->m_polygonLocal );
-	}
-	default:
-		return false;
-		break;
-	}
-}
+//bool DiscCollider2D::Intersects( Collider2D const* other ) const
+//{
+//	
+//
+//	switch ( other->m_colliderType )
+//	{
+//	case COLLIDER2D_DISC:
+//	{
+//		DiscCollider2D* temp = ( DiscCollider2D* ) other;
+//		return DoDiscsOverlap( m_worldPosition , m_radius , temp->m_worldPosition , temp->m_radius );
+//	}
+//
+//	case  COLLIDER2D_POLYGON:
+//	{
+//		PolygonCollider2D* temp = ( PolygonCollider2D* ) other;
+//		return DoDiscAndPolygonOverlap( m_worldPosition , m_radius , *temp->m_polygonLocal );
+//	}
+//	default:
+//		return false;
+//		break;
+//	}
+//}
 
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {

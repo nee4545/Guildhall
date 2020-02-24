@@ -1,9 +1,4 @@
 #pragma once
-
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Core/Vertex_PCU.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
-
 class Game;
 
 class App

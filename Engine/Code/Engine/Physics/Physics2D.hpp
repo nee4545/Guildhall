@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
+#include "Engine/Physics/Collision2D.hpp"
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +31,9 @@ public:
 	void DestroyCollider( Collider2D* collider );
 	void ApplyAffectors( float deltaSeconds );
 	void MoveRigidBodies( float deltaSeconds );
+	void DetectCollissions();
+	void ResolveCollissions();
+	void ResolveCollission( Collision2D collission );
 	void SetSceneGravity( float gravity );
 	void CleanUp();
 
@@ -40,10 +44,16 @@ public:
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;
 	float m_gravityMultiplier = 9.8f;
+	std::vector<Collision2D> m_frameCollisions;
 
 
 };
 
+typedef Manifold2(*manifoldGenerations)( Collider2D const* , Collider2D const* );
+
+Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 );
+Manifold2 GenerateDiscAndPolygonManifold( Collider2D const* col0 , Collider2D const* col1 );
+Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 );
 
 
 

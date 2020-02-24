@@ -3,11 +3,7 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Math/MathUtils.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Core/StringUtils.hpp"
-#include "Engine/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/RigidBody2D.hpp"
@@ -93,14 +89,14 @@ void Game::PopulateInitialObjects()
 
 	m_gameObjects.push_back( obj1 );
 
-	GameObject* obj2 = new GameObject();
-	obj2->m_rigidbody = m_physicsSystem->CreateRigidbody();
-	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
-
-	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
-	obj2->m_rigidbody->TakeCollider( collider2 );
-
-	m_gameObjects.push_back( obj2 );
+// 	GameObject* obj2 = new GameObject();
+// 	obj2->m_rigidbody = m_physicsSystem->CreateRigidbody();
+// 	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
+// 
+// 	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
+// 	obj2->m_rigidbody->TakeCollider( collider2 );
+// 
+// 	m_gameObjects.push_back( obj2 );
 
 }
 
@@ -711,7 +707,7 @@ void Game::Update( float deltaseconds )
 	}
 
 	HandleGravityModification();
-	HandleCollissions();
+	//HandleCollissions();
 	HandleBounceAndWrapAround();
 
 	
@@ -742,39 +738,3 @@ void Game::Render()
 
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

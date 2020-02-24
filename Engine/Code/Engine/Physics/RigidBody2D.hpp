@@ -50,7 +50,9 @@ public:
 	Vec2 m_gravityDirection = Vec2( 0.f , -1.f );
 	Vec2 m_gravityVector = Vec2( 0.f , 0.f );
 	void ApplyGravity( float deltaTime, float gravityMultiplier );
+	void ApplyImpulse( Vec2 impulse );
 	void MoveRigidBody( float deltaSeconds );
+	void Move(Vec2 movement);
 	void ReverseVelocityYAxis();
 	void SetSimulationMode( eSimulationMode mode );
 	Vec2 m_worldPosition =Vec2(0.f,0.f);				// where in the world is this rigidbody

@@ -1,4 +1,4 @@
-#include "Engine/Math/Vec4.hpp"\
+#include "Engine/Math/Vec4.hpp"
 
 const Vec4 Vec4::operator + ( const Vec4& vecToAdd ) const
 {

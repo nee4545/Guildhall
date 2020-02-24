@@ -2,6 +2,7 @@
 
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Physics/PhysicsMaterial.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +16,10 @@ enum COLLIDER2D_TYPE
 {
 	COLLIDER2D_DISC ,
 	COLLIDER2D_POLYGON ,
+	NUM_COLLIDER_TYPES
 };
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +34,7 @@ public:
 
 	virtual Vec2 GetClosestPoint( Vec2 pos ) const = 0;
 	virtual bool Contains( Vec2 pos ) const = 0;
-	virtual bool Intersects( Collider2D const* other ) const = 0;
+	bool Intersects( Collider2D const* other ) const;
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 
@@ -46,5 +50,18 @@ public:
 	COLLIDER2D_TYPE		m_colliderType;				// keep track of the type - will help with collision later
 	Physics2D* m_system;                   // system who created or destr
 	Rigidbody2D* m_rigidbody = nullptr;		// owning rigidbody, used for calculating world shape
+	PhysicsMaterial m_material;
 };
 
+
+typedef bool ( *collision_check_cb )( Collider2D const* , Collider2D const* );
+
+bool DiscVPolygonCollisionCheck( Collider2D const* col0 , Collider2D const* col1 );
+bool PolygonVDiscCollisionCheck( Collider2D const* col0 , Collider2D const* col1 );
+bool DiscVsDiscCollisionCheck( Collider2D const* col0 , Collider2D const* col1 );
+bool PolygonVPolygonCollisionCheck( Collider2D const* col0 , Collider2D const* col1 );
+
+
+
+
+ 

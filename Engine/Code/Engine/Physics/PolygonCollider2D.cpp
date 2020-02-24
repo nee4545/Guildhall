@@ -14,6 +14,7 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 	m_polygonLocal = polygon;
 	m_polygonLocal->m_localPos = localPosition;
 	m_localPosition = localPosition;
+	//UpdateWorldShape();
 	
 }
 
@@ -32,27 +33,6 @@ Vec2 PolygonCollider2D::GetClosestPoint( Vec2 pos ) const
 bool PolygonCollider2D::Contains( Vec2 pos ) const
 {
 	return m_polygonLocal->Contains( pos );
-}
-
-bool PolygonCollider2D::Intersects( Collider2D const* other ) const
-{
-	switch ( other->m_colliderType )
-	{
-	case COLLIDER2D_DISC:
-	{
-		DiscCollider2D* temp = ( DiscCollider2D* ) other;
-		return DoDiscAndPolygonOverlap( other->m_rigidbody->m_worldPosition , temp->m_radius , *m_polygonLocal );
-	}
-
-	case COLLIDER2D_POLYGON:
-	{
-		return false;
-		break;
-	}
-	default:
-		return false;
-		break;
-	}
 }
 
 void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )

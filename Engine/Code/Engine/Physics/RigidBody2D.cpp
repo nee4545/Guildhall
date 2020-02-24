@@ -54,6 +54,11 @@ void Rigidbody2D::ApplyGravity( float deltaTime, float gravityMultiplier )
 
 }
 
+void Rigidbody2D::ApplyImpulse( Vec2 impulse )
+{
+	m_velocity += impulse / m_mass;
+}
+
 void Rigidbody2D::MoveRigidBody( float deltaSeconds )
 {
 	if ( !enableSimulation )
@@ -64,6 +69,12 @@ void Rigidbody2D::MoveRigidBody( float deltaSeconds )
 }
 
 
+
+void Rigidbody2D::Move(Vec2 movement)
+{
+	m_worldPosition += movement;
+	m_collider->UpdateWorldShape();
+}
 
 void Rigidbody2D::ReverseVelocityYAxis()
 {
