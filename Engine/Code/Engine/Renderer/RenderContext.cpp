@@ -164,18 +164,18 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness )
 {
 	int numPoints = polygon.GetVertexCount();
-	Vec2* points;
+	/*Vec2* points;
 	points = new Vec2[ numPoints ];
-	polygon.GetPoints( points );
+	polygon.GetPoints( points );*/
 
-	int start =  0 ;
-	int end =  1 ;
+	int start = 0;
+	int end = 1;
 
 	int counter = 0;
 
-	while ( counter<numPoints )
+	while ( counter < numPoints )
 	{
-		DrawLine( points[start] , points[end] , color , thickness );
+		DrawLine( polygon.m_points[ start ] , polygon.m_points[ end ] , color , thickness );
 		start = ( start + 1 ) % numPoints;
 		end = ( end + 1 ) % numPoints;
 		counter++;
@@ -185,9 +185,9 @@ void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8&
 void RenderContext::DrawPolygonFilled( const Polygon2D& polygon , const Rgba8& color )
 {
 	int numPoints = polygon.GetVertexCount();
-	Vec2* points;
-	points = new Vec2[ numPoints ];
-	polygon.GetPoints( points );
+	//Vec2* points;
+	//points = new Vec2[ numPoints ];
+	//polygon.GetPoints( points );
 
 	int vert1 = 1;
 	int vert2 = 2;
@@ -197,9 +197,9 @@ void RenderContext::DrawPolygonFilled( const Polygon2D& polygon , const Rgba8& c
 	while ( counter < numPoints - 2 )
 	{
 		Vertex_PCU vertexs[ 3 ];
-		vertexs[ 0 ] = Vertex_PCU(Vec3(points[0].x,points[0].y,0.f),color,Vec2(0.f,0.f));
-		vertexs[ 1 ] = Vertex_PCU( Vec3( points[ vert1 ].x , points[ vert1 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
-		vertexs[ 2 ] = Vertex_PCU( Vec3( points[ vert2 ].x , points[ vert2 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
+		vertexs[ 0 ] = Vertex_PCU( Vec3( polygon.m_points[ 0 ].x , polygon.m_points[ 0 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
+		vertexs[ 1 ] = Vertex_PCU( Vec3( polygon.m_points[ vert1 ].x , polygon.m_points[ vert1 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
+		vertexs[ 2 ] = Vertex_PCU( Vec3( polygon.m_points[ vert2 ].x , polygon.m_points[ vert2 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
 
 		DrawVertexArray( 3 , vertexs );
 
