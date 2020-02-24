@@ -68,6 +68,7 @@ void PolygonCollider2D::MarkForDestroy()
 
 PolygonCollider2D::~PolygonCollider2D()
 {
-
+	delete m_polygonLocal;
+	m_polygonLocal = nullptr;
 }
 

@@ -375,7 +375,7 @@ void Polygon2D::Translate2D( Vec2 translation2D )
 
 Vec2 Polygon2D::GetCentre()
 {
-	Vec2 centre = Vec2(0.f,0.f);
+	Vec2 centre = Vec2( 0.f , 0.f );
 
 	for ( int index = 0; index < m_points.size(); index++ )
 	{
@@ -385,6 +385,7 @@ Vec2 Polygon2D::GetCentre()
 	centre = centre / ( float ) m_points.size();
 
 	return centre;
+	
 }
 
 void Polygon2D::SetPosition(Vec2 pos)
