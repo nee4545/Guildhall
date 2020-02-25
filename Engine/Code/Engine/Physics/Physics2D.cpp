@@ -135,6 +135,11 @@ void Physics2D::ApplyAffectors( float deltaSeconds )
 		{
 			continue;
 		}
+
+		if ( m_rigidBodies2D[ index ]->enableSimulation == false )
+		{
+			continue;
+		}
 		
 		switch (m_rigidBodies2D[index]->m_mode)
 		{
@@ -165,11 +170,16 @@ void Physics2D::MoveRigidBodies( float deltaSeconds )
 			continue;
 		}
 
+		if ( m_rigidBodies2D[ index ]->enableSimulation == false )
+		{
+			continue;
+		}
+
 		switch ( m_rigidBodies2D[ index ]->m_mode )
 		{
 			case STATIC:
 			{
-				//m_rigidBodies2D[ index ]->m_velocity = Vec2( 1.f , 1.f );
+				m_rigidBodies2D[ index ]->m_velocity = Vec2( 0.f , 0.f );
 				break;	
 			}
 			case DYNAMIC:
@@ -196,9 +206,19 @@ void Physics2D::DetectCollissions()
 		continue;
 		}
 
+		if ( m_rigidBodies2D[ i ]->enableSimulation == false )
+		{
+			continue;
+		}
+
 		for ( int j = i+1; j < m_rigidBodies2D.size(); j++ )
 		{
 			if ( m_rigidBodies2D[ j ] == nullptr )
+			{
+				continue;
+			}
+
+			if ( m_rigidBodies2D[ j ]->enableSimulation == false )
 			{
 				continue;
 			}
@@ -242,66 +262,109 @@ void Physics2D::ResolveCollission( Collision2D collision )
 	float pushMe = theirMass / ( myMass + theirMass );
 	float pushThem = 1.0f - pushMe;
 
-	if ( collision.me->m_colliderType == STATIC || (collision.them->m_colliderType == KINAMETIC || collision.them->m_colliderType == DYNAMIC) )
+	if ( collision.me->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
 	{
-		pushMe = INFINITE;
-		pushThem = theirMass;
+		collision.manifold.normal *= -1;
 	}
-	else if ( collision.them->m_colliderType == STATIC || ( collision.me->m_colliderType == KINAMETIC || collision.me->m_colliderType == DYNAMIC ) )
-	{
-		pushThem = INFINITE;
-		pushMe = myMass;
-	}
-
-	/* Dynamic vs Dynamic (push each other)
-	 Kinematic vs Kinematic (push each other)*/
+	
 	if ( ( collision.me->m_rigidbody->m_mode == DYNAMIC && collision.them->m_rigidbody->m_mode == DYNAMIC ) || ( collision.me->m_rigidbody->m_mode == KINAMETIC && collision.them->m_rigidbody->m_mode == KINAMETIC ) )
 	{
 		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration * 0.5f );
 		collision.them->m_rigidbody->Move( -pushThem * collision.manifold.normal * collision.manifold.penetration * 0.5f );
 	}
 
-	if (  collision.me->m_rigidbody->m_mode == STATIC  &&(collision.them->m_rigidbody->m_mode == KINAMETIC  || collision.them->m_rigidbody->m_mode == DYNAMIC) )
+	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
 	{
 		collision.them->m_rigidbody->Move( -pushThem * collision.manifold.normal * collision.manifold.penetration );
 	}
 
-	if ( ( collision.me->m_rigidbody->m_mode == KINAMETIC || collision.me->m_rigidbody->m_mode == DYNAMIC ) && collision.them->m_rigidbody->m_mode == STATIC)
+	if ( ( collision.me->m_rigidbody->m_mode == KINAMETIC || collision.me->m_rigidbody->m_mode == DYNAMIC ) && collision.them->m_rigidbody->m_mode == STATIC )
 	{
-		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration  );
+		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration );
 	}
 
-	/*if ( collision.me->m_rigidbody->m_mode == KINAMETIC && collision.them->m_rigidbody->m_mode == DYNAMIC )
+	if ( collision.me->m_rigidbody->m_mode == KINAMETIC && collision.them->m_rigidbody->m_mode == DYNAMIC )
 	{
-		collision.them->m_rigidbody->Move( -pushThem * collision.manifold.normal * collision.manifold.penetration  );
+		collision.them->m_rigidbody->Move( -pushThem * collision.manifold.normal * collision.manifold.penetration );
 	}
 
 	if ( collision.me->m_rigidbody->m_mode == DYNAMIC && collision.them->m_rigidbody->m_mode == KINAMETIC )
 	{
-		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration  );
-	}		
+		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration );
+	}
 
 	if ( collision.me->m_rigidbody->m_mode == KINAMETIC && collision.them->m_rigidbody->m_mode == STATIC )
 	{
-		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration  );
+		collision.me->m_rigidbody->Move( pushMe * collision.manifold.normal * collision.manifold.penetration );
 	}
 
 	if ( collision.me->m_rigidbody->m_mode == STATIC && collision.them->m_rigidbody->m_mode == KINAMETIC )
 	{
 		collision.them->m_rigidbody->Move( -pushThem * collision.manifold.normal * collision.manifold.penetration );
-	}*/
+	}
 
-		
-	float jn = (pushMe* pushThem )/( pushMe + pushThem )*(1+collision.me->m_material.bounciness)*
-	DotProduct2D( (collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal);
 
-	
-	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
+	float jn = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.me->GetRestitutionWith(collision.them) ) *
+		DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
+
+	jn = ( jn < 0 ) ? 0 : jn;
+
+
+	if ( ( collision.me->m_rigidbody->m_mode == DYNAMIC || collision.me->m_rigidbody->m_mode == KINAMETIC ) && ( collision.them->m_rigidbody->m_mode == DYNAMIC || collision.them->m_rigidbody->m_mode == KINAMETIC ) )
 	{
-		collision.me->m_rigidbody->ApplyImpulse( -jn * collision.manifold.normal );
+		collision.me->m_rigidbody->ApplyImpulse( jn * collision.manifold.normal );
 		collision.them->m_rigidbody->ApplyImpulse( -jn * collision.manifold.normal );
 	}
-	
+
+
+	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
+	{
+		float j = ( 1 + collision.me->GetRestitutionWith( collision.them )) * DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
+
+		j = ( j < 0 ) ? 0 : j;
+
+		if ( collision.me->m_colliderType == COLLIDER2D_POLYGON || collision.them->m_colliderType == COLLIDER2D_POLYGON )
+		{
+			if ( collision.me->m_colliderType == COLLIDER2D_POLYGON )
+			{
+				collision.them->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
+			}
+			else
+			{
+				collision.them->m_rigidbody->ApplyImpulse( j * collision.manifold.normal );
+			}
+		}
+		else
+		{
+			collision.them->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
+		}
+	}
+
+
+	if ( collision.them->m_rigidbody->m_mode == STATIC && ( collision.me->m_rigidbody->m_mode == KINAMETIC || collision.me->m_rigidbody->m_mode == DYNAMIC ) )
+	{
+		float j = ( 1 + collision.me->GetRestitutionWith( collision.them )) * DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
+
+		j = ( j < 0 ) ? 0 : j;
+
+		if ( collision.me->m_colliderType == COLLIDER2D_POLYGON || collision.them->m_colliderType == COLLIDER2D_POLYGON )
+		{
+			if ( collision.them->m_colliderType == COLLIDER2D_POLYGON )
+			{
+				collision.me->m_rigidbody->ApplyImpulse( j * collision.manifold.normal );
+			}
+			else
+			{
+				collision.me->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
+			}
+		}
+		else
+		{
+			collision.me->m_rigidbody->ApplyImpulse( j* collision.manifold.normal );
+		}
+
+	}
+
 }
 
 void Physics2D::SetSceneGravity( float gravity )
@@ -379,15 +442,12 @@ Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D co
 	collision.normal = ( discColliderMe->m_worldPosition - closetPoint ).GetNormalized();
 	collision.penetration = discColliderMe->m_radius - ( discColliderMe->m_worldPosition - closetPoint ).GetLength();
 
-	/*if ( polyColliderThem->Contains( discColliderMe->m_worldPosition ) )
+	if ( polyColliderThem->Contains( discColliderMe->m_worldPosition ) )
 	{
 		collision.normal = -collision.normal;
 		collision.penetration = ( discColliderMe->m_worldPosition - closetPoint ).GetLength();
-	}*/
+	}
 
 	collision.centre = discColliderMe->m_worldPosition + ( collision.normal * ( discColliderMe->m_radius - ( collision.penetration * 0.5f ) ) );
 	return collision;
-
-	
-
 }

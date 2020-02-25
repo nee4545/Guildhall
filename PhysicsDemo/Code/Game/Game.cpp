@@ -89,14 +89,14 @@ void Game::PopulateInitialObjects()
 
 	m_gameObjects.push_back( obj1 );
 
-// 	GameObject* obj2 = new GameObject();
-// 	obj2->m_rigidbody = m_physicsSystem->CreateRigidbody();
-// 	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
-// 
-// 	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
-// 	obj2->m_rigidbody->TakeCollider( collider2 );
-// 
-// 	m_gameObjects.push_back( obj2 );
+	GameObject* obj2 = new GameObject();
+	obj2->m_rigidbody = m_physicsSystem->CreateRigidbody();
+	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
+
+	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
+	obj2->m_rigidbody->TakeCollider( collider2 );
+
+	m_gameObjects.push_back( obj2 );
 
 }
 
@@ -212,6 +212,16 @@ void Game::HandleDrag()
 			{
 				m_selectedObject->m_rigidbody->SetSimulationMode( DYNAMIC );
 			}
+
+			if ( g_theInput->WasKeyJustPressed( 'G' ) )
+			{
+				m_selectedObject->m_rigidbody->m_collider->IncreamentBounciness( 0.1f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'H' ) )
+			{
+				m_selectedObject->m_rigidbody->m_collider->DecreamentBounciness( 0.1f );
+			}
 			
 			if ( !m_offsetSet )
 			{
@@ -255,8 +265,6 @@ void Game::HandleDrag()
 
 void Game::HandleObjectCreationRequests()
 {
-	
-
 	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
 
 	if ( g_theInput->WasRightMouseButtonJustPressed() )

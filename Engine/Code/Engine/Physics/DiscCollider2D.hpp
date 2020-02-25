@@ -31,6 +31,7 @@ private:
 public:
 	Vec2	m_localPosition = Vec2(0.f,0.f); // my local offset from my parent
 	Vec2	m_worldPosition = Vec2(0.f,0.f); // calculated from local position and owning rigidbody if present
+	
 	float	m_radius =0;
 
 protected:

@@ -36,7 +36,12 @@ public:
 	virtual bool Contains( Vec2 pos ) const = 0;
 	bool Intersects( Collider2D const* other ) const;
 
+	float GetRestitutionWith( Collider2D const* other ) const;
+
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
+
+	void IncreamentBounciness( float increament );
+	void DecreamentBounciness( float decreament );
 
 protected:
 	virtual ~Collider2D() {}; // private - make sure this is virtual so correct deconstructor gets called

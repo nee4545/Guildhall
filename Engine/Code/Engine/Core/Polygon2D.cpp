@@ -398,3 +398,28 @@ void Polygon2D::SetPosition(Vec2 pos)
 	m_localPos = pos;
 }
 
+float Polygon2D::GetBoundingDiscRadius()
+{
+	Vec2 center = GetCentre();
+
+	std::vector<float> distances;
+
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		float d = ( m_points[ index ] - center ).GetLength();
+		distances.push_back( d );
+	}
+
+	float maxDistance = distances[ 0 ];
+
+	for ( int index = 1; index < distances.size(); index++ )
+	{
+		if ( distances[ index ] > maxDistance )
+		{
+			maxDistance = distances[ index ];
+		}
+	}
+
+	return maxDistance;
+}
+

@@ -37,6 +37,7 @@ public: // static constructors (feel free to just use a constructor - I just lik
 	void Translate2D( Vec2 translation2D );
 	Vec2 GetCentre();
 	void SetPosition(Vec2 pos);
+	float GetBoundingDiscRadius();
 
 private:
 	Vec2 m_centre;

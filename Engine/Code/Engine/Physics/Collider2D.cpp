@@ -40,12 +40,46 @@ bool Collider2D::Intersects( Collider2D const* other ) const
 
 
 
+float Collider2D::GetRestitutionWith( Collider2D const* other ) const
+{
+	return m_material.bounciness * other->m_material.bounciness;
+}
+
+void Collider2D::IncreamentBounciness( float increament )
+{
+	m_material.bounciness += increament;
+
+	if ( m_material.bounciness > 1.f )
+	{
+		m_material.bounciness = 1.f;
+	}
+}
+
+void Collider2D::DecreamentBounciness( float decreament )
+{
+	m_material.bounciness -= decreament;
+
+	if ( m_material.bounciness < 0.f )
+	{
+		m_material.bounciness = 0.f;
+	}
+}
+
 bool DiscVPolygonCollisionCheck( Collider2D const* col0 , Collider2D const* col1 )
 {
+
 	DiscCollider2D const* disc = ( DiscCollider2D const* ) col0;
 	PolygonCollider2D const* poly = ( PolygonCollider2D const* ) col1;
-	return DoDiscAndPolygonOverlap( disc->m_worldPosition , disc->m_radius , *poly->m_polygonLocal );
 
+	//Mid Phase Check
+	if ( !DoDiscsOverlap( poly->m_polygonLocal->GetCentre() , poly->boundingDiscRadius , disc->m_worldPosition , disc->m_radius ) )
+	{
+		return false;
+	}
+	else
+	{
+		return DoDiscAndPolygonOverlap( disc->m_worldPosition , disc->m_radius , *poly->m_polygonLocal );
+	}
 }
 
 bool PolygonVDiscCollisionCheck( Collider2D const* col0 , Collider2D const* col1 )

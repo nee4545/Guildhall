@@ -14,6 +14,7 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 	m_polygonLocal = polygon;
 	m_polygonLocal->m_localPos = localPosition;
 	m_localPosition = localPosition;
+	boundingDiscRadius = m_polygonLocal->GetBoundingDiscRadius();
 	//UpdateWorldShape();
 	
 }
@@ -21,7 +22,7 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 void PolygonCollider2D::UpdateWorldShape()
 {
 	Vec2 worldPos = m_rigidbody->GetWorldPosition();
-	m_worldPosition = worldPos/*+m_localPosition*/;
+	m_worldPosition = worldPos;
 	m_polygonLocal->SetPosition( m_worldPosition );
 }
 
@@ -39,6 +40,7 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 {
 	ctx->DrawPolygonFilled( *m_polygonLocal , fillColor );
 	ctx->DrawPolygonUnfilled( *m_polygonLocal , borderColor , 0.2f );
+	//ctx->DrawDisc( m_polygonLocal->GetCentre() , boundingDiscRadius , Rgba8( 100 , 0 , 0 , 100 ) );
 }
 
 void PolygonCollider2D::MarkForDestroy()
