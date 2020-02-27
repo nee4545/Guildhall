@@ -3,6 +3,7 @@
 #include <Engine\Renderer\Camera.hpp>
 #include "Engine\Core\AABB2.hpp"
 #include "Engine\Core\Texture.hpp"
+#include "Engine\Math\Mat44.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -35,6 +36,11 @@ enum eBufferSlot
 {
 	UBO_FRAME_SLOT=0,
 	UBO_CAMERA_SLOT=1,
+};
+
+struct modelData_t
+{
+	Mat44 modal;
 };
 
 //Data for frame ubo
@@ -73,8 +79,11 @@ public:
 	Sampler* m_defaultSampler = nullptr;
 	Texture* m_defaultColor = nullptr; //white
 	VertexBuffer* m_immediateVBO = nullptr;
+
 	ID3D11Buffer* m_lastBoundVBO = nullptr;
 	RenderBuffer* m_frameUBO = nullptr;
+	RenderBuffer* m_modelUBO = nullptr;
+
 	Texture* m_texture;
 	ID3D11BlendState* m_alphaBlendState;
 	ID3D11BlendState* m_additiveBlendState;
@@ -105,6 +114,7 @@ public:
 	void BindShader( std::string filename );
 	void BindVertexInput( VertexBuffer* vbo );
 	Shader* GetOrCreateShader( char const* filename );
+	void SetModalMatrix( Mat44 mat );
 
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
 

@@ -66,6 +66,8 @@ struct Mat44
 	void SetBasisVectors3D(const Vec3& iBasis3D, const Vec3& jBasis3D, const Vec3& kBasis3D, const Vec3& translation3D);
 	void SetBasisVectors4D(const Vec4& iBasis4D, const Vec4& jBasis4D, const Vec4& kBasis4D, const Vec4& translation4D);
 
+	
+
    //Static creation Methods
 
 	static const Mat44 CreateXRotationDegrees(float degreesAboutX);
@@ -78,8 +80,16 @@ struct Mat44
 	static const Mat44 CreateUniformScale3D(float uniformScale3D);
 	static const Mat44 CreateNonUniformScale3D(const Vec3& scaleFactorsXYZ);
 
+	static const Mat44 CreateFromScaleRotationPosition( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position );
+
 	//projection
 	static const Mat44 CreateOrthographicProjection( const Vec3& min , const Vec3& max );
+	static const Mat44 CreatePerspectiveProjection( float fovDegrees , float aspectRatio , float nearZ , float farZ );
+
+
+	static void MatrixTranspose( Mat44& mat );          // A04
+	static void MatrixInvertOrthoNormal( Mat44& mat );  // A04
+	static void MatrixInvert( Mat44& mat );
 
   //Transformation Mutators
 

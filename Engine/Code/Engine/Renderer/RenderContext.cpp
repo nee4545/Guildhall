@@ -219,6 +219,20 @@ Shader* RenderContext::GetOrCreateShader( char const* filename )
 	return m_loadedShaders[ filename ];
 }
 
+void RenderContext::SetModalMatrix( Mat44 mat )
+{
+	if ( m_modelUBO == nullptr )
+	{
+		m_modelUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	modelData_t data;
+	data.modal = mat;
+
+	m_modelUBO->Update( &data , sizeof( data ) , sizeof( data ) );
+
+}
+
 void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 {
 	ID3D11Buffer* uboHandle = ubo->m_handle;
@@ -226,6 +240,8 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
 	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
 }
+
+
 
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 {
@@ -394,6 +410,12 @@ void RenderContext::Shutdown()
 		m_defaultSampler = nullptr;
 	}
 
+	if ( m_modelUBO != nullptr )
+	{
+		delete m_modelUBO;
+		m_modelUBO = nullptr;
+	}
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
@@ -492,8 +514,12 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	m_lastBoundVBO = nullptr;
 
+	SetModalMatrix( Mat44() );
+	
+
 	BindUniformBuffer( 0 , m_frameUBO );
 	BindUniformBuffer( 1 , camera.UpdateAndGetUBO( this ) );
+	BindUniformBuffer( 2 , m_modelUBO );
 
 	BindTexture( m_defaultColor );
 	BindSampler( m_defaultSampler );

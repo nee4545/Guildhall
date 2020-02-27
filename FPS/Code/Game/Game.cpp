@@ -41,7 +41,8 @@ Game::Game()
 	rng= RandomNumberGenerator();
 	m_camera=new Camera();
 	m_devConsoleCamera = new Camera();
-	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(160.f,90.f));
+	//m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(160.f,90.f));
+	m_camera->SetProjectionPerspective( 60.f ,16.f/9.f, -0.1f , -100.f );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
    
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
@@ -82,11 +83,22 @@ void Game::Update( float deltaseconds )
 
 
 	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( (unsigned char)(100 * m_rColorValue) , 0 , 0 , 0 ) , 0.f , 0 );
+
+	if ( g_theInput->IsKeyPressed( 'W' ) )
+	{
+		m_camera->m_transform.m_position.z += 1.f;
+	}
+
+	if ( g_theInput->IsKeyPressed( 'S' ) )
+	{
+		m_camera->m_transform.m_position.z -= 1.f;
+	}
 	
 }
 
 void Game::Render()
 {
+	
 
 	g_theRenderer->BeginCamera(*m_camera);
 	
@@ -113,6 +125,7 @@ void Game::Render()
 		g_theRenderer->EndCamera( *m_devConsoleCamera );
 	}
 
+	
 
 }
 

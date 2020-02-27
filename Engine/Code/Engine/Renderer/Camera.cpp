@@ -18,6 +18,11 @@ void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottom_Left,0.f),Vec3(topRight,1.f));
 }
 
+void Camera::SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip )
+{
+	m_projection = Mat44::CreatePerspectiveProjection( fovDegrees , aspect , nearZClip , farZClip );
+}
+
 Vec2 Camera::GetOrthoBottomLeft() const
 {
 	return bottom_Left;
@@ -54,12 +59,12 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*
 
 void Camera::SetPosition( const Vec3& position )
 {
-	m_position = position;
+	m_transform.m_position = position;
 }
 
 void Camera::Translate( const Vec3& translation )
 {
-	m_position += translation;
+	m_transform.m_position += translation;
 }
 
 Rgba8 Camera::GetClearColor() const
@@ -77,11 +82,11 @@ RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
 	cameraData_t cameraData;
 	cameraData.projection = m_projection;
 
-	cameraData.view = Mat44::CreateTranslation3D( m_position );
+	Mat44 mat = m_transform.ToMatrix();
+	cameraData.view = GetViewMatrix();
 
 
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ));
-
 	return m_cameraUBO;
 }
 
@@ -93,6 +98,14 @@ Vec2 Camera::ClientToWordPosition( Vec2 clientPos )
 	worldPosition.y = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().y , GetOrthoTopRight().y , clientPos.y );
 
 	return worldPosition;
+}
+
+Mat44 Camera::GetViewMatrix()
+{
+	Mat44 model = m_transform.ToMatrix();
+	model.MatrixInvertOrthoNormal( model );
+	m_view = model;
+	return m_view;
 }
 
 Camera::~Camera()

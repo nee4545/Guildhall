@@ -2,6 +2,7 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/Mat44.hpp"
+#include "Engine/Core/Transform.hpp"
 
 class Texture;
 class TextureView;
@@ -27,10 +28,12 @@ private:
 
 	Mat44 m_projection;
 	Mat44 m_view;
-	Vec3 m_position;
 	
 public:
+	Transform m_transform;
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
+	void SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip );
+
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
 	Texture* GetColorTarget() const;
@@ -44,6 +47,7 @@ public:
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
 	Vec2 ClientToWordPosition( Vec2 clientPos );
+	Mat44 GetViewMatrix();
 	
 
 	Camera()
