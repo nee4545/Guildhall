@@ -1,7 +1,6 @@
 #pragma once
 #include <Engine\Core\Vertex_PCU.hpp>
 #include <Engine\Renderer\Camera.hpp>
-#include "Engine\Core\AABB2.hpp"
 #include "Engine\Core\Texture.hpp"
 #include "Engine\Math\Mat44.hpp"
 #include <map>
@@ -14,6 +13,7 @@ class BitmapFont;
 class Window;
 class Shader;
 class VertexBuffer;
+class Polygon2D;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -110,6 +110,8 @@ public:
 	void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2 centre, float radius, Rgba8 color, float thickness );
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
+	void DrawPolygonUnfilled(const Polygon2D& polygon, const Rgba8& color, float thickness );
+	void DrawPolygonFilled(const Polygon2D& polygon, const Rgba8& color);
 
 	void BindShader( Shader* shader );
 	void BindShader( std::string filename );

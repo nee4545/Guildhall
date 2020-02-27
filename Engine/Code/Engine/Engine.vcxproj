@@ -29,6 +29,7 @@
     <ClCompile Include="Core\IntRange.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\OBB2.cpp" />
+    <ClCompile Include="Core\Polygon2D.cpp" />
     <ClCompile Include="Core\SimpleTriangleFont.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
     <ClCompile Include="Core\Texture.cpp" />
@@ -51,7 +52,15 @@
     <ClCompile Include="Math\SmoothNoise.cpp" />
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
+<<<<<<< HEAD
     <ClCompile Include="Platform\Window.cpp" />
+=======
+    <ClCompile Include="Physics\Collider2D.cpp" />
+    <ClCompile Include="Physics\DiscCollider2D.cpp" />
+    <ClCompile Include="Physics\Physics2D.cpp" />
+    <ClCompile Include="Physics\PolygonCollider2D.cpp" />
+    <ClCompile Include="Physics\RigidBody2D.cpp" />
+>>>>>>> math
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\GPUMesh.cpp" />
@@ -80,6 +89,7 @@
     <ClInclude Include="Core\IntRange.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\OBB2.hpp" />
+    <ClInclude Include="Core\Polygon2D.hpp" />
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
@@ -104,7 +114,18 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+<<<<<<< HEAD
     <ClInclude Include="Platform\Window.hpp" />
+=======
+    <ClInclude Include="Physics\Collider2D.hpp" />
+    <ClInclude Include="Physics\Collision2D.hpp" />
+    <ClInclude Include="Physics\DiscCollider2D.hpp" />
+    <ClInclude Include="Physics\Manifold2.hpp" />
+    <ClInclude Include="Physics\Physics2D.hpp" />
+    <ClInclude Include="Physics\PhysicsMaterial.hpp" />
+    <ClInclude Include="Physics\PolygonCollider2D.hpp" />
+    <ClInclude Include="Physics\RigidBody2D.hpp" />
+>>>>>>> math
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />

@@ -25,6 +25,9 @@ private:
 	unsigned int m_clearMode = 0;
 	Rgba8 m_clearColor;
 	RenderBuffer* m_cameraUBO = nullptr;
+	Vec2 m_outpitsize;
+	Vec2 m_pos;
+
 
 	Mat44 m_projection;
 	Mat44 m_view;
@@ -37,6 +40,15 @@ public:
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
 	Texture* GetColorTarget() const;
+	void SetOutputsize( Vec2 size );
+	float GetCameraHeight();
+	void SetPosition( Vec2 position );
+	Vec2 GetPosition() { return m_pos; }
+	Vec2 GetOutputSize() { return m_outpitsize; }
+	void SetOrthoViewForCameraPosition();
+	void SetProjectionOrthographic( float height , float nearZ = -1.f , float farZ = 1.f );
+	float GetAspectRatio() const;
+	Vec2 ClientToWorldPosition( Vec2 clientPos );
 
 	void Translate2D(Vec2 translation2D);
 	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth=0.f , unsigned int stencil=0.f );

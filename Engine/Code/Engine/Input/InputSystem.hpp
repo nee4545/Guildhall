@@ -45,12 +45,15 @@ public:
 
 	void UpdateMouse();
 	std::queue<char> m_characters;
+	int GetMouseWheelData();
+	void SetMouseWheelData( int data );
 
 private:
 
 	KeyButtonState m_keyStates[MAX_KEYBOARD_STATES];
 	KeyButtonState m_leftMousebutton;
 	KeyButtonState m_rightMousebutton;
+
 
 	XboxController m_Cotrollers[MAX_XBOX_CONTROLLERS] =
 	{
@@ -61,6 +64,7 @@ private:
 	};
 
 	Vec2 m_mouseNormalizedClientPos;
+	int m_mouseWheelData = 0;
 	
 
 

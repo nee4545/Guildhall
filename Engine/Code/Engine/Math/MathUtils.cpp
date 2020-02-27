@@ -1,5 +1,6 @@
 #include "MathUtils.hpp"
 #include "Engine/Math/Vec4.hpp"
+#include "Engine/Core/Polygon2D.hpp"
 #include <cmath>
 #include <vector>
 
@@ -195,6 +196,21 @@ bool DoOBBAndOBBOverlap2D( const OBB2& box1 , const OBB2& box2 )
 
 	return true;
 }
+
+bool DoDiscAndPolygonOverlap( const Vec2& discCenter , float discRadius , const Polygon2D& polygon )
+{
+	Vec2 nearestPoint = polygon.GetClosestPoint( discCenter );
+
+	if ( IsPointInsideDisc2D( nearestPoint , discCenter , discRadius ) )
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
+
 
 const Vec2 TransformPosition2D( const Vec2& position, float uniformScale, float rotationDegrees, const Vec2& translation )
 {

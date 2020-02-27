@@ -5,6 +5,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/Polygon2D.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
@@ -248,6 +249,57 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 }
 
 
+
+
+
+void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness )
+{
+	int numPoints = polygon.GetVertexCount();
+	/*Vec2* points;
+	points = new Vec2[ numPoints ];
+	polygon.GetPoints( points );*/
+
+	int start = 0;
+	int end = 1;
+
+	int counter = 0;
+
+	while ( counter < numPoints )
+	{
+		DrawLine( polygon.m_points[ start ] , polygon.m_points[ end ] , color , thickness );
+		start = ( start + 1 ) % numPoints;
+		end = ( end + 1 ) % numPoints;
+		counter++;
+	}
+}
+
+void RenderContext::DrawPolygonFilled( const Polygon2D& polygon , const Rgba8& color )
+{
+	int numPoints = polygon.GetVertexCount();
+	//Vec2* points;
+	//points = new Vec2[ numPoints ];
+	//polygon.GetPoints( points );
+
+	int vert1 = 1;
+	int vert2 = 2;
+
+	int counter = 0;
+
+	while ( counter < numPoints - 2 )
+	{
+		Vertex_PCU vertexs[ 3 ];
+		vertexs[ 0 ] = Vertex_PCU( Vec3( polygon.m_points[ 0 ].x , polygon.m_points[ 0 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
+		vertexs[ 1 ] = Vertex_PCU( Vec3( polygon.m_points[ vert1 ].x , polygon.m_points[ vert1 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
+		vertexs[ 2 ] = Vertex_PCU( Vec3( polygon.m_points[ vert2 ].x , polygon.m_points[ vert2 ].y , 0.f ) , color , Vec2( 0.f , 0.f ) );
+
+		DrawVertexArray( 3 , vertexs );
+
+		vert1++;
+		vert2++;
+		counter++;
+
+	}
+}
 
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 {
