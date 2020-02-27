@@ -1,0 +1,64 @@
+#pragma once
+#include "Engine/Math/Vec2.hpp"
+#include "Engine/Physics/Collision2D.hpp"
+#include <vector>
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class DiscCollider2D;
+class Rigidbody2D;
+class Collider2D;
+class PolygonCollider2D;
+class Polygon2D;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class Physics2D
+{
+public:
+	void BeginFrame();
+	void Update(float deltaSeconds);
+	void EndFrame();    // cleanup destroyed objects
+
+	Physics2D() {};
+
+	// factory style create/destroy
+	Rigidbody2D* CreateRigidbody();
+	void DestroyRigidbody( Rigidbody2D* rigidbody );
+
+	DiscCollider2D* CreateDiscCollider( Vec2 localPosition , float radius );
+	PolygonCollider2D* CreatePolygonCollider( Vec2 localPosition , Polygon2D* polygon );
+	void DestroyCollider( Collider2D* collider );
+	void ApplyAffectors( float deltaSeconds );
+	void MoveRigidBodies( float deltaSeconds );
+	void DetectCollissions();
+	void ResolveCollissions();
+	void ResolveCollission( Collision2D collission );
+	void SetSceneGravity( float gravity );
+	void CleanUp();
+
+public:
+	// add members you may need to store these
+	// storage for all rigid bodies
+	std::vector<Rigidbody2D*>	m_rigidBodies2D;
+	// storage for all colliders
+	std::vector<Collider2D*>	m_colliders2D;
+	float m_gravityMultiplier = 9.8f;
+	std::vector<Collision2D> m_frameCollisions;
+
+
+};
+
+typedef Manifold2(*manifoldGenerations)( Collider2D const* , Collider2D const* );
+
+Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 );
+Manifold2 GenerateDiscAndPolygonManifold( Collider2D const* col0 , Collider2D const* col1 );
+Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 );
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

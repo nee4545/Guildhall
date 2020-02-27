@@ -29,6 +29,7 @@ void InputSystem::EndFrame()
 
 	m_leftMousebutton.m_wasPressedLastFrame = m_leftMousebutton.m_isPressed;
 	m_rightMousebutton.m_wasPressedLastFrame = m_rightMousebutton.m_isPressed;
+	m_mouseWheelData = 0;
 }
 
 void InputSystem::ShutDown()
@@ -140,5 +141,15 @@ void InputSystem::UpdateMouse()
 	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y;
 	
 
+}
+
+int InputSystem::GetMouseWheelData()
+{
+	return m_mouseWheelData;
+}
+
+void InputSystem::SetMouseWheelData( int data )
+{
+	m_mouseWheelData = data;
 }
 

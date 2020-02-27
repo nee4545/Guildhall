@@ -40,12 +40,15 @@ public:
 	Vec2 GetCurrentMousePosition() { return m_mouseNormalizedClientPos; }
 
 	void UpdateMouse();
+	int GetMouseWheelData();
+	void SetMouseWheelData( int data );
 
 private:
 
 	KeyButtonState m_keyStates[MAX_KEYBOARD_STATES];
 	KeyButtonState m_leftMousebutton;
 	KeyButtonState m_rightMousebutton;
+
 
 	XboxController m_Cotrollers[MAX_XBOX_CONTROLLERS] =
 	{
@@ -56,6 +59,7 @@ private:
 	};
 
 	Vec2 m_mouseNormalizedClientPos;
+	int m_mouseWheelData = 0;
 	
 
 
