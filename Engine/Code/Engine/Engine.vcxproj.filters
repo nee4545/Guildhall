@@ -17,6 +17,9 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{2d7cc2f6-d9c7-4da8-b642-79101c130c03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{fe3749a6-2434-47c2-84ef-2fbe7dd090b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -44,9 +47,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\AABB2.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Texture.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Image.cpp">
@@ -135,6 +135,36 @@
     </ClCompile>
     <ClCompile Include="Math\Poly2D.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Window.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\SwapChain.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Texture.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\TextureView.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Shader.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Sampler.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MatrixUitls.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Transform.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\GPUMesh.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -261,9 +291,6 @@
     <ClInclude Include="Core\StringUtils.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Texture.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Time.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -276,9 +303,42 @@
     <ClInclude Include="Renderer\SpriteAnimSet.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Math\Poly2D.hpp" />
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SwapChain.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Texture.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\D3D11Common.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\TextureView.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="Math\SmoothNoise.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Shader.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderBuffer.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Sampler.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MatrixUtils.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Math\Poly2D.hpp" />
+    <ClInclude Include="Core\Transform.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\GPUMesh.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

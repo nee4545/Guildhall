@@ -1,7 +1,4 @@
-#define WIN32_LEAN_AND_MEAN		// Always #define this before #including <windows.h>
-#include<windows.h>
-#include <gl/gl.h>					// Include basic OpenGL constants and function declarations
-#pragma comment( lib, "opengl32" )
+
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/ThirdParty/stb_image.h"
 #include "Engine/Core/Texture.hpp"
@@ -9,37 +6,55 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Core/Time.hpp"
+#include "Engine/Renderer/Sampler.hpp"
+
+
 #define UNUSED(x) (void)(x);
+
+#include "Engine/Core/D3D11Common.hpp"
+
+#define RENDER_DEBUG
+
+
+BitmapFont* g_theBitMapFont = nullptr;
+
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
-	glBegin(GL_TRIANGLES);
-	{
-		for( int vertIndex=0; vertIndex<numVertexes; vertIndex++ )
-		{
-			const Vertex_PCU& vert = vertexes[ vertIndex ];
-			glTexCoord2f(vert.m_uvTexCoords.x,vert.m_uvTexCoords.y);
-			glColor4ub(vert.m_color.r,vert.m_color.g,vert.m_color.b,vert.m_color.a);
-			glVertex3f(vert.m_position.x,vert.m_position.y,vert.m_position.z);
-		}
+	//RenderBuffer* m_immediateVBO;
 
-	}
-	glEnd();
+	//Update a vertex buffer
+	size_t bufferByteSize = numVertexes * sizeof( Vertex_PCU );
+	size_t elementSize = sizeof( Vertex_PCU );
+	m_immediateVBO->Update( vertexes , bufferByteSize , elementSize );
+
+	//Bind 
+
+		BindVertexInput( m_immediateVBO );
+
+
+		Draw( numVertexes , 0 );
+
+
 }
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU> &verts )
 {
-	glBegin( GL_TRIANGLES );
-	{
-		for( int vertIndex=0; vertIndex<verts.size(); vertIndex++ )
-		{
-			glTexCoord2f( verts[vertIndex].m_uvTexCoords.x, verts[vertIndex].m_uvTexCoords.y );
-			glColor4ub( verts[vertIndex].m_color.r, verts[vertIndex].m_color.g, verts[vertIndex].m_color.b,verts[vertIndex].m_color.a );
-			glVertex3f( verts[vertIndex].m_position.x, verts[vertIndex].m_position.y, verts[vertIndex].m_position.z );
-		}
 
-	}
-	glEnd();
+	DrawVertexArray( (int)verts.size() , &verts[0] );
+
+}
+
+void RenderContext::DrawVertexArray(  int numVertexes , VertexBuffer* vertices )
+{
+	BindVertexInput( vertices );
+	Draw( numVertexes , 0 );
 }
 
 void RenderContext::DrawAABB2D( const AABB2& aabb, const Rgba8& color )
@@ -158,51 +173,125 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
+void RenderContext::BindShader( Shader* shader )
+{
+	ASSERT_OR_DIE( m_isDrawing == true , "Camera has not been set" );
+
+	m_currentShader = shader;
+
+	if ( m_currentShader == nullptr )
+	{
+		m_currentShader = m_defaultShader;
+	}
+
+	
+}
+
+void RenderContext::BindShader( std::string filename )
+{
+	Shader* temp = nullptr;
+	if ( filename == "" )
+	{
+		BindShader( temp );
+		return;
+	}
+
+	m_currentShader=GetOrCreateShader( filename.c_str() );
+}
+
+void RenderContext::BindVertexInput( VertexBuffer* vbo )
+{
+	ID3D11Buffer* vboHandle = vbo->m_handle;
+	unsigned int stride = sizeof( Vertex_PCU );
+	unsigned int offset = 0;
+	
+	if ( m_lastBoundVBO != vboHandle )
+	{
+		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
+		m_lastBoundVBO = vboHandle;
+	}
+}
+
+Shader* RenderContext::GetOrCreateShader( char const* filename )
+{
+	Shader* temp = m_loadedShaders[ filename ];
+	if ( temp == nullptr )
+	{
+		temp = new Shader( this );
+		temp->CreateFromFile( filename );
+		m_loadedShaders[ filename ] = temp;
+	}
+
+	return m_loadedShaders[ filename ];
+}
+
+void RenderContext::SetModalMatrix( Mat44 mat )
+{
+	if ( m_modelUBO == nullptr )
+	{
+		m_modelUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	modelData_t data;
+	data.modal = mat;
+
+	m_modelUBO->Update( &data , sizeof( data ) , sizeof( data ) );
+
+}
+
+void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
+{
+	ID3D11Buffer* uboHandle = ubo->m_handle;
+
+	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
+	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
+}
+
+
+
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 {
+	
 	//const char* imageFilePath = "Data/Images/Test_StbiFlippedAndOpenGL.png";
-	unsigned int textureID = 0;
+	//unsigned int textureID = 0;
 	int imageTexelSizeX = 0; // This will be filled in for us to indicate image width
 	int imageTexelSizeY = 0; // This will be filled in for us to indicate image height
 	int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
-	int numComponentsRequested = 0; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
+	int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
 	stbi_set_flip_vertically_on_load( 1 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT
 	unsigned char* imageData = stbi_load( imageFilePath, &imageTexelSizeX, &imageTexelSizeY, &numComponents, numComponentsRequested );
 	// Check if the load was successful
 	GUARANTEE_OR_DIE( imageData, Stringf( "Failed to load image \"%s\"", imageFilePath ) );
-	GUARANTEE_OR_DIE( numComponents >= 3 && numComponents <= 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
-	glEnable( GL_TEXTURE_2D );
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-	glGenTextures( 1, (GLuint*)&textureID );
-	glBindTexture( GL_TEXTURE_2D, textureID );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT ); // GL_CLAMP or GL_REPEAT
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-	//These 2 lines below are compulsory Please don't remove them.
-	// Set magnification (texel > pixel) and minification (texel < pixel) filters
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST ); // one of: GL_NEAREST, GL_LINEAR
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR ); // one of: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR
-	GLenum bufferFormat = GL_RGBA; // the format our source pixel data is in; any of: GL_RGB, GL_RGBA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, ...
-	if( numComponents == 3 )
-	{
-		bufferFormat = GL_RGB;
-	}
-	GLenum internalFormat = bufferFormat;
-	glTexImage2D(            // Upload this pixel data to our new OpenGL texture
-		GL_TEXTURE_2D,        // Creating this as a 2d texture
-		0,                    // Which mipmap level to use as the "root" (0 = the highest-quality, full-res image), if mipmaps are enabled
-		internalFormat,        // Type of texel format we want OpenGL to use for this texture internally on the video card
-		imageTexelSizeX,    // Texel-width of image; for maximum compatibility, use 2^N + 2^B, where N is some integer in the range [3,11], and B is the border thickness [0,1]
-		imageTexelSizeY,    // Texel-height of image; for maximum compatibility, use 2^M + 2^B, where M is some integer in the range [3,11], and B is the border thickness [0,1]
-		0,                    // Border size, in texels (must be 0 or 1, recommend 0)
-		bufferFormat,        // Pixel format describing the composition of the pixel data in buffer
-		GL_UNSIGNED_BYTE,    // Pixel color components are unsigned bytes (one byte per color channel/component)
-		imageData );        // Address of the actual pixel data bytes/buffer in system memory
-							// Free the raw image texel data now that we've sent a copy of it down to the GPU to be stored in video memory
+	GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
+	
+
+	//DirectX Creation
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = imageTexelSizeX;
+	desc.Height = imageTexelSizeY;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1; //MSAA
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_IMMUTABLE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA  initialData;
+	initialData.pSysMem = imageData;
+	initialData.SysMemPitch = imageTexelSizeX * 4;
+	initialData.SysMemSlicePitch = 0;
+
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc , &initialData , &texHandle );
 
 	stbi_image_free( imageData );
-	Texture* temp=new Texture(imageFilePath,textureID,IntVec2(imageTexelSizeX,imageTexelSizeY));
-	m_LoadedTextures[imageFilePath]=temp;
+	Texture* temp = new Texture(imageFilePath,this,texHandle);
+	m_LoadedTextures[imageFilePath] = temp;
 	return temp;
+
 }
 
 
@@ -217,13 +306,137 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 	return temp;
 }
 
-void RenderContext::Startup()
+
+
+Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 {
+	UNUSED( color );
+	return nullptr;
+}
+
+void RenderContext::Startup( Window* window )
+{
+
+	/*#if defined(RENDER_DEBUG)
+	  CreateDebugModule();
+	#endif*/
+	//Instance - singleton
+	IDXGISwapChain* swapchain = nullptr; 
+
+	UINT flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+
+	 #if defined(RENDER_DEBUG)
+	 flags |= D3D11_CREATE_DEVICE_DEBUG;
+	 #endif
+
+	DXGI_SWAP_CHAIN_DESC swapchainDesc;
+	memset( &swapchainDesc , 0 , sizeof( swapchainDesc ) );
+	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
+	swapchainDesc.BufferCount = 2;
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	swapchainDesc.Flags = 0;
 	
+	HWND hwnd = ( HWND ) window->m_hwnd;
+	swapchainDesc.OutputWindow = hwnd;
+	swapchainDesc.SampleDesc.Count = 1;
+	swapchainDesc.Windowed = TRUE;
+	swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapchainDesc.BufferDesc.Width = window->GetClientWidth();
+	swapchainDesc.BufferDesc.Height = window->GetClientHeight();
+
+
+	D3D11CreateDeviceAndSwapChain( nullptr , D3D_DRIVER_TYPE_HARDWARE, nullptr ,
+		flags , nullptr , 0 , D3D11_SDK_VERSION , &swapchainDesc , &swapchain , &m_device , nullptr , &m_context );
+
+	m_swapChain = new SwapChain( this , swapchain );
+
+	//m_defaultShader = new Shader(this);
+	//m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
+
+	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
+
+	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
+	//swapchain->Release();
+	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+
+	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
+	m_defaultColor = CreateTextureFromFile( "Data/Images/white.png" );
+
+	CreateBlendStates();
+
+	g_theBitMapFont = CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
+
+	CreateDebugModule();
+
 }
 
 void RenderContext::Shutdown()
 {
+	
+	delete g_theBitMapFont;
+
+	for ( auto& x : m_loadedShaders )
+	{
+		if ( x.second != nullptr )
+		{
+			delete x.second;
+			x.second = nullptr;
+		}
+	}
+
+	for ( auto& x : m_LoadedTextures )
+	{
+		if ( x.second != nullptr )
+		{
+			delete x.second; 
+			x.second = nullptr; 
+		}
+	}
+
+	m_defaultColor = nullptr; 
+
+	delete m_immediateVBO;
+	m_immediateVBO = nullptr;
+
+	/*if ( m_defaultShader != nullptr )
+	{
+		delete m_defaultShader;
+		m_defaultShader = nullptr;
+	}*/
+
+	if ( m_frameUBO != nullptr )
+	{
+		delete m_frameUBO;
+		m_frameUBO = nullptr;
+	}
+
+	if ( m_defaultSampler != nullptr )
+	{
+		delete m_defaultSampler;
+		m_defaultSampler = nullptr;
+	}
+
+	if ( m_modelUBO != nullptr )
+	{
+		delete m_modelUBO;
+		m_modelUBO = nullptr;
+	}
+
+	delete m_swapChain;
+	m_swapChain = nullptr;
+
+	DX_SAFE_RELEASE( m_alphaBlendState );
+	DX_SAFE_RELEASE( m_additiveBlendState );
+	DX_SAFE_RELEASE( m_opaqueBlendState );
+
+
+	DX_SAFE_RELEASE( m_context );
+	DX_SAFE_RELEASE( m_device );
+
+	
+
+	ReportLiveObjects();
+	DestroyDebugModule();
 
 }
 
@@ -231,23 +444,109 @@ void RenderContext::BeginFrame()
 {
 	
 
+
 }
 
 void RenderContext::EndFrame()
 {
-
+	m_swapChain->Present();
 }
 
-void RenderContext::BeginCamera(const Camera &camera)
+void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
-	glLoadIdentity();
-	glOrtho(camera.GetOrthoBottomLeft().x,camera.GetOrthoTopRight().x,camera.GetOrthoBottomLeft().y,camera.GetOrthoTopRight().y,0.f,1.f);
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
+
+	/*TextureView* view = m_texture->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();*/
 	
+	//This is temporary
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	
+	
+	//Describe vertex format to shader
+
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
+	m_context->IASetInputLayout( inputLayout );
+
+	m_context->Draw( numVertexes , vertexOffset );
+}
+
+void RenderContext::BeginCamera( Camera &camera)
+{
+	#if defined(RENDER_DEBUG)
+		m_context->ClearState();
+	#endif
+
+	m_isDrawing = true;
+	Texture* colorTarget = camera.GetColorTarget();
+	{
+		if ( colorTarget == nullptr )
+		{
+			colorTarget = m_swapChain->GetBackBuffer();
+		}
+	}
+
+	TextureView* view = colorTarget->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+
+	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
+
+	if ( camera.m_texture != nullptr )
+	{
+		m_texture = camera.m_texture;
+	} else
+	{
+		m_texture = m_swapChain->GetBackBuffer();
+	}
+
+	IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
+
+	D3D11_VIEWPORT viewport;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = ( float ) textureDimensions.x;
+	viewport.Height = ( float ) textureDimensions.y;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	m_context->RSSetViewports( 1 , &viewport );
+
+	ClaerScreen(camera.GetClearColor());
+	BindShader( "" );
+
+	m_lastBoundVBO = nullptr;
+
+	SetModalMatrix( Mat44() );
+	
+
+	BindUniformBuffer( 0 , m_frameUBO );
+	BindUniformBuffer( 1 , camera.UpdateAndGetUBO( this ) );
+	BindUniformBuffer( 2 , m_modelUBO );
+
+	BindTexture( m_defaultColor );
+	BindSampler( m_defaultSampler );
+
+	SetBlendMode( BlendMode::ALPHA );
+
 }
 
 void RenderContext::EndCamera( const Camera& camera )
 {
 	 UNUSED(camera);
+	 m_isDrawing = false;
+}
+
+void RenderContext::UpdateFrameTime( float deltaTime )
+{
+	frameData_t frameData;
+	frameData.systemTime = (float)GetCurrentTimeSeconds();
+	frameData.systemDeltaTime = deltaTime;
+
+	m_frameUBO->Update( &frameData , sizeof( frameData ) , sizeof( frameData ) );
 }
 
 void RenderContext::TransformVertexArray( int numVertices, Vertex_PCU* vertices, float scale, float rotationDegrees, const Vec2& translation )
@@ -260,18 +559,23 @@ void RenderContext::TransformVertexArray( int numVertices, Vertex_PCU* vertices,
 
 void RenderContext::SetBlendMode( BlendMode blendMode )
 {
-	if( blendMode == BlendMode::ALPHA )
+	float const zeros[] = { 0,0,0,0 };
+
+	switch ( blendMode )
 	{
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	case BlendMode::ALPHA:
+		m_context->OMSetBlendState( m_alphaBlendState , zeros , ~0U );
+		break;
+	case BlendMode::ADDITIVE:
+		m_context->OMSetBlendState( m_additiveBlendState , zeros , ~0U );
+		break;
+	case BlendMode::OPAQE:
+		m_context->OMSetBlendState( m_opaqueBlendState , zeros , ~0U );
+		break;
+	default:
+		break;
 	}
-	else if( blendMode == BlendMode::ADDITIVE )
-	{
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-	}
-	else
-	{
-		ERROR_AND_DIE( Stringf( "Unknown / unsupported blend mode #%i", blendMode ) );
-	}
+
 
 }
 
@@ -296,24 +600,141 @@ BitmapFont* RenderContext::GetOrCreateBitMapFontFromFile( std::string filePath )
 	return temp;
 }
 
+void RenderContext::CreateBlendStates()
+{
+	D3D11_BLEND_DESC alphaDesc;
+	alphaDesc.AlphaToCoverageEnable = false;
+	alphaDesc.IndependentBlendEnable = false;
+	alphaDesc.RenderTarget[ 0 ].BlendEnable = true;
+	alphaDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
+	alphaDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	alphaDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	alphaDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	alphaDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
+	alphaDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+	// render all output
+	alphaDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_device->CreateBlendState( &alphaDesc , &m_alphaBlendState );
+
+	D3D11_BLEND_DESC additiveDesc;
+	additiveDesc.AlphaToCoverageEnable = false;
+	additiveDesc.IndependentBlendEnable = false;
+	additiveDesc.RenderTarget[ 0 ].BlendEnable = true;
+	additiveDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
+	additiveDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_ONE;
+	additiveDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_ONE;
+	additiveDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	additiveDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
+	additiveDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+	// render all output
+	additiveDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_device->CreateBlendState( &additiveDesc , &m_additiveBlendState );
+
+	D3D11_BLEND_DESC opaqueDesc;
+	opaqueDesc.AlphaToCoverageEnable = false;
+	opaqueDesc.IndependentBlendEnable = false;
+	opaqueDesc.RenderTarget[ 0 ].BlendEnable = false;
+	opaqueDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
+	opaqueDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	opaqueDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	opaqueDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	opaqueDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
+	opaqueDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+	// render all output
+	opaqueDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_device->CreateBlendState( &opaqueDesc , &m_opaqueBlendState );
+
+	
+
+}
+
 void RenderContext::ClaerScreen( const Rgba8 clearColor )
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(float(clearColor.r),float(clearColor.g),float(clearColor.b),float(clearColor.a));
+	/*glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(float(clearColor.r),float(clearColor.g),float(clearColor.b),float(clearColor.a));*/
+	float clearFloats[ 4 ];
+	clearFloats[ 0 ] = ( float ) clearColor.r / 255.0f;
+	clearFloats[ 1 ] = ( float ) clearColor.g / 255.0f;
+	clearFloats[ 2 ] = ( float ) clearColor.b / 255.0f;
+	clearFloats[ 3 ] = ( float ) clearColor.a / 255.0f;
+
+	Texture* backbuffer = m_swapChain->GetBackBuffer();
+	TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+
+	m_context->ClearRenderTargetView( rtv , clearFloats );
+
+	//GUARANTEE_OR_DIE( false , "clrscr" );
 
 }
 
 
-void RenderContext::BindTexture( const Texture* texture )
+void RenderContext::BindTexture(const Texture* texture )
 {
-	if( texture )
+	Texture* tex;
+	
+	if(texture!=nullptr )
 	{
-		glEnable( GL_TEXTURE_2D );
-		glBindTexture( GL_TEXTURE_2D, texture->GetTextureID() );
+		tex = const_cast< Texture* >( texture );
 	}
 	else
 	{
-		glDisable( GL_TEXTURE_2D );
+		tex = m_defaultColor;
+	}
+
+
+	TextureView* shaderResourceView= tex->GetOrCreateShaderResourceView();
+	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetSRV();
+	m_context->PSSetShaderResources( 0 , 1 , &srvHandle );
+}
+
+void RenderContext::BindSampler( const Sampler* sampler )
+{
+	ID3D11SamplerState* samplerHandle = sampler->m_handle;
+	m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+}
+
+
+
+void RenderContext::CreateDebugModule()
+{
+	// load the dll
+	m_debugModule = ::LoadLibraryA( "Dxgidebug.dll" );
+	if ( m_debugModule == nullptr )
+	{
+		DebuggerPrintf( "gfx" , "Failed to find dxgidebug.dll.  No debug features enabled." );
+	}
+	else
+	{
+		// find a function in the loaded dll
+		typedef HRESULT( WINAPI * GetDebugModuleCB )( REFIID , void** );
+		GetDebugModuleCB cb = ( GetDebugModuleCB ) ::GetProcAddress( (HMODULE)m_debugModule , "DXGIGetDebugInterface" );
+
+		// create our debug object
+		HRESULT hr = cb( __uuidof( IDXGIDebug ) , ( void** ) & m_debug );
+		ASSERT_OR_DIE( SUCCEEDED( hr ),"Failed debug" );
+	}
+}
+
+// cleanup after ourselves
+void RenderContext::DestroyDebugModule()
+{
+	if ( nullptr != m_debug )
+	{
+		DX_SAFE_RELEASE( m_debug );   // release our debug object
+		FreeLibrary((HMODULE) m_debugModule ); // unload the dll
+
+		m_debug = nullptr;
+		m_debugModule = nullptr;
+	}
+}
+
+// This method will list all current live D3D objects, types, and reference counts
+void RenderContext::ReportLiveObjects()
+{
+	if ( nullptr != m_debug )
+	{
+		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
 	}
 }
 

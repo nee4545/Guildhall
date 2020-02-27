@@ -1,5 +1,6 @@
 #pragma once
 
+struct Vec2;
 
 struct Vec3
 {
@@ -9,7 +10,7 @@ struct Vec3
 
 	Vec3(){};
 	~Vec3(){};
-
+	Vec3(const Vec2& vec , float zValue );
 	Vec3( const Vec3& copyFrom );							// copy constructor (from another vec2)
 	explicit Vec3( float initialX, float initialY,float initialZ );		// explicit constructor (from x, y)
 

@@ -18,6 +18,8 @@ private:
 	 BitmapFont( const char* fontName, const Texture* fontTexture );
 
 public:
+	
+
 	const Texture* GetTexture() const;
 
 	void AddVertsForText2D( std::vector<Vertex_PCU>& vertexArray, const Vec2& textMins,

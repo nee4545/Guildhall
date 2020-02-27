@@ -10,12 +10,15 @@ m_uvTexCoords=uvTexCoords;
 }
 
 
- Vertex_PCU::Vertex_PCU( const Vec2& position, const Rgba8& tint, const Vec2 uvTexCoords )
- {
-	 m_pos=position;
-	 m_color=tint;
-	 m_uvTexCoords=uvTexCoords;
- }
+	 buffer_attribute_t  Vertex_PCU::LAYOUT[] = 
+	{
+		buffer_attribute_t( "POSITION",  BUFFER_FORMAT_VEC3,      		offsetof( Vertex_PCU, m_position ) ),
+		buffer_attribute_t( "COLOR",     BUFFER_FORMAT_R8G8B8A8_UNORM, 	offsetof( Vertex_PCU, m_color ) ),
+		buffer_attribute_t( "TEXCOORD",        BUFFER_FORMAT_VEC2,      		offsetof( Vertex_PCU, m_uvTexCoords ) ),
+		buffer_attribute_t() // end - terminator element; 
+	};
+
+ 
 
  void AppendAABB2( std::vector<Vertex_PCU>& verts, AABB2& aabb, const Rgba8& tint )
  {
@@ -58,3 +61,16 @@ m_uvTexCoords=uvTexCoords;
  }
 
  
+ buffer_attribute_t::buffer_attribute_t( char const* n , eBufferFormatType t , unsigned int offset )
+ {
+	 name = n;
+	 type = t;
+	 this->offset = offset;
+ }
+
+ buffer_attribute_t::buffer_attribute_t()
+ {
+	 name = "";
+	 type = BUFFER_FORMAT_VEC2;
+	 offset = 0;
+ }

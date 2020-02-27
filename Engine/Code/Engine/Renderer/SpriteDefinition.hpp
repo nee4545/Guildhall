@@ -7,6 +7,7 @@ class Texture;
 class SpriteDefinition
 {
 public:
+	~SpriteDefinition(){}
 	explicit SpriteDefinition(const SpriteSheet& spriteSheet, int spriteIndex, const Vec2& uvAtMins, const Vec2& uvAtMaxs);
 	void GetUVs(Vec2& out_uvAtmins, Vec2& out_uvAtMaxs) const;
 	const SpriteSheet& GetSpriteSheet() const;

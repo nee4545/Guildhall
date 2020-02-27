@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Input/XboxController.hpp"
+#include <queue>
 
 constexpr int MAX_XBOX_CONTROLLERS=4;
 constexpr int MAX_KEYBOARD_STATES=256;
@@ -35,11 +36,15 @@ public:
 	bool HandelRightMouseButtonPressed();
 	bool HandleRightMouseButtonReleased();
 
+	void PushCharacter( char character );
+	bool PopCharacter( char* outCharacter );
+
 
 	const XboxController& GetXboxController(int ControllerID);
 	Vec2 GetCurrentMousePosition() { return m_mouseNormalizedClientPos; }
 
 	void UpdateMouse();
+	std::queue<char> m_characters;
 
 private:
 
