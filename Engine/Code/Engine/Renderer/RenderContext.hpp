@@ -103,6 +103,7 @@ public:
 	void Draw( int numVertexes , int vertexOffset );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray(const std::vector<Vertex_PCU> &verts);
+	void DrawVertexArray(int numVertexes, VertexBuffer* vertices );
 
 	void DrawAABB2D(const AABB2& aabb,const Rgba8& color );
 	void DrawXFlippedAABB2D( const AABB2& aabb , const Rgba8& color );

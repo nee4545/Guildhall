@@ -20,6 +20,8 @@ public:
 		UpdateVertices( vcount , vertices , sizeof( VERTEX_TYPE ) , VERTEX_TYPE::LAYOUT );
 	}
 
+	int m_vertexCount = 0;
+
 public:
 	VertexBuffer* m_vertices;  // like a std::vector<VertexPCU> -> but on GPU
 	//IndexBuffer* m_indices; 	// like a std::vector<uint> -> but on the GPU

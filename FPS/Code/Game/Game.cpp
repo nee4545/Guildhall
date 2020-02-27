@@ -6,6 +6,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -55,6 +56,15 @@ Game::Game()
 
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetSize( 2.5f );
+
+	mesh = new GPUMesh( g_theRenderer );
+
+	std::vector<Vertex_PCU> verices;
+	AABB2 aabb = AABB2( 0.5f , 0.5f , 10.5f , 20.5f );
+
+	AppendAABB2( verices , aabb , Rgba8( 200 , 0 , 100 , 255 ) );
+
+	mesh->UpdateVertices( verices.size() , &verices[ 0 ] );
 
 }
 
@@ -113,6 +123,9 @@ void Game::Render()
 	g_theRenderer->BindTexture( tex );
 	g_theRenderer->DrawAABB2D( AABB2( 20.5f , 20.5f , 30.5f , 30.5f ) , Rgba8( 255 , 255 , 255 , 255 ) );
 	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->DrawVertexArray(mesh->m_vertexCount ,mesh->m_vertices );
 
 
 	g_theRenderer->EndCamera(*m_camera);

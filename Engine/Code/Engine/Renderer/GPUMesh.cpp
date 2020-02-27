@@ -9,5 +9,7 @@ GPUMesh::GPUMesh( RenderContext* owner )
 
 void GPUMesh::UpdateVertices( unsigned int vcount , void const* vertexData , unsigned int vertexStride , buffer_attribute_t const* layout )
 {
-	//m_vertices->Update()
+	m_vertexCount = vcount;
+	size_t bufferByteSize = vcount * vertexStride;
+	m_vertices->Update( vertexData , bufferByteSize, vertexStride );
 }

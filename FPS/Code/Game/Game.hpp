@@ -6,6 +6,7 @@
 class BitMapFont;
 class Texture;
 class Shader;
+class GPUMesh;
 
 
 
@@ -18,7 +19,7 @@ class Game
 	BitmapFont* m_font;
 	bool devConsoleOpen = false;
 	Texture* tex = nullptr;
-
+	GPUMesh* mesh = nullptr;
 
 public:
 

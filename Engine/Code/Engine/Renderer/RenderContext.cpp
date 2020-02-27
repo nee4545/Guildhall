@@ -51,6 +51,12 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU> &verts )
 
 }
 
+void RenderContext::DrawVertexArray(  int numVertexes , VertexBuffer* vertices )
+{
+	BindVertexInput( vertices );
+	Draw( numVertexes , 0 );
+}
+
 void RenderContext::DrawAABB2D( const AABB2& aabb, const Rgba8& color )
 {
 	Vertex_PCU vert[6]
