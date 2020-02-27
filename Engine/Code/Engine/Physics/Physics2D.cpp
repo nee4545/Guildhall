@@ -323,21 +323,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 
 		j = ( j < 0 ) ? 0 : j;
 
-		if ( collision.me->m_colliderType == COLLIDER2D_POLYGON || collision.them->m_colliderType == COLLIDER2D_POLYGON )
-		{
-			if ( collision.me->m_colliderType == COLLIDER2D_POLYGON )
-			{
-				collision.them->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
-			}
-			else
-			{
-				collision.them->m_rigidbody->ApplyImpulse( j * collision.manifold.normal );
-			}
-		}
-		else
-		{
-			collision.them->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
-		}
+		collision.them->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
 	}
 
 
@@ -347,22 +333,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 
 		j = ( j < 0 ) ? 0 : j;
 
-		if ( collision.me->m_colliderType == COLLIDER2D_POLYGON || collision.them->m_colliderType == COLLIDER2D_POLYGON )
-		{
-			if ( collision.them->m_colliderType == COLLIDER2D_POLYGON )
-			{
-				collision.me->m_rigidbody->ApplyImpulse( j * collision.manifold.normal );
-			}
-			else
-			{
-				collision.me->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
-			}
-		}
-		else
-		{
-			collision.me->m_rigidbody->ApplyImpulse( j* collision.manifold.normal );
-		}
-
+		collision.me->m_rigidbody->ApplyImpulse( j* collision.manifold.normal );
 	}
 
 }
