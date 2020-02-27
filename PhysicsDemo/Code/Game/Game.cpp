@@ -469,6 +469,13 @@ void Game::DrawModeRender()
 	{
 		g_theRenderer->DrawLine( drawModePoints[ drawModePoints.size() - 1 ] , invalidPoint , Rgba8( 100 , 0 , 0 , 128 ) , 0.15f );
 	}
+
+	Polygon2D polygon;
+	polygon.m_points = drawModePoints;
+
+	g_theRenderer->DrawDisc( polygon.GetCentre() , polygon.GetBoundingDiscRadius(), Rgba8(100,0,0,100) );
+
+	
 }
 
 void Game::HandleBounceAndWrapAround()
