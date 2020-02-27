@@ -52,15 +52,12 @@
     <ClCompile Include="Math\SmoothNoise.cpp" />
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
-<<<<<<< HEAD
     <ClCompile Include="Platform\Window.cpp" />
-=======
     <ClCompile Include="Physics\Collider2D.cpp" />
     <ClCompile Include="Physics\DiscCollider2D.cpp" />
     <ClCompile Include="Physics\Physics2D.cpp" />
     <ClCompile Include="Physics\PolygonCollider2D.cpp" />
     <ClCompile Include="Physics\RigidBody2D.cpp" />
->>>>>>> math
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\GPUMesh.cpp" />
@@ -114,9 +111,7 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
-<<<<<<< HEAD
     <ClInclude Include="Platform\Window.hpp" />
-=======
     <ClInclude Include="Physics\Collider2D.hpp" />
     <ClInclude Include="Physics\Collision2D.hpp" />
     <ClInclude Include="Physics\DiscCollider2D.hpp" />
@@ -125,7 +120,6 @@
     <ClInclude Include="Physics\PhysicsMaterial.hpp" />
     <ClInclude Include="Physics\PolygonCollider2D.hpp" />
     <ClInclude Include="Physics\RigidBody2D.hpp" />
->>>>>>> math
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />
@@ -205,6 +199,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+    <LibraryPath>D:\Git\Guildhall"D:\Git\Guildhall\Engine\Code\Engine";$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -215,6 +210,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+    <LibraryPath>D:\Git\Guildhall"D:\Git\Guildhall\Engine\Code\Engine";$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

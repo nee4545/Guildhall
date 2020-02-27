@@ -16,9 +16,9 @@
 Game::Game()
 {
 	m_camera = new Camera();
-	m_camera->SetOutputsize( Vec2( 160.f , 90.f ) );
+	m_camera->SetOrthoView(Vec2(0.f,0.f), Vec2( 160.f , 90.f ) );
 	m_cameraHeight = 90.f;
-	m_camera->SetPosition( Vec2( 0.f , 0.f ) );
+	//m_camera->SetPosition( Vec2( 0.f , 0.f ) );
 	m_maxZoomIn = 0.1f * m_cameraHeight;
 	m_maxZoomOut = 3.f * m_cameraHeight;
 	m_rng = RandomNumberGenerator();
