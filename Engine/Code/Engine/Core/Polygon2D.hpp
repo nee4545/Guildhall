@@ -12,6 +12,7 @@ public:
 	bool Contains( Vec2 point ) const;
 	float GetDistance( Vec2 point ) const;
 	Vec2 GetClosestPoint( Vec2 point ) const;
+	Vec2 GetClosestPointOnTheEdges( Vec2 point ) const;
 
 	// accessors
 	int GetVertexCount() const;

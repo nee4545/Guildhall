@@ -73,6 +73,8 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 	obj->m_rigidbody->TakeCollider( collider );
 	obj->m_rigidbody->SetPosition( mousePos );
 
+	obj->m_rigidbody->m_mode = STATIC;
+
 	m_gameObjects.push_back( obj );
 
 	return obj;
@@ -213,12 +215,12 @@ void Game::HandleDrag()
 				m_selectedObject->m_rigidbody->SetSimulationMode( DYNAMIC );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'G' ) )
+			if ( g_theInput->WasKeyJustPressed( 0x6B ) )
 			{
 				m_selectedObject->m_rigidbody->m_collider->IncreamentBounciness( 0.1f );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'H' ) )
+			if ( g_theInput->WasKeyJustPressed( 0x6D ) )
 			{
 				m_selectedObject->m_rigidbody->m_collider->DecreamentBounciness( 0.1f );
 			}
@@ -452,6 +454,11 @@ void Game::DrawModeRender()
 		return;
 	}
 
+	Polygon2D polygon;
+	polygon.m_points = drawModePoints;
+
+	g_theRenderer->DrawDisc( polygon.GetCentre() , polygon.GetBoundingDiscRadius() , Rgba8( 100 , 0 , 0 , 100 ) );
+
 	for ( int index = 0; index < drawModePoints.size(); index++ )
 	{
 		g_theRenderer->DrawDisc( drawModePoints[ index ] , 0.3f , Rgba8( 100 , 100 , 100 , 255 ));
@@ -470,10 +477,7 @@ void Game::DrawModeRender()
 		g_theRenderer->DrawLine( drawModePoints[ drawModePoints.size() - 1 ] , invalidPoint , Rgba8( 100 , 0 , 0 , 128 ) , 0.15f );
 	}
 
-	Polygon2D polygon;
-	polygon.m_points = drawModePoints;
-
-	g_theRenderer->DrawDisc( polygon.GetCentre() , polygon.GetBoundingDiscRadius(), Rgba8(100,0,0,100) );
+	
 
 	
 }
@@ -618,14 +622,17 @@ void Game::DisplayX()
 
 void Game::HandleGravityModification()
 {
-	if ( g_theInput->WasKeyJustPressed( 0x6B ) )
+	if ( !m_dragInProgress )
 	{
-		m_physicsSystem->m_gravityMultiplier += 0.1f;
-	}
+		if ( g_theInput->IsKeyPressed( 0x6B ) )
+		{
+			m_physicsSystem->m_gravityMultiplier += 0.1f;
+		}
 
-	if ( g_theInput->WasKeyJustPressed( 0x6D ) )
-	{
-		m_physicsSystem->m_gravityMultiplier -= 0.1f;
+		if ( g_theInput->IsKeyPressed( 0x6D ) )
+		{
+			m_physicsSystem->m_gravityMultiplier -= 0.1f;
+		}
 	}
 }
 

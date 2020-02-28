@@ -413,10 +413,18 @@ Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D co
 	collision.normal = ( discColliderMe->m_worldPosition - closetPoint ).GetNormalized();
 	collision.penetration = discColliderMe->m_radius - ( discColliderMe->m_worldPosition - closetPoint ).GetLength();
 
+	if ( discColliderMe->Contains( closetPoint ) )
+	{
+		closetPoint = polyColliderThem->m_polygonLocal->GetClosestPointOnTheEdges( closetPoint );
+		collision.normal = ( closetPoint - discColliderMe->m_worldPosition ).GetNormalized();
+		collision.penetration = -( closetPoint - discColliderMe->m_worldPosition ).GetLength() + discColliderMe->m_radius;
+		collision.normal = collision.normal.GetRotatedDegrees( 180.f );
+	}
+
 	if ( polyColliderThem->Contains( discColliderMe->m_worldPosition ) )
 	{
 		collision.normal = -collision.normal;
-		collision.penetration = ( discColliderMe->m_worldPosition - closetPoint ).GetLength();
+		collision.penetration = ( discColliderMe->m_worldPosition - closetPoint ).GetLength()+discColliderMe->m_radius;
 	}
 
 	collision.centre = discColliderMe->m_worldPosition + ( collision.normal * ( discColliderMe->m_radius - ( collision.penetration * 0.5f ) ) );

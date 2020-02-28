@@ -43,5 +43,5 @@ void GameObject::UpdateColorsBasedOnStatus()
 	}
 
 	float value = RangeMapFloat( 0.f , 1.f , 25.f , 255.f , this->m_rigidbody->m_collider->m_material.bounciness );
-	m_fillColor = Rgba8( ( unsigned char ) value , ( unsigned char ) value , ( unsigned char ) value , 128 );
+	m_fillColor = Rgba8(  255 , 255 , 255 , (unsigned char)value );
 }
