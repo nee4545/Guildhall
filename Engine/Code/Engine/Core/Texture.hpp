@@ -29,7 +29,8 @@ public:
 	TextureView* GetRenderTargetView();
 	TextureView* GetOrCreateShaderResourceView();
 	unsigned int GetTextureID()const;
-	const IntVec2 GetDimensions() const { return m_dimensions;}
+	const IntVec2 GetDimensions() const { return m_texelSizeCoords;}
+	static Texture* CreateDepthBuffer(IntVec2 dimensions, RenderContext* ctx );
 
 	IntVec2 GetTexelSizeCoords() const;
 };

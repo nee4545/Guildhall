@@ -91,6 +91,29 @@ unsigned int Texture::GetTextureID() const
 	return textureID;
 }
 
+Texture* Texture::CreateDepthBuffer( IntVec2 dimensions,RenderContext* ctx )
+{
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = dimensions.x;
+	desc.Height = dimensions.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_D32_FLOAT;
+	desc.SampleDesc.Count = 1; //MSAA
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	ID3D11Texture2D* texHandle = nullptr;
+	ctx->m_device->CreateTexture2D( &desc , NULL , &texHandle );
+
+	Texture* temp = new Texture(  ctx , texHandle );
+	return temp;
+
+}
+
 IntVec2 Texture::GetTexelSizeCoords() const
 {
 	return m_texelSizeCoords;

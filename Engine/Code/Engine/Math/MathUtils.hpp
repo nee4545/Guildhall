@@ -68,6 +68,8 @@ const Vec2 GetNearestPointOnCapsule2D(const Vec2& refPos, const Vec2& capsuleMid
 const Vec2 GetNearestPointOnLineSegment2D(const Vec2& refPos, const Vec2& start, const Vec2& end);
 const Vec2 GetNearestPointOnInfiniteLine2D(const Vec2& refPos, const Vec2& somePosition, const Vec2& anotherPosition);
 
+Vec3 GetSphericalCoordinates( float theta , float phi , float r );
+
 FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const Vec2& relativePosition , const Vec2& axisNormal );
 
 //Dot Product

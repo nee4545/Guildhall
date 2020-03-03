@@ -20,6 +20,7 @@ class Game
 	bool devConsoleOpen = false;
 	Texture* tex = nullptr;
 	GPUMesh* mesh = nullptr;
+	Transform cubeTransform;
 
 public:
 

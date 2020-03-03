@@ -413,8 +413,8 @@ const Mat44 Mat44::CreateFromScaleRotationPosition( const Vec3& scale , const Ve
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	transform.TransformBy( translateBy );
 	transform.TransformBy( tranformPitch );
-	transform.TransformBy( tranformYaw );
 	transform.TransformBy( tranformRoll );
+	transform.TransformBy( tranformYaw );
 	transform.TransformBy( scaleMatrix );
 	return transform;
 }

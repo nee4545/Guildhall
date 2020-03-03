@@ -614,6 +614,16 @@ const Vec2 GetNearestPointOnInfiniteLine2D( const Vec2& refPos, const Vec2& some
 	return result;
 }
 
+Vec3 GetSphericalCoordinates( float theta , float phi , float r )
+{
+	Vec3 toReturn;
+	toReturn.x = CosDegrees( theta ) * CosDegrees( phi ) * r;
+	toReturn.y = SinDegrees( phi )*r;
+	toReturn.z = SinDegrees( theta ) * CosDegrees( phi ) * r;
+
+	return toReturn;
+}
+
 FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const Vec2& relativePosition , const Vec2& axisNormal )
 {
 	std::vector<Vec2> projectedPoints;

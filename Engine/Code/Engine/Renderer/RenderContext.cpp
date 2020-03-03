@@ -285,6 +285,8 @@ void RenderContext::SetModalMatrix( Mat44 mat )
 
 	m_modelUBO->Update( &data , sizeof( data ) , sizeof( data ) );
 
+	BindUniformBuffer( 2 , m_modelUBO );
+	
 }
 
 void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
@@ -398,13 +400,37 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	//m_defaultShader = new Shader(this);
-	//m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
+	//Create depth stencil state
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	dsDesc.StencilEnable = FALSE;
+	dsDesc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+	dsDesc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	ID3D11DepthStencilState* pDSState;
+	m_device->CreateDepthStencilState( &dsDesc , &pDSState );
+	m_depthStencilState = pDSState;
+
+
+
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
-	//swapchain->Release();
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
@@ -467,6 +493,8 @@ void RenderContext::Shutdown()
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
+	DX_SAFE_RELEASE( m_depthStencilState );
+
 	DX_SAFE_RELEASE( m_alphaBlendState );
 	DX_SAFE_RELEASE( m_additiveBlendState );
 	DX_SAFE_RELEASE( m_opaqueBlendState );
@@ -487,7 +515,6 @@ void RenderContext::Shutdown()
 void RenderContext::BeginFrame()
 {
 	
-
 
 }
 

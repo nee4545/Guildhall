@@ -70,6 +70,12 @@ void Camera::Translate( const Vec3& translation )
 	m_transform.m_position += translation;
 }
 
+void Camera::CreateDepthStencilTarget(RenderContext* ctx)
+{
+	
+	m_backBuffer = Texture::CreateDepthBuffer( m_texture->GetDimensions(),ctx );
+}
+
 Rgba8 Camera::GetClearColor() const
 {
 	return m_clearColor;

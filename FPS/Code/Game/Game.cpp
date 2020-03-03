@@ -42,15 +42,15 @@ Game::Game()
 	rng= RandomNumberGenerator();
 	m_camera=new Camera();
 	m_devConsoleCamera = new Camera();
+
 	//m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(160.f,90.f));
 	m_camera->SetProjectionPerspective( 60.f ,16.f/9.f, -0.1f , -100.f );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
 
-	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( ( 0 , 0 , 0 , 0 ) , 0.f , 0 ));
+	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8(  0 , 0 , 0 , 0 ) );
    
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
-	/*g_theConsole.SetIsOpen( true );*/
 
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
@@ -62,78 +62,76 @@ Game::Game()
 	mesh = new GPUMesh( g_theRenderer );
 
 	std::vector<Vertex_PCU> verices;
-	AABB2 aabb = AABB2( 0.5f , 0.5f , 10.5f , 20.5f );
 
-	Vertex_PCU vert1 = Vertex_PCU( Vec3( 0.5f , 0.5f,0.f), Rgba8( 200 , 0 , 100 , 255 ) , Vec2( 0.f , 0.f ) );
-	Vertex_PCU vert2 = Vertex_PCU( Vec3( 10.5f , 0.5f , 0.f ) , Rgba8( 200 , 0 , 100 , 255 ) , Vec2( 1.f , 0.f ) );
-	Vertex_PCU vert3 = Vertex_PCU( Vec3( 10.5f , 10.5f , 0.f ) , Rgba8( 200 , 0 , 100 , 255 ) , Vec2( 1.f , 1.f ) );
-	Vertex_PCU vert4 = Vertex_PCU( Vec3( 0.5f , 10.5f , 0.f ) , Rgba8( 200 , 0 , 100 , 255 ) , Vec2( 0.f , 1.f ) );
+	Rgba8 WHITE = Rgba8( 255 , 255 , 255 , 255 );
+	Rgba8 GREEN = Rgba8( 0 , 255 , 0 , 255 );
+	Rgba8 BLUE = Rgba8( 0 , 0 , 255 , 255 );
+	Rgba8 CYAN = Rgba8( 0 , 255 , 255 , 255 );
+	Rgba8 RED = Rgba8( 255 , 0 , 0 , 255 );
+	Rgba8 YELLOW = Rgba8( 255 , 255 , 0 , 255 );
 
-	verices.push_back( vert1 );
-	verices.push_back( vert2 );
-	verices.push_back( vert3 );
-	verices.push_back( vert4 );
 
-	/*Vertex_PCU CubeVerts[ 24 ] = {
-						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+	Vertex_PCU cube[] =
+	{
+		Vertex_PCU( Vec3( -0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-						Vertex_PCU( Vec3( -1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) , GREEN, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f )  , GREEN, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) ,BLUE, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f, 0.5f, 0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f, 0.5f, 0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , BLUE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( 1.f,1.f,1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f, -0.5f, 0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f, -0.5f, 0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) ,CYAN, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) ,CYAN, Vec2( 0.f, 0.f ) ),
-
-						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , CYAN, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,1.f ) ,CYAN, Vec2( 1.f, 0.f ) ),
-
-						Vertex_PCU( Vec3( -1.f, 1.f, 1.f ) ,RED, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f, 1.f, 1.f ) ,RED, Vec2( 1.f, 0.f ) ),
-
-						Vertex_PCU( Vec3( -1.f,1.f, -1.f ) ,RED, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , RED, Vec2( 1.f, 1.f ) ),
-
-						Vertex_PCU( Vec3( 1.f, -1.f, 1.f ) ,YELLOW, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( -1.f, -1.f, 1.f ) ,YELLOW, Vec2( 0.f, 0.f ) ),
-
-						Vertex_PCU( Vec3( -1.f,-1.f, -1.f ) ,YELLOW, Vec2( 1.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , YELLOW, Vec2( 1.f, 1.f ) ),
 	};
 
-	unsigned int CubeIndices[ 36 ] = {
-							0,1,2,
-							2,3,0,
-							4,5,6,
-							6,7,4,
-							8,9,10,
-							10,11,8,
-							12,13,14,
-							14,15,12,
-							16,17,18,
-							18,19,16,
-							20,21,22,
-							22,23,20,
-	};*/
+	
+
+	for ( int index = 0; index < 24; index++ )
+	{
+		verices.push_back( cube[ index ] );
+	}
 
 
-	//AppendAABB2( verices , aabb , Rgba8( 200 , 0 , 100 , 255 ) );
+	unsigned int cubeInd[] =
+	{
+		0,1,2,
+		0,2,3,
+		4,5,6,
+		4,6,7,
+		8,9,10,
+		8,10,11,
+		12,13,14,
+		12,14,15,
+		16,17,18,
+		16,18,19,
+		20,21,22,
+		20,22,23
+	};
+
 
 	mesh->UpdateVertices( (unsigned int)verices.size() , &verices[ 0 ] );
-
-	int indices[ 6 ] = { 0,1,2,2,3,0 };
-	mesh->UpdateIndices( 6 , indices );
+	mesh->UpdateIndices( 36 , cubeInd );
 
 	g_theInput->ClipSystemCursor();
 	g_theInput->UnClipSystemCursor();
@@ -168,6 +166,15 @@ void Game::Update( float deltaseconds )
 	m_cameraRotation.y = Clamp( m_cameraRotation.y , -180.f , 180.f );
 	m_cameraRotation.x = Clamp( m_cameraRotation.x , -180.f , 180.f );
 
+	cubeTransform.m_rotationPitchRollYawDegrees.x += deltaseconds*10.f;
+
+	if ( cubeTransform.m_rotationPitchRollYawDegrees.x >= 360.f )
+	{
+		cubeTransform.m_rotationPitchRollYawDegrees.x = 0.f;
+	}
+
+	//cubeTransform.SetRotationFromPitchRollYawDegrees( 0.f , 30.f , 0.f );
+
 	m_camera->m_transform.SetRotationFromPitchRollYawDegrees( m_cameraRotation.x , m_cameraRotation.y , m_cameraRotation.z );
 	
 	if ( g_theInput->IsKeyPressed( 'W' ) )
@@ -180,8 +187,6 @@ void Game::Update( float deltaseconds )
 		m_camera->m_transform.m_position.z -= 1.f;
 	}
 
-	
-	
 	
 }
 
@@ -204,10 +209,12 @@ void Game::Render()
 	g_theRenderer->BindTexture( nullptr );
 
 	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->BindTexture( tex );
+	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( mesh );
 	
 
-	g_theRenderer->DrawDisc( Vec2( 0.f , 0.f ) , 3.f , Rgba8( 255 , 0 , 0 , 255 ) );
+	//g_theRenderer->DrawDisc( Vec2( 0.f , 0.f ) , 3.f , Rgba8( 255 , 0 , 0 , 255 ) );
 	g_theRenderer->EndCamera(*m_camera);
 
 
