@@ -3,6 +3,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Input/InputSystem.hpp"
 
+
 static TCHAR const* WND_CLASS_NAME = L"Simple Window Class";
 
 static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UINT wmMessageCode , WPARAM wParam , LPARAM lParam )
@@ -21,6 +22,21 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		window->QuitWindow();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
+
+	case WM_ACTIVATE:
+	{
+
+		/*InputSystem* ip = window->GetInputSystem();
+
+		if ( wParam == 1 || wParam == 2 )
+		{
+			if(ip!=nullptr )
+			ip->ClipSystemCursor();
+		}
+		*/
+		break;
+	}
+
 
 	case WM_LBUTTONUP:
 	{
@@ -217,6 +233,18 @@ void Window::Close()
 void Window::SetInputSysten( InputSystem* input )
 {
 	m_input = input;
+}
+
+Vec2 Window::GetCentre()
+{
+	RECT centre; 
+	GetClientRect( (HWND)m_hwnd,&centre );
+
+	Vec2 c;
+	c.x = ( float ) ( centre.right - centre.left ) * 0.5f;
+	c.y = ( float ) ( centre.bottom - centre.top ) * 0.5f;
+
+	return c;
 }
 
 void Window::QuitWindow()

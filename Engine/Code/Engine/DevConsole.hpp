@@ -47,7 +47,7 @@ public:
 	int m_selectedTextEnd = 0;
 
 	void TakeCamera( Camera* camera );
-	inline void SetSize( float size ) { m_textSize = size; }
+	inline void SetTextSize( float size ) { m_textSize = size; }
 
 	AABB2* m_selectedText;
 

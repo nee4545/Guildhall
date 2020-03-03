@@ -67,6 +67,11 @@ void App::Update(float deltaSeconds)
 
 	g_theInput->UpdateMouse();
 
+	if ( g_theInput->GetCursorMode() == MODE_RELATIVE )
+	{
+		g_theInput->UpdateRelativeMode();
+	}
+
 	thegame->Update( deltaSeconds );
 	
 	g_theConsole.Update( deltaSeconds );

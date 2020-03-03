@@ -9,7 +9,7 @@ public:
 	Transform();
 	~Transform() {};
 	void SetPosition( Vec3 pos );
-	void SetRotationFromPitchRollYawDegrees( float pitch , float roll , float yaw );
+	void SetRotationFromPitchRollYawDegrees( float pitch , float yaw, float roll );
 	void Translate( Vec3 translation );
 
 	Mat44 ToMatrix() const;

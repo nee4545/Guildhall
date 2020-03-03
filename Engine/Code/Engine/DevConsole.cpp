@@ -334,7 +334,7 @@ void DevConsole::SetCarrotUsingMouse()
 		return;
 	}
 
-	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	AABB2 textBoc = AABB2( m_devConsoleCamera->GetOrthoBottomLeft() , m_devConsoleCamera->GetOrthoTopRight() );
 	textBoc.CarveBoxOffBottom( 0.1f );
@@ -424,7 +424,7 @@ void DevConsole::HandleTextSelection()
 		return;
 	}
 
-	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_devConsoleCamera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	AABB2 textBoc = AABB2( m_devConsoleCamera->GetOrthoBottomLeft() , m_devConsoleCamera->GetOrthoTopRight() );
 	textBoc.CarveBoxOffBottom( 0.1f );

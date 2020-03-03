@@ -11,10 +11,10 @@ void Transform::SetPosition( Vec3 pos )
 	m_position = pos;
 }
 
-void Transform::SetRotationFromPitchRollYawDegrees( float pitch , float roll , float yaw )
+void Transform::SetRotationFromPitchRollYawDegrees( float pitch , float yaw , float roll )
 {
-	m_rotationPitchRollYawDegrees.x = yaw;
-	m_rotationPitchRollYawDegrees.y = pitch;
+	m_rotationPitchRollYawDegrees.x = pitch;
+	m_rotationPitchRollYawDegrees.y = yaw;
 	m_rotationPitchRollYawDegrees.z = roll;
 }
 

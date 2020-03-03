@@ -24,6 +24,7 @@ class Game
 public:
 
 	Vec3 movement;
+	Vec3 m_cameraRotation;
 	Game();
 	~Game();
 

@@ -407,15 +407,15 @@ const Mat44 Mat44::CreateFromScaleRotationPosition( const Vec3& scale , const Ve
 	Mat44 transform;
 	Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
 	Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
-	Mat44 tranformYaw = CreateZRotationDegrees( eulerRotation.z );
-	Mat44 tranformRoll = CreateYRotationDegrees( eulerRotation.y );
+	Mat44 tranformYaw = CreateYRotationDegrees( eulerRotation.y );
+	Mat44 tranformRoll = CreateZRotationDegrees( eulerRotation.z );
 	Mat44 translateBy = CreateTranslation3D( position );
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-	transform.TransformBy( scaleMatrix );
+	transform.TransformBy( translateBy );
 	transform.TransformBy( tranformPitch );
 	transform.TransformBy( tranformYaw );
 	transform.TransformBy( tranformRoll );
-	transform.TransformBy( translateBy );
+	transform.TransformBy( scaleMatrix );
 	return transform;
 }
 
@@ -433,6 +433,7 @@ const Mat44 Mat44::CreatePerspectiveProjection( float fovDegrees , float aspectR
 		0.f , 0.f , -farZ * q , -1.f ,
 		0.f , 0.f , nearZ * farZ * q , 0.f
 	};
+	
 
 	return Mat44( proj );
 }

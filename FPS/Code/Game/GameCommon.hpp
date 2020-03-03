@@ -6,7 +6,7 @@
 
 class Window;
 
-constexpr float CLIENT_ASPECT = 16.f/9.f; // We are requesting a 2:1 aspect (square) window area
+constexpr float CLIENT_ASPECT = 16.f/9.f; 
 extern RenderContext* g_theRenderer;
 extern App* g_theapp;
 extern Window* g_theWindow;
