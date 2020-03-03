@@ -14,6 +14,8 @@ class BitmapFont;
 class Window;
 class Shader;
 class VertexBuffer;
+class GPUMesh;
+class IndexBuffer;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -81,6 +83,7 @@ public:
 	VertexBuffer* m_immediateVBO = nullptr;
 
 	ID3D11Buffer* m_lastBoundVBO = nullptr;
+	//ID3D11Buffer* m_lastBoundIBO = nullptr;
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;
 
@@ -104,20 +107,25 @@ public:
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray(const std::vector<Vertex_PCU> &verts);
 	void DrawVertexArray(int numVertexes, VertexBuffer* vertices );
+	void DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride );
 
 	void DrawAABB2D(const AABB2& aabb,const Rgba8& color );
 	void DrawXFlippedAABB2D( const AABB2& aabb , const Rgba8& color );
 	void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2 centre, float radius, Rgba8 color, float thickness );
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
+	void DrawMesh( GPUMesh* mesh );
 
 	void BindShader( Shader* shader );
 	void BindShader( std::string filename );
-	void BindVertexInput( VertexBuffer* vbo );
+	void BindVertexBuffer( VertexBuffer* vbo );
+	void BindIndexBuffer( IndexBuffer* ibo );
+
 	Shader* GetOrCreateShader( char const* filename );
 	void SetModalMatrix( Mat44 mat );
 
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
+	
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);

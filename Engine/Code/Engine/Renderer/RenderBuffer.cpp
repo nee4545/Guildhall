@@ -163,3 +163,13 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 
 	return( m_handle != nullptr );
 }
+
+void IndexBuffer::Update( unsigned int icount , unsigned int const* indices )
+{
+	RenderBuffer::Update( indices , icount * sizeof( unsigned int ) , sizeof( unsigned int ) );
+}
+
+void IndexBuffer::Update( std::vector<unsigned int> const& indices )
+{
+	Update( (unsigned int)indices.size() , &indices[ 0 ] );
+}

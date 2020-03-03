@@ -2,15 +2,18 @@
 
 class RenderContext;
 class VertexBuffer;
+class IndexBuffer;
 struct buffer_attribute_t;
 
 class GPUMesh // A04
 {
 public:
 	GPUMesh( RenderContext* owner );
+	~GPUMesh();
 
 	void UpdateVertices( unsigned int vcount , void const* vertexData , unsigned int vertexStride , buffer_attribute_t const* layout );
 	void UpdateIndices( unsigned int icount , unsigned int const* indices );
+	void UpdateIndices( unsigned int icount,void const* vertexData );
 
 	int GetIndexCount() const;
 
@@ -21,10 +24,11 @@ public:
 	}
 
 	int m_vertexCount = 0;
+	int m_indexCount = 0;
 
 public:
-	VertexBuffer* m_vertices;  // like a std::vector<VertexPCU> -> but on GPU
-	//IndexBuffer* m_indices; 	// like a std::vector<uint> -> but on the GPU
+	VertexBuffer* m_vertices=nullptr;  // like a std::vector<VertexPCU> -> but on GPU
+	IndexBuffer* m_indices=nullptr; 	// like a std::vector<uint> -> but on the GPU
 
 	// optionally
 	// std::vector<uint8_t> m_cpuVertexData; 

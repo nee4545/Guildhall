@@ -21,16 +21,19 @@ void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 void Camera::SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip )
 {
 	m_projection = Mat44::CreatePerspectiveProjection( fovDegrees , aspect , nearZClip , farZClip );
+	
 }
 
-Vec2 Camera::GetOrthoBottomLeft() const
+Vec2 Camera::GetOrthoBottomLeft()
 {
-	return bottom_Left;
+	return ClientToWordPosition2D( Vec2( 0.f , 0.f ) );
+	//return bottom_Left;
 }
 
-Vec2 Camera::GetOrthoTopRight() const
+Vec2 Camera::GetOrthoTopRight()
 {
-	return top_Right;
+	return ClientToWordPosition2D( Vec2( 1.f , 1.f ) );
+	//return top_Right;
 }
 
 Texture* Camera::GetColorTarget() const
@@ -90,14 +93,49 @@ RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
 	return m_cameraUBO;
 }
 
-Vec2 Camera::ClientToWordPosition( Vec2 clientPos )
+Vec2 Camera::ClientToWordPosition2D( Vec2 clientPos,float ndcZ )
 {
-	Vec2 worldPosition;
+	Vec3 ndc;
+	ndc.x = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , clientPos.x );
+	ndc.y = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , clientPos.y );
+	ndc.z = RangeMapFloat( 0.f , 1.f , 0.f , 1.f , ndcZ );
 
-	worldPosition.x = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().x , GetOrthoTopRight().x , clientPos.x );
-	worldPosition.y = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().y , GetOrthoTopRight().y , clientPos.y );
+	Mat44 projection = m_projection;
+	Mat44 worldToClip = projection;
+	worldToClip.TransformBy( GetViewMatrix() );
+	Mat44::MatrixInvert( worldToClip );
+	Mat44 clipToWorld = worldToClip;
+	Vec4 worldHomogeneousPt = clipToWorld.TransformHomogeneousPoint3D( Vec4( ndc.x , ndc.y , ndc.z , 1 ) );
 
-	return worldPosition;
+	Vec3 worldPos;
+	worldPos.x = worldHomogeneousPt.x / worldHomogeneousPt.w;
+	worldPos.y = worldHomogeneousPt.y / worldHomogeneousPt.w;
+	worldPos.z = worldHomogeneousPt.z / worldHomogeneousPt.w;
+
+	return Vec2( worldPos.x , worldPos.y );
+
+}
+
+Vec3 Camera::ClientToWorldPosition( Vec2 clientPos , float ndcZ /*= 0 */ )
+{
+	Vec3 ndc;
+	ndc.x = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , clientPos.x );
+	ndc.y = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , clientPos.y );
+	ndc.z = RangeMapFloat( 0.f , 1.f , 0.f , 1.f , ndcZ );
+
+	Mat44 projection = m_projection;
+	Mat44 worldToClip = projection;
+	worldToClip.TransformBy( GetViewMatrix() );
+	Mat44::MatrixInvert( worldToClip );
+	Mat44 clipToWorld = worldToClip;
+	Vec4 worldHomogeneousPt = clipToWorld.TransformHomogeneousPoint3D( Vec4( ndc.x , ndc.y , ndc.z , 1 ) );
+
+	Vec3 worldPos;
+	worldPos.x = worldHomogeneousPt.x / worldHomogeneousPt.w;
+	worldPos.y = worldHomogeneousPt.y / worldHomogeneousPt.w;
+	worldPos.z = worldHomogeneousPt.z / worldHomogeneousPt.w;
+
+	return worldPos;
 }
 
 Mat44 Camera::GetViewMatrix()

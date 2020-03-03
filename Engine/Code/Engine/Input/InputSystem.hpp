@@ -5,6 +5,12 @@
 constexpr int MAX_XBOX_CONTROLLERS=4;
 constexpr int MAX_KEYBOARD_STATES=256;
 
+enum eMousePositionMode
+{
+	MODE_ABSOLUTE=0,
+	MODE_RELATIVE
+};
+
 
 class InputSystem
 {
@@ -39,9 +45,17 @@ public:
 	void PushCharacter( char character );
 	bool PopCharacter( char* outCharacter );
 
+	void HideSystemCursor();
+	void UnClipSystemCursor();
+	void ClipSystemCursor();
+	void UpdateRelativeMode();
+	void SetCursorMode( eMousePositionMode mode );
+	eMousePositionMode GetCursorMode();
 
 	const XboxController& GetXboxController(int ControllerID);
 	Vec2 GetCurrentMousePosition() { return m_mouseNormalizedClientPos; }
+	Vec2 m_relativeMovement;
+
 
 	void UpdateMouse();
 	std::queue<char> m_characters;
@@ -61,6 +75,9 @@ private:
 	};
 
 	Vec2 m_mouseNormalizedClientPos;
+	Vec2 m_positionLastFrame;
+	eMousePositionMode m_mode = MODE_ABSOLUTE;
+	int m_hideCursorIndex = 0;
 	
 
 

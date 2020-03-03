@@ -13,6 +13,7 @@
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
 
 
 #define UNUSED(x) (void)(x);
@@ -36,7 +37,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 	//Bind 
 
-		BindVertexInput( m_immediateVBO );
+		BindVertexBuffer( m_immediateVBO );
 
 
 		Draw( numVertexes , 0 );
@@ -53,8 +54,20 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU> &verts )
 
 void RenderContext::DrawVertexArray(  int numVertexes , VertexBuffer* vertices )
 {
-	BindVertexInput( vertices );
+	BindVertexBuffer( vertices );
 	Draw( numVertexes , 0 );
+}
+
+void RenderContext::DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride )
+{
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
+
+	//ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
+	//m_context->IASetInputLayout( inputLayout );
+
+	m_context->DrawIndexed( indexCount , startIndex , indexStride );
 }
 
 void RenderContext::DrawAABB2D( const AABB2& aabb, const Rgba8& color )
@@ -173,6 +186,24 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
+void RenderContext::DrawMesh( GPUMesh* mesh )
+{
+	BindVertexBuffer( mesh->m_vertices );
+
+
+	bool hasIndices = mesh->GetIndexCount() > 0;
+
+	if ( hasIndices )
+	{
+		BindIndexBuffer( mesh->m_indices );
+		DrawIndexed( mesh->GetIndexCount() , 0 , 0 );
+	}
+	else
+	{
+		Draw( mesh->m_vertexCount , 0 );
+	}
+}
+
 void RenderContext::BindShader( Shader* shader )
 {
 	ASSERT_OR_DIE( m_isDrawing == true , "Camera has not been set" );
@@ -199,7 +230,7 @@ void RenderContext::BindShader( std::string filename )
 	m_currentShader=GetOrCreateShader( filename.c_str() );
 }
 
-void RenderContext::BindVertexInput( VertexBuffer* vbo )
+void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
 	unsigned int stride = sizeof( Vertex_PCU );
@@ -210,6 +241,23 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
 		m_lastBoundVBO = vboHandle;
 	}
+}
+
+void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
+{
+	ID3D11Buffer* iboHandle = ibo->m_handle;
+	unsigned int offset = 0;
+	
+	m_context->IASetIndexBuffer( iboHandle , DXGI_FORMAT_R32_UINT , offset );
+
+// 	if ( m_lastBoundIBO != iboHandle )
+// 	{
+// 		m_lastBoundIBO = iboHandle;
+// 	}
+// 	else
+// 	{
+// 		m_context->IASetIndexBuffer( m_lastBoundIBO , DXGI_FORMAT_R32_UINT , offset );
+// 	}
 }
 
 Shader* RenderContext::GetOrCreateShader( char const* filename )
@@ -398,12 +446,6 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
-	/*if ( m_defaultShader != nullptr )
-	{
-		delete m_defaultShader;
-		m_defaultShader = nullptr;
-	}*/
-
 	if ( m_frameUBO != nullptr )
 	{
 		delete m_frameUBO;
@@ -429,6 +471,8 @@ void RenderContext::Shutdown()
 	DX_SAFE_RELEASE( m_additiveBlendState );
 	DX_SAFE_RELEASE( m_opaqueBlendState );
 
+	//DX_SAFE_RELEASE( m_lastBoundIBO );
+	//DX_SAFE_RELEASE( m_lastBoundVBO );
 
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -458,16 +502,9 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 	m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
 
-	/*TextureView* view = m_texture->GetRenderTargetView();
-	ID3D11RenderTargetView* rtv = view->GetRTVHandle();*/
-	
-	//This is temporary
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-	
-	
 	//Describe vertex format to shader
-
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
 	m_context->IASetInputLayout( inputLayout );
 

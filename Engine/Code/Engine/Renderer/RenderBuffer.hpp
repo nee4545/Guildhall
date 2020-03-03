@@ -1,6 +1,7 @@
 #pragma once
 
 //A GPU allocator
+#include <vector>
 
 struct ID3D11Buffer;
 class RenderContext;
@@ -59,4 +60,14 @@ class VertexBuffer :public RenderBuffer
 {
 public:
 	VertexBuffer( RenderContext* ctx , eRenderMemoryHint hint ) :RenderBuffer( ctx,VERTEX_BUFFER_BIT , hint ) {};
+};
+
+
+class IndexBuffer : public RenderBuffer
+{
+public:
+	IndexBuffer( RenderContext* ctx , eRenderMemoryHint hint ) :RenderBuffer( ctx , INDEX_BUFFER_BIT , hint ) {};
+
+	void Update( unsigned int icount , unsigned	int const* indices );
+	void Update( std::vector<unsigned int> const& indices ); // helper, calls one above
 };

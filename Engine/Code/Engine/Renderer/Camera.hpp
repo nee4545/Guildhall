@@ -34,8 +34,8 @@ public:
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip );
 
-	Vec2 GetOrthoBottomLeft() const;
-	Vec2 GetOrthoTopRight() const;
+	Vec2 GetOrthoBottomLeft();
+	Vec2 GetOrthoTopRight();
 	Texture* GetColorTarget() const;
 
 	void Translate2D(Vec2 translation2D);
@@ -46,8 +46,10 @@ public:
 
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
-	Vec2 ClientToWordPosition( Vec2 clientPos );
+	Vec2 ClientToWordPosition2D( Vec2 clientPos,float ndcZ=0 );
+	Vec3 ClientToWorldPosition( Vec2 clientPos , float ndcZ = 0 );
 	Mat44 GetViewMatrix();
+
 	
 
 	Camera()

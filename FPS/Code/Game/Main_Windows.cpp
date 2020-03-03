@@ -44,8 +44,8 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME , CLIENT_ASPECT , 0.90f ); // feed from blackBoard
-		
 	g_theInput= new InputSystem();
+		
 	g_theapp->Startup();
 
 	// Program main loop; keep running frames until it's time to quit

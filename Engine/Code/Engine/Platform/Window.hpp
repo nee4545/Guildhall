@@ -2,6 +2,7 @@
 #include "string"
 
 class InputSystem;
+struct Vec2;
 
 class Window
 {
@@ -18,6 +19,7 @@ public:
 	bool Open( std::string const& title , float aspectRatio , float ratioOfHeight );
 	void Close();
 	void SetInputSysten( InputSystem* input );
+	Vec2 GetCentre();
 	void QuitWindow();
 
 

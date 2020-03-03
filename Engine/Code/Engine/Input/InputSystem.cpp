@@ -39,6 +39,8 @@ void InputSystem::EndFrame()
 	{
 		m_characters.pop();
 	}
+
+	m_relativeMovement = Vec2( 0.f , 0.f );
 }
 
 void InputSystem::ShutDown()
@@ -148,6 +150,73 @@ bool InputSystem::PopCharacter( char* outCharacter )
 	{
 		return false;
 	}
+}
+
+void InputSystem::HideSystemCursor()
+{
+	m_hideCursorIndex++;
+	ShowCursor( m_hideCursorIndex );
+}
+
+void InputSystem::UnClipSystemCursor()
+{
+	HWND hwnd;
+	RECT desktopRect;
+	hwnd = GetDesktopWindow();
+	GetClientRect( hwnd , &desktopRect );
+
+	ClipCursor( &desktopRect );
+
+}
+
+void InputSystem::ClipSystemCursor()
+{
+	HWND hwnd = ( HWND ) g_theWindow->m_hwnd;
+	RECT clientRect;
+	GetWindowRect( hwnd , &clientRect );
+
+	ClipCursor( &clientRect );
+	
+}
+
+
+
+void InputSystem::UpdateRelativeMode()
+{
+	POINT curPos ;
+	GetCursorPos( &curPos );
+	Vec2 positionThisFrame = Vec2((float)curPos.x,(float)curPos.y);
+	m_relativeMovement = positionThisFrame - m_positionLastFrame;
+
+	Vec2 windowCenter = g_theWindow->GetCentre(); 
+	SetCursorPos( (int)windowCenter.x,(int)windowCenter.y );
+
+	POINT point ;
+	GetCursorPos( &point );
+	windowCenter = Vec2( (float)point.x , (float)point.y );
+
+	m_positionLastFrame = windowCenter;
+}
+
+void InputSystem::SetCursorMode( eMousePositionMode mode )
+{
+	m_mode = mode;
+	switch ( mode )
+	{
+		case MODE_RELATIVE:
+		{
+			Vec2 windowCenter = g_theWindow->GetCentre(); 
+			SetCursorPos( (int)windowCenter.x,(int)windowCenter.y );
+			m_positionLastFrame = windowCenter;
+		}
+		default:
+			break;
+	}
+}
+
+eMousePositionMode InputSystem::GetCursorMode()
+{
+	return m_mode;
 }
 
 const XboxController& InputSystem::GetXboxController( int ControllerID )
