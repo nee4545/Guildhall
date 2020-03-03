@@ -18,6 +18,7 @@ Game::Game()
 	m_camera = new Camera();
 	m_camera->SetOrthoView(Vec2(0.f,0.f), Vec2( 160.f , 90.f ) );
 	m_cameraHeight = 90.f;
+	m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) );
 	//m_camera->SetPosition( Vec2( 0.f , 0.f ) );
 	m_maxZoomIn = 0.1f * m_cameraHeight;
 	m_maxZoomOut = 3.f * m_cameraHeight;
@@ -27,6 +28,11 @@ Game::Game()
 	m_BitmapFont = g_theRenderer->CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
 
+}
+
+Game::~Game()
+{
+	delete m_camera;
 }
 
 void Game::StartUp()
@@ -45,7 +51,7 @@ GameObject* Game::CreateDisc()
 {
 	GameObject* obj = new GameObject();
 	
-	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	obj->m_rigidbody = m_physicsSystem->CreateRigidbody();
 	obj->m_rigidbody->SetPosition( mousePos );
@@ -64,7 +70,7 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 {
 	GameObject* obj = new GameObject();
 
-	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	obj->m_rigidbody = m_physicsSystem->CreateRigidbody();
 
@@ -126,7 +132,7 @@ void Game::UpdateCameraMovement(float deltaSeconds )
 
 void Game::HandleMouseInsideObjects()
 {
-	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	for ( int index = 0; index < m_gameObjects.size(); index++ )
 	{
@@ -181,7 +187,7 @@ void Game::HandleCollissions()
 void Game::HandleDrag()
 {
 	GetCurrentSelectedObject();
-	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	if ( isDrawing )
 	{
@@ -193,7 +199,6 @@ void Game::HandleDrag()
 		if ( g_theInput->IsLeftMouseButtonPressed() )
 		{
 			
-
 			m_dragInProgress = true;
 			m_selectedObject->isBeingDragged = true;
 			m_selectedObject->m_rigidbody->enableSimulation = false;
@@ -265,7 +270,7 @@ void Game::HandleDrag()
 
 void Game::HandleObjectCreationRequests()
 {
-	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	if ( g_theInput->WasRightMouseButtonJustPressed() )
 	{
@@ -281,7 +286,7 @@ void Game::HandleThrow()
 	}
 
 	Vec2 velocity = -throwFinalPoint+throwInitialPoint;
-	m_selectedObject->m_rigidbody->SetVelocity( velocity * 25.f );
+	m_selectedObject->m_rigidbody->SetVelocity( velocity*10.f  );
 	initialPointSet = false;
 	finalPointSet = false;
 }
@@ -298,7 +303,7 @@ void Game::GetCurrentSelectedObject()
 		return;
 	}
 
-	Vec2 mousePos = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	for( int index =(int) m_gameObjects.size() - 1; index >= 0; index-- )
 	{
@@ -350,11 +355,11 @@ void Game::PolygonDrawMode()
 	{
 		if ( drawModePoints.size() == 1 )
 		{
-			drawModePoints.push_back( m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() ) );
+			drawModePoints.push_back( m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() ) );
 			return;
 		}
 
-		Vec2 point = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+		Vec2 point = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 		if ( IsPolygonPotentiallyConvex( point ) )
 		{
 			drawModePoints.push_back( point );
@@ -435,7 +440,7 @@ void Game::HandlePolygonDrawMode()
 	if ( g_theInput->WasKeyJustPressed( '2' ) )
 	{
 		isDrawing = true;
-		Vec2 point = m_camera->ClientToWorldPosition( g_theInput->GetCurrentMousePosition() );
+		Vec2 point = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 		drawModePoints.clear();
 		isThereInvalidPoint = false;
 		drawModePoints.push_back( point );
@@ -633,7 +638,7 @@ void Game::UpdateFramePositions( )
 {
 
 	m_frameCounter++;
-	if ( m_frameCounter > 30 )
+	if ( m_frameCounter > 11 )
 	{
 		m_frameCounter = 0;
 	}
@@ -657,7 +662,7 @@ void Game::UpdateFramePositions( )
 		}
 	}
 
-	if ( m_frameCounter == 30 )
+	if ( m_frameCounter == 10 )
 	{
 		if ( m_selectedObject != nullptr )
 		{
@@ -735,6 +740,8 @@ void Game::Render()
 
 	
 	g_theRenderer->BeginCamera( *m_camera );
+
+	
 	
 	DrawModeRender();
 	for ( int index = 0; index < m_gameObjects.size(); index++ )

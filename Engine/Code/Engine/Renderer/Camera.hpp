@@ -48,7 +48,6 @@ public:
 	void SetOrthoViewForCameraPosition();
 	void SetProjectionOrthographic( float height , float nearZ = -1.f , float farZ = 1.f );
 	float GetAspectRatio() const;
-	Vec2 ClientToWorldPosition( Vec2 clientPos );
 
 	void Translate2D(Vec2 translation2D);
 	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth=0.f , unsigned int stencil=0.f );

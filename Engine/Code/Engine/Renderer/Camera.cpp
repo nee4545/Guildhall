@@ -85,15 +85,6 @@ float Camera::GetAspectRatio() const
 	return m_outpitsize.x / m_outpitsize.y;
 }
 
-Vec2 Camera::ClientToWorldPosition( Vec2 clientPos )
-{
-	Vec2 worldPosition;
-
-	worldPosition.x = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().x , GetOrthoTopRight().x , clientPos.x );
-	worldPosition.y = RangeMapFloat( 0.f , 1.f , GetOrthoBottomLeft().y , GetOrthoTopRight().y , clientPos.y );
-
-	return worldPosition;
-}
 
 void Camera::Translate2D( Vec2 translation2D )
 {

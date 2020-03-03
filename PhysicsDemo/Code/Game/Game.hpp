@@ -27,12 +27,24 @@ class Game
 	Vec2 invalidPoint;
 	bool isThereInvalidPoint = false;
 	int m_frameCounter = 0;
+	bool m_offsetSet = false;
+	Vec2 m_offset;
+	float m_cameraHeight = 0.f;
+	float m_zoomspeed = 1000.f;
+	float m_maxZoomIn = 0.f;
+	float m_maxZoomOut = 0.f;
+
+	Vec2 throwInitialPoint;
+	bool initialPointSet = false;
+	Vec2 throwFinalPoint;
+	bool finalPointSet = false;
 
 public:
 	
 
 	
 	Game();
+	~Game();
 	void StartUp();
 	void EndFrame();
 	GameObject* CreateDisc();
@@ -57,20 +69,7 @@ public:
 	void DisplayX();
 	void HandleGravityModification();
 	void UpdateFramePositions();
-
 	void Update(float deltaseconds);
 	void Render();
 
-	bool m_offsetSet = false;
-	Vec2 m_offset;
-	float m_cameraHeight = 0.f;
-	float m_zoomspeed = 1000.f;
-	float m_maxZoomIn = 0.f;
-	float m_maxZoomOut = 0.f;
-
-	Vec2 throwInitialPoint;
-	bool initialPointSet = false;
-	Vec2 throwFinalPoint;
-	bool finalPointSet = false;
-	
 };
