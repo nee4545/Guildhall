@@ -70,6 +70,26 @@ void Collider2D::DecreamentBounciness( float decreament )
 	}
 }
 
+void Collider2D::IncreamentFriction( float increament )
+{
+	m_material.friction += increament;
+
+	if ( m_material.friction > 1.f )
+	{
+		m_material.friction = 1.f;
+	}
+}
+
+void Collider2D::DecreamentFriction( float decreament )
+{
+	m_material.friction -= decreament;
+
+	if ( m_material.friction < 0.f )
+	{
+		m_material.friction = 0.f;
+	}
+}
+
 bool DiscVPolygonCollisionCheck( Collider2D const* col0 , Collider2D const* col1 )
 {
 

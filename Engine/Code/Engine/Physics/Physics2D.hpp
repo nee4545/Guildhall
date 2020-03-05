@@ -41,6 +41,7 @@ public:
 	void SetSceneGravity( float gravity );
 	void CleanUp();
 	void SetClock(Clock* clock);
+	void SetFixedStepTime( double newDt );
 
 public:
 	// add members you may need to store these

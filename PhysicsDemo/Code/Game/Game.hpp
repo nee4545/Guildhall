@@ -10,13 +10,15 @@ class GameObject;
 class Poygon2D;
 class BitmapFont;
 
+static Physics2D* physicsSystem = nullptr;
+
 class Game
 {
 	RandomNumberGenerator m_rng;
 	BitmapFont* m_BitmapFont = nullptr;
 	Camera* m_camera=nullptr;
 	Camera* m_devConsoleCamera = nullptr;
-	Physics2D* m_physicsSystem = nullptr;
+	
 	std::vector<GameObject*> m_gameObjects;
 	GameObject* m_selectedObject = nullptr;
 	Vec2 m_mousePosition;
@@ -31,7 +33,7 @@ class Game
 	bool m_offsetSet = false;
 	Vec2 m_offset;
 	float m_cameraHeight = 0.f;
-	float m_zoomspeed = 1000.f;
+	float m_zoomspeed = 100.f;
 	float m_maxZoomIn = 0.f;
 	float m_maxZoomOut = 0.f;
 
@@ -68,9 +70,11 @@ public:
 	void HandlePolygonDrawMode();
 	void DrawModeRender();
 	void HandleBounceAndWrapAround();
-	void DisplayGravityInfo();
+	void HandleClockChanges();
+	void DisplayMiscInfo();
 	void DisplayX();
 	void HandleGravityModification();
+	void DisplayToolTip();
 	void UpdateFramePositions();
 	void Update(float deltaseconds);
 	void Render();

@@ -35,6 +35,10 @@ public:
 	Vec2 GetWorldPosition() { return m_worldPosition; }
 	Vec2 GetVerletVelocity() { return m_verletVelocity; }
 	void SetVelocity( Vec2 velocity );
+	void IncreamentMass( float increament );
+	void DecreamentMass( float decreament );
+	void IncreamentDrag( float increament );
+	void DecreamentDrag( float decreament );
 
 private: 
 
@@ -49,7 +53,7 @@ public:
 	Vec2 m_verletVelocity = Vec2(0.f,0.f);
 	eSimulationMode m_mode = DYNAMIC;
 	float m_mass=1.f;
-	float m_drag = 0.5f;
+	float m_drag = 0.f;
 	Vec2 m_gravityDirection = Vec2( 0.f , -1.f );
 	Vec2 m_gravityVector = Vec2( 0.f , 0.f );
 	Vec2 m_frameStartPosition = Vec2( 0.f , 0.f );

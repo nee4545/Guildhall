@@ -44,6 +44,9 @@ public:
 	void IncreamentBounciness( float increament );
 	void DecreamentBounciness( float decreament );
 
+	void IncreamentFriction( float increament );
+	void DecreamentFriction( float decreament );
+
 protected:
 	virtual ~Collider2D() {}; // private - make sure this is virtual so correct deconstructor gets called
 	bool				m_isGarbage = false;

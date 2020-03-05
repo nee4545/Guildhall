@@ -382,6 +382,37 @@ bool DevConsole::IsCommandInHistory( std::string command )
 
 void DevConsole::ProcessCommand(std::string& command)
 {
+	Strings cmd=SplitStringOnDelimiter( command , ':' );
+	EventArgs currentCommandArgs;
+	std::string currentCommand;
+
+	if ( cmd.size() == 2 )
+	{
+		currentCommand = cmd[ 0 ];
+		std::string parameter = cmd[ 1 ];
+		currentCommandArgs.SetValue( currentCommand , parameter );
+	}
+
+	for ( int i = 0; i < m_commands.size(); i++ )
+	{
+		if ( cmd.size() < 2 )
+		{
+			break;
+		}
+
+		if ( m_commands[ i ] == cmd[ 0 ] )
+		{
+			SoundID s = g_theAudio->CreateOrGetSound( "Data/Sounds/Success.wav" );
+			g_theAudio->PlaySound( s );
+			g_theEventSystem.FireEvent(currentCommand , currentCommandArgs );
+			if ( !IsCommandInHistory( currentCommand ) )
+			{
+				m_commandHistory.push_back( currentCommand );
+			}
+			return;
+		}
+	}
+
 	for ( int index = 0; index < m_commands.size(); index++ )
 	{
 		if ( m_commands[ index ] == command )
@@ -403,11 +434,17 @@ void DevConsole::ProcessCommand(std::string& command)
 	PrintString( Rgba8( 100 , 0 , 0 , 255 ) , "Invalid command: " + command );
 }
 
+void DevConsole::ProcessCommand( std::string& command , EventArgs& commandArgs )
+{
+	g_theEventSystem.FireEvent( command , commandArgs );
+}
+
 void DevConsole::InitializeCommands()
 {
 	m_commands.push_back( "quit" );
 	m_commands.push_back( "help" );
 	m_commands.push_back( "close" );
+	m_commands.push_back( "set_physics_update_freq" );
 }
 
 void DevConsole::HandleTextSelection()

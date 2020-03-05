@@ -10,12 +10,12 @@
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {
-	this->bottom_Left.x = bottomLeft.x;
+	/*this->bottom_Left.x = bottomLeft.x;
 	this->bottom_Left.y = bottomLeft.y;
 	this->top_Right.x = topRight.x;
-	this->top_Right.y = topRight.y;
+	this->top_Right.y = topRight.y;*/
 
-	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottom_Left,0.f),Vec3(topRight,1.f));
+	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottomLeft,0.f),Vec3(topRight,1.f));
 }
 
 void Camera::SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip )
@@ -60,15 +60,17 @@ float Camera::GetCameraHeight()
 
 void Camera::SetPosition( Vec2 position )
 {
-	m_pos = position;
+	m_transform.m_position.x = position.x;
+	m_transform.m_position.y = position.y;
 	SetOrthoViewForCameraPosition();
 	
 }
 
 void Camera::SetOrthoViewForCameraPosition()
 {
-	bottom_Left = m_pos - m_outpitsize / 2.f;
-	top_Right = m_pos + m_outpitsize / 2.f;
+	bottom_Left = Vec2(m_transform.m_position.x,m_transform.m_position.y) -m_outpitsize / 2.f;
+	top_Right = Vec2( m_transform.m_position.x , m_transform.m_position.y ) + m_outpitsize / 2.f;
+	m_projection = Mat44::CreateOrthographicProjection( Vec3( bottom_Left , 0.f ) , Vec3( top_Right , 1.f ) );
 }
 
 void Camera::SetProjectionOrthographic( float height , float nearZ /*= -1.f */ , float farZ /*= 1.f */ )

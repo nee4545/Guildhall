@@ -37,6 +37,13 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		break;
 	}
 
+	case WM_MOUSEWHEEL:
+	{
+		InputSystem* ip = window->GetInputSystem();
+		ip->SetMouseWheelData( ( int ) GET_WHEEL_DELTA_WPARAM( wParam ) );
+		break;
+	}
+
 
 	case WM_LBUTTONUP:
 	{

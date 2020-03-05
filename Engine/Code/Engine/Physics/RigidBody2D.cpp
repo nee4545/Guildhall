@@ -38,6 +38,36 @@ void Rigidbody2D::SetVelocity( Vec2 velocity )
 	m_velocity = velocity;
 }
 
+void Rigidbody2D::IncreamentMass( float increament )
+{
+	m_mass += increament;
+}
+
+void Rigidbody2D::DecreamentMass( float decreament )
+{
+	m_mass -= decreament;
+
+	if ( m_mass < 0.f )
+	{
+		m_mass = 0.001f;
+	}
+}
+
+void Rigidbody2D::IncreamentDrag( float increament )
+{
+	m_drag += increament;
+}
+
+void Rigidbody2D::DecreamentDrag( float decreament )
+{
+	m_drag -= decreament;
+	
+	if ( m_drag < 0.f )
+	{
+		m_drag = 0.f;
+	}
+}
+
 void Rigidbody2D::MarkForDestroy()
 {
 	m_isGarbage = true;
@@ -54,11 +84,11 @@ void Rigidbody2D::ApplyGravity( float deltaTime, float gravityMultiplier )
 
 }
 
-//void Rigidbody2D::ApplyDrag( float deltaTime )
-//{
-//	Vec2 velocity = GetVerletVelocity();
-//	Vec2 dragForce = -velocity * m_drag;
-//}
+void Rigidbody2D::ApplyDrag( float deltaTime )
+{
+	Vec2 dragDirection = 1.f / m_mass * GetVerletVelocity().GetNormalized().GetRotated90Degrees().GetRotated90Degrees();
+	m_velocity += m_drag * dragDirection * deltaTime;
+}
 
 void Rigidbody2D::ApplyImpulse( Vec2 impulse )
 {

@@ -393,13 +393,11 @@ const Mat44 Mat44::CreateOrthographicProjection( const Vec3& min , const Vec3& m
 	Vec3 sum = max + min;
 
 	float mat[] = { 2.0f / diff.x ,    0.f,         0.f,             0.f,
-					0.f,               2.0f/diff.y, 0.f,             0.f,
-					0.f,               0.f,         1.0f/diff.z,     0.f,
-					-sum.x/diff.x,    -sum.y/diff.y,-min.x/diff.z,   1.f };
-
+					0.f,               2.0f / diff.y, 0.f,             0.f,
+					0.f,               0.f,         1.0f / diff.z,     0.f,
+					-sum.x / diff.x,    -sum.y / diff.y,-min.z / diff.z,   1.f };
 
 	return Mat44( mat );
-
 }
 
 const Mat44 Mat44::CreateFromScaleRotationPosition( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position )

@@ -9,6 +9,7 @@
 #include "Engine/Physics/RigidBody2D.hpp"
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Core/Polygon2D.hpp"
+#include "Engine/Core/Clock.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -20,6 +21,7 @@ bool Help( EventArgs& args )
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "help" );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "quit" );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "close" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "set_physics_update_freq  Usage Ex: set_physics_update_freq:100" );
 	return false;
 }
 
@@ -38,13 +40,22 @@ bool Close( EventArgs& args )
 	return false;
 }
 
+bool SetPhysicsUpdateStep( EventArgs& args )
+{
+	float dt = args.GetValue("set_physics_update_freq",0.f);
+	physicsSystem->SetFixedStepTime( ( double ) 1/dt );
+	return false;
+}
+
 
 
 Game::Game()
 {
 	m_camera = new Camera();
 	m_devConsoleCamera = new Camera();
-	m_camera->SetOrthoView(Vec2(0.f,0.f), Vec2( 160.f , 90.f ) );
+	//m_camera->m_transform.m_position = Vec3( 0.f , 0.f , -1.f );
+	m_camera->SetOrthoView(Vec2(-80.f,-45.f), Vec2( 80.f , 45.f ) );
+	m_camera->SetOutputsize( Vec2( 160.f , 90.f ) );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
@@ -52,6 +63,7 @@ Game::Game()
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
 	g_theEventSystem.SubscribeToEvent( "close" , Close );
+	g_theEventSystem.SubscribeToEvent( "set_physics_update_freq" , SetPhysicsUpdateStep );
 
 	m_cameraHeight = 90.f;
 	m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) );
@@ -75,19 +87,19 @@ Game::~Game()
 void Game::StartUp()
 {
 
-	m_physicsSystem = new Physics2D();
-	m_physicsSystem->StartUp();
+	physicsSystem = new Physics2D();
+	physicsSystem->StartUp();
 
 }
 
 void Game::BeginFrame()
 {
-	m_physicsSystem->BeginFrame();
+	physicsSystem->BeginFrame();
 }
 
 void Game::EndFrame()
 {
-	m_physicsSystem->EndFrame();
+	physicsSystem->EndFrame();
 }
 
 GameObject* Game::CreateDisc()
@@ -96,11 +108,11 @@ GameObject* Game::CreateDisc()
 	
 	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
-	obj->m_rigidbody = m_physicsSystem->CreateRigidbody();
+	obj->m_rigidbody = physicsSystem->CreateRigidbody();
 	obj->m_rigidbody->SetPosition( mousePos );
 
 	float discRadius = m_rng.RollRandomFloatInRange( 1.5f , 6.5f );
-	DiscCollider2D* collider = m_physicsSystem->CreateDiscCollider( Vec2(0.f,0.f) , discRadius );
+	DiscCollider2D* collider = physicsSystem->CreateDiscCollider( Vec2(0.f,0.f) , discRadius );
 	obj->m_rigidbody->TakeCollider( collider );
 
 	m_gameObjects.push_back( obj );
@@ -115,9 +127,9 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 
 	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
-	obj->m_rigidbody = m_physicsSystem->CreateRigidbody();
+	obj->m_rigidbody = physicsSystem->CreateRigidbody();
 
-	PolygonCollider2D* collider = m_physicsSystem->CreatePolygonCollider( mousePos , &polygon );
+	PolygonCollider2D* collider = physicsSystem->CreatePolygonCollider( mousePos , &polygon );
 
 	obj->m_rigidbody->TakeCollider( collider );
 	obj->m_rigidbody->SetPosition( mousePos );
@@ -130,19 +142,19 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 void Game::PopulateInitialObjects()
 {
 	GameObject* obj1 = new GameObject();
-	obj1->m_rigidbody = m_physicsSystem->CreateRigidbody();
+	obj1->m_rigidbody = physicsSystem->CreateRigidbody();
 	obj1->m_rigidbody->SetPosition( Vec2( 20.f , 20.f ) );
 
-	DiscCollider2D* collider1 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 4.f );
+	DiscCollider2D* collider1 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 4.f );
 	obj1->m_rigidbody->TakeCollider( collider1 );
 
 	m_gameObjects.push_back( obj1 );
 
 	GameObject* obj2 = new GameObject();
-	obj2->m_rigidbody = m_physicsSystem->CreateRigidbody();
+	obj2->m_rigidbody = physicsSystem->CreateRigidbody();
 	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
 
-	DiscCollider2D* collider2 = m_physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
+	DiscCollider2D* collider2 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
 	obj2->m_rigidbody->TakeCollider( collider2 );
 
 	m_gameObjects.push_back( obj2 );
@@ -261,15 +273,47 @@ void Game::HandleDrag()
 				m_selectedObject->m_rigidbody->SetSimulationMode( DYNAMIC );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'G' ) )
+			if ( g_theInput->WasKeyJustPressed( 'H' ) )
 			{
 				m_selectedObject->m_rigidbody->m_collider->IncreamentBounciness( 0.1f );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'H' ) )
+			if ( g_theInput->WasKeyJustPressed( 'G' ) )
 			{
 				m_selectedObject->m_rigidbody->m_collider->DecreamentBounciness( 0.1f );
 			}
+
+			if ( g_theInput->WasKeyJustPressed( 'J' ) )
+			{
+				m_selectedObject->m_rigidbody->m_collider->DecreamentFriction( 0.1f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'K' ) )
+			{
+				m_selectedObject->m_rigidbody->m_collider->IncreamentFriction( 0.1f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'D' ) )
+			{
+				m_selectedObject->m_rigidbody->DecreamentMass( 0.1f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'F' ) )
+			{
+				m_selectedObject->m_rigidbody->IncreamentMass( 0.1f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'Z' ) )
+			{
+				m_selectedObject->m_rigidbody->DecreamentDrag( 0.1f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'X' ) )
+			{
+				m_selectedObject->m_rigidbody->IncreamentDrag( 0.1f );
+			}
+
+			
 			
 			if ( !m_offsetSet )
 			{
@@ -371,8 +415,11 @@ void Game::ZoomInCamera( float deltaSeconds )
 		m_cameraHeight -= deltaSeconds * m_zoomspeed;
 	}
 
-	m_camera->SetProjectionOrthographic(m_cameraHeight );
-	
+	m_camera->SetProjectionOrthographic( m_cameraHeight );
+
+	/*m_camera->m_transform.m_scale.x += deltaSeconds;
+	m_camera->m_transform.m_scale.y += deltaSeconds;*/
+
 }
 
 void Game::ZoomOutCamera( float deltaSeconds )
@@ -383,6 +430,9 @@ void Game::ZoomOutCamera( float deltaSeconds )
 	}
 
 	m_camera->SetProjectionOrthographic( m_cameraHeight );
+
+	/*m_camera->m_transform.m_scale.x -= deltaSeconds;
+	m_camera->m_transform.m_scale.y -= deltaSeconds;*/
 }
 
 void Game::PolygonDrawMode()
@@ -578,7 +628,38 @@ void Game::HandleBounceAndWrapAround()
 	}
 }
 
-void Game::DisplayGravityInfo()
+void Game::HandleClockChanges()
+{
+	if ( g_theInput->WasKeyJustPressed( 'P' ) )
+	{
+		if ( physicsSystem->m_clock->IsPaused() )
+		{
+			physicsSystem->m_clock->isPaused = false;
+		}
+		else
+		{
+			physicsSystem->m_clock->isPaused = true;
+		}
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '0' ) )
+	{
+		physicsSystem->m_clock->SetScale( 1.0 );
+		physicsSystem->m_clock->isPaused = false;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '8' ) )
+	{
+		physicsSystem->m_clock->SetScale( 2.0 );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '9' ) )
+	{
+		physicsSystem->m_clock->SetScale( 0.5 );
+	}
+}
+
+void Game::DisplayMiscInfo()
 {
 	AABB2 aabb = AABB2( m_camera->GetOrthoBottomLeft() , m_camera->GetOrthoTopRight() );
 	aabb.CarveBoxOffTop( 0.2f );
@@ -586,14 +667,46 @@ void Game::DisplayGravityInfo()
 
 	std::string data = "Current Gravity: ";
 	std::string gravity = "";
-	gravity =data + std::to_string(m_physicsSystem->m_gravityMultiplier);
+	gravity =data + std::to_string(physicsSystem->m_gravityMultiplier);
 
 	std::vector<Vertex_PCU> textVerts;
 
-	m_BitmapFont->AddVertsForTextInBox2D( textVerts , aabb , 2.f , gravity , Rgba8( 0 , 0 , 100 , 255 ) , 1.f , Vec2( 0.9f , 0.9f ));
+	m_BitmapFont->AddVertsForTextInBox2D( textVerts , aabb , 2.f , gravity , Rgba8( 100 , 0 , 100 , 255 ) , 1.f , Vec2( 0.9f , 0.9f ));
 	
 	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( nullptr );
+
+
+	std::vector<Vertex_PCU> timeScaleInfo;
+	std::vector<Vertex_PCU> clockPausedInfo;
+
+	std::string scaleStr = "Time Scale :";
+	scaleStr = scaleStr + std::to_string( physicsSystem->m_clock->m_scale );
+
+	m_BitmapFont->AddVertsForTextInBox2D( timeScaleInfo , aabb , 2.f , scaleStr , Rgba8( 100 , 0 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.9f ));
+
+	
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( timeScaleInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+
+	std::string clockStr = "Clock Status :";
+
+	if ( physicsSystem->m_clock->IsPaused() )
+	{
+		clockStr += "Paused";
+	}
+	else
+	{
+		clockStr += "Running";
+	}
+
+	m_BitmapFont->AddVertsForTextInBox2D( clockPausedInfo , aabb , 2.f , clockStr , Rgba8( 100 , 0 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.7f ) );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( clockPausedInfo );
 	g_theRenderer->BindTexture( nullptr );
 
 }
@@ -668,13 +781,125 @@ void Game::HandleGravityModification()
 {
 	if ( g_theInput->WasKeyJustPressed( 0x6B ) )
 	{
-		m_physicsSystem->m_gravityMultiplier += 0.1f;
+		physicsSystem->m_gravityMultiplier += 0.1f;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 0x6D ) )
 	{
-		m_physicsSystem->m_gravityMultiplier -= 0.1f;
+		physicsSystem->m_gravityMultiplier -= 0.1f;
 	}
+}
+
+void Game::DisplayToolTip()
+{
+	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
+
+	AABB2 tooltipBox = AABB2( mousePos , Vec2( mousePos.x + 38.f , mousePos.y + 18.f ) );
+
+	g_theRenderer->DrawAABB2D( tooltipBox , Rgba8( 100 , 100 , 100 , 200 ) );
+
+
+	std::vector<Vertex_PCU> massInfo;
+	std::vector<Vertex_PCU> simulationModeInfo;
+	std::vector<Vertex_PCU> velocityInfo;
+	std::vector<Vertex_PCU> verletVelocityInfo;
+	std::vector<Vertex_PCU> bounceInfo;
+	std::vector<Vertex_PCU> frictionInfo;
+	std::vector<Vertex_PCU> dragInfo;
+
+	std::string temp = "";
+	
+	std::string massStr = "Mass:";
+	std::string frictionStr = "Friction:";
+	std::string bounceStr = "Bounciness:";
+	std::string velocityStr = "Velocity:";
+	std::string verletStr = "Verlet Velocity:";
+	std::string simStr = "Simulation Mode: ";
+	std::string dragStr = "Drag: ";
+
+	temp = std::to_string(m_selectedObject->m_rigidbody->m_mass);
+	massStr += temp;
+	massStr += "(D,F->dec/incr)";
+
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_collider->m_material.friction );
+	frictionStr += temp;
+	frictionStr+="(J,K->dec/incr)";
+
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_collider->m_material.bounciness );
+	bounceStr += temp;
+	bounceStr += "(G,H->dec/incr)";
+
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_velocity.x ) + ","+std::to_string( m_selectedObject->m_rigidbody->m_velocity.y );
+	velocityStr += temp;
+
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_verletVelocity.x ) + "," + std::to_string( m_selectedObject->m_rigidbody->m_verletVelocity.y );
+	verletStr += temp;
+
+	temp = "";
+	switch ( m_selectedObject->m_rigidbody->m_mode )
+	{
+	case STATIC:
+		temp = "STATIC";
+		break;
+	case KINAMETIC:
+		temp = "KINAMETIC";
+		break;
+	case DYNAMIC:
+		temp = "DYNAMIC";
+		break;
+	}
+	simStr += temp;
+
+
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_drag );
+	dragStr += temp;
+	dragStr += "(Z,X->dec/incr)";
+
+
+	
+
+	m_BitmapFont->AddVertsForTextInBox2D( massInfo , tooltipBox , 1.f , massStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.02f ));
+	m_BitmapFont->AddVertsForTextInBox2D( frictionInfo , tooltipBox , 1.f , frictionStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.12f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( bounceInfo , tooltipBox , 1.f , bounceStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.22f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( velocityInfo , tooltipBox , 1.f , velocityStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.32f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( verletVelocityInfo , tooltipBox , 1.f , verletStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.42f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( dragInfo , tooltipBox , 1.f , dragStr , Rgba8( 0 , 0 , 0 , 255 ), 1.f , Vec2( 0.02f , 0.52f ));
+	m_BitmapFont->AddVertsForTextInBox2D( simulationModeInfo , tooltipBox , 1.f , simStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.62f ) );
+	
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( massInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( frictionInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( bounceInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( velocityInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( verletVelocityInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( dragInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( simulationModeInfo );
+	g_theRenderer->BindTexture( nullptr );
+
 }
 
 void Game::UpdateFramePositions( )
@@ -726,6 +951,8 @@ void Game::Update( float deltaseconds )
 		return;
 	}
 
+	HandleClockChanges();
+
 	if ( !isDrawing )
 	{
 		if ( g_theInput->WasKeyJustPressed( 0x1B ) )
@@ -736,7 +963,7 @@ void Game::Update( float deltaseconds )
 
 	UpdateCameraMovement( deltaseconds );
 
-	m_physicsSystem->Update();
+	physicsSystem->Update();
 	if ( !isDrawing )
 	{
 		HandleObjectCreationRequests();
@@ -802,8 +1029,13 @@ void Game::Render()
 		m_gameObjects[ index ]->m_rigidbody->m_collider->DebugRender( g_theRenderer , m_gameObjects[index]->m_borderColor , m_gameObjects[index]->m_fillColor  );
 	}
 
-	DisplayGravityInfo();
+	DisplayMiscInfo();
 	DisplayX();
+
+	if ( m_selectedObject )
+	{
+		DisplayToolTip();
+	}
 	
 	g_theRenderer->EndCamera( *m_camera );
 

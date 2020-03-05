@@ -34,6 +34,7 @@ public:
 	void SetCarrotUsingMouse();
 	bool IsCommandInHistory( std::string command );
 	void ProcessCommand(std::string& command);
+	void ProcessCommand( std::string& command , EventArgs& commandArgs );
 	void InitializeCommands();
 	void HandleTextSelection();
 
