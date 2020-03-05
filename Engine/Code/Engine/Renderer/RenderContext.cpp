@@ -29,21 +29,14 @@ BitmapFont* g_theBitMapFont = nullptr;
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
-	//RenderBuffer* m_immediateVBO;
-
 	//Update a vertex buffer
 	size_t bufferByteSize = numVertexes * sizeof( Vertex_PCU );
 	size_t elementSize = sizeof( Vertex_PCU );
 	m_immediateVBO->Update( vertexes , bufferByteSize , elementSize );
-
+	
 	//Bind 
-
-		BindVertexBuffer( m_immediateVBO );
-
-
-		Draw( numVertexes , 0 );
-
-
+	BindVertexBuffer( m_immediateVBO );
+	Draw( numVertexes , 0 );
 }
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU> &verts )
@@ -417,9 +410,9 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 void RenderContext::Startup( Window* window )
 {
 
-	/*#if defined(RENDER_DEBUG)
+	#if defined(RENDER_DEBUG)
 	  CreateDebugModule();
-	#endif*/
+	#endif
 	//Instance - singleton
 	IDXGISwapChain* swapchain = nullptr; 
 
@@ -450,23 +443,18 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	//m_defaultShader = new Shader(this);
-	//m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
-
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
-	//swapchain->Release();
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
 	m_defaultColor = CreateTextureFromFile( "Data/Images/white.png" );
 
 	CreateBlendStates();
-
 	g_theBitMapFont = CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
-	CreateDebugModule();
+	//CreateDebugModule();
 
 }
 
@@ -733,14 +721,10 @@ void RenderContext::CreateBlendStates()
 	opaqueDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_device->CreateBlendState( &opaqueDesc , &m_opaqueBlendState );
 
-	
-
 }
 
 void RenderContext::ClaerScreen( const Rgba8 clearColor )
 {
-	/*glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(float(clearColor.r),float(clearColor.g),float(clearColor.b),float(clearColor.a));*/
 	float clearFloats[ 4 ];
 	clearFloats[ 0 ] = ( float ) clearColor.r / 255.0f;
 	clearFloats[ 1 ] = ( float ) clearColor.g / 255.0f;
@@ -752,8 +736,6 @@ void RenderContext::ClaerScreen( const Rgba8 clearColor )
 	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
 
 	m_context->ClearRenderTargetView( rtv , clearFloats );
-
-	//GUARANTEE_OR_DIE( false , "clrscr" );
 
 }
 

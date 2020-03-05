@@ -54,6 +54,12 @@ void Rigidbody2D::ApplyGravity( float deltaTime, float gravityMultiplier )
 
 }
 
+//void Rigidbody2D::ApplyDrag( float deltaTime )
+//{
+//	Vec2 velocity = GetVerletVelocity();
+//	Vec2 dragForce = -velocity * m_drag;
+//}
+
 void Rigidbody2D::ApplyImpulse( Vec2 impulse )
 {
 	m_velocity += impulse / m_mass;

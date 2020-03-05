@@ -45,6 +45,11 @@ float Collider2D::GetRestitutionWith( Collider2D const* other ) const
 	return m_material.bounciness * other->m_material.bounciness;
 }
 
+float Collider2D::GetFrictionWith( Collider2D const* other ) const
+{
+	return m_material.friction * other->m_material.friction;
+}
+
 void Collider2D::IncreamentBounciness( float increament )
 {
 	m_material.bounciness += increament;

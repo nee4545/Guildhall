@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Audio\AudioSystem.cpp" />
     <ClCompile Include="Core\AABB2.cpp" />
+    <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\EngineCommon.cpp" />
     <ClCompile Include="Core\ErrorWarningAssert.cpp" />
     <ClCompile Include="Core\EventSystem.cpp" />
@@ -34,6 +35,7 @@
     <ClCompile Include="Core\StringUtils.cpp" />
     <ClCompile Include="Core\Texture.cpp" />
     <ClCompile Include="Core\Time.cpp" />
+    <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Core\Transform.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
@@ -77,6 +79,7 @@
   <ItemGroup>
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Core\AABB2.hpp" />
+    <ClInclude Include="Core\Clock.hpp" />
     <ClInclude Include="Core\D3D11Common.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
     <ClInclude Include="Core\ErrorWarningAssert.hpp" />
@@ -92,6 +95,7 @@
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Texture.hpp" />
     <ClInclude Include="Core\Time.hpp" />
+    <ClInclude Include="Core\Timer.hpp" />
     <ClInclude Include="Core\Transform.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />

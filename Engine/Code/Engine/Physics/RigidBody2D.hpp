@@ -33,6 +33,7 @@ public:
 	void SetCollider( Collider2D* collider );
 	void SetPosition( Vec2 position );
 	Vec2 GetWorldPosition() { return m_worldPosition; }
+	Vec2 GetVerletVelocity() { return m_verletVelocity; }
 	void SetVelocity( Vec2 velocity );
 
 private: 
@@ -45,11 +46,15 @@ public:
 	Physics2D* m_system=nullptr;						// which scene created/owns this object
 	Collider2D* m_collider=nullptr;
 	Vec2 m_velocity = Vec2(0.f,0.f);
+	Vec2 m_verletVelocity = Vec2(0.f,0.f);
 	eSimulationMode m_mode = DYNAMIC;
 	float m_mass=1.f;
+	float m_drag = 0.5f;
 	Vec2 m_gravityDirection = Vec2( 0.f , -1.f );
 	Vec2 m_gravityVector = Vec2( 0.f , 0.f );
+	Vec2 m_frameStartPosition = Vec2( 0.f , 0.f );
 	void ApplyGravity( float deltaTime, float gravityMultiplier );
+	void ApplyDrag( float deltaTime );
 	void ApplyImpulse( Vec2 impulse );
 	void MoveRigidBody( float deltaSeconds );
 	void Move(Vec2 movement);

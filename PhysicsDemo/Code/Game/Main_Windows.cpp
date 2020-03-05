@@ -51,10 +51,8 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle , _In_opt_ HINSTANC
 	// Program main loop; keep running frames until it's time to quit
 	while ( !g_theapp->isQuitting() )
 	{
-
-		//Sleep(16);
 		g_theWindow->BeginFrame();
-		g_theapp->RunFrame();
+		//g_theapp->RunFrame();
 		RunFrame();
 	}
 

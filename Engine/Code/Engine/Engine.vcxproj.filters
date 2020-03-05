@@ -55,6 +55,8 @@
     <ClCompile Include="Renderer\TextureView.cpp" />
     <ClCompile Include="ThirdParty\tinyxml2.cpp" />
     <ClCompile Include="Vec4.cpp" />
+    <ClCompile Include="Core\Clock.cpp" />
+    <ClCompile Include="Core\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioSystem.hpp" />
@@ -124,5 +126,7 @@
     <ClInclude Include="ThirdParty\fmod\fmod_errors.h" />
     <ClInclude Include="ThirdParty\fmod\fmod_output.h" />
     <ClInclude Include="ThirdParty\tinyxml2.h" />
+    <ClInclude Include="Core\Clock.hpp" />
+    <ClInclude Include="Core\Timer.hpp" />
   </ItemGroup>
 </Project>

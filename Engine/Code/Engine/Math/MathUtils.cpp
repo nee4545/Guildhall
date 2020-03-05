@@ -591,6 +591,11 @@ float SmoothStep3( float t )
 	return ( ( t * t ) * ( 3 - ( 2 * t ) ) );
 }
 
+float SignFloat( float val )
+{
+	return ( val >= 0.0f ) ? 1.0f : -1.0f;
+}
+
 float GetProjectedLength2D( const Vec2& sourceVector, const Vec2& ontoVector )
 {
 	Vec2 temp = ontoVector.GetNormalized();

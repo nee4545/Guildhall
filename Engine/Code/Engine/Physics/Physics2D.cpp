@@ -4,6 +4,8 @@
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Core/Polygon2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/Clock.hpp"
+#include "Engine/Core/Timer.hpp"
 #include <wtypes.h>
 
 manifoldGenerations gManifoldGenerations[ NUM_COLLIDER_TYPES * NUM_COLLIDER_TYPES ] =
@@ -19,49 +21,61 @@ void Physics2D::BeginFrame()
 }
 
 
-void Physics2D::Update( float deltaSeconds )
+void Physics2D::StartUp()
 {
-	ApplyAffectors( deltaSeconds );
-	MoveRigidBodies( deltaSeconds );
-	DetectCollissions();
-	ResolveCollissions();
+	m_clock = new Clock();
+	m_stepTimer = new Timer();
+	m_fixedDeltaTime = 1.0/120.0;
+	//m_clock->m_scale = 5.f;
+	m_stepTimer->SetSeconds( m_clock , m_fixedDeltaTime );
+}
+
+void Physics2D::Update()
+{
+	while ( m_stepTimer->CheckAndDecrement() )
+	{
+		for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
+		{
+			if ( m_rigidBodies2D[ i ] == nullptr )
+			{
+				continue;
+			}
+
+			m_rigidBodies2D[ i ]->m_frameStartPosition = m_rigidBodies2D[ i ]->GetWorldPosition();
+		}
+		AdvanceSimulation( m_fixedDeltaTime );
+	}
+
+	//AdvanceSimulation( m_clock->GetLastDeltaSeconds() );
 	CleanUp();
 }
 
 
+void Physics2D::AdvanceSimulation( double deltaSeconds )
+{
+	ApplyAffectors( (float)deltaSeconds );
+	MoveRigidBodies( (float)deltaSeconds );
+	DetectCollissions();
+	ResolveCollissions();
+	m_frameCollisions.clear();
+	
+}
+
 void Physics2D::EndFrame()
 {
-	for ( int index = 0; index < m_colliders2D.size(); index++ )
+
+	//Set Verlet velocity
+
+	for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
 	{
-		if ( m_colliders2D[ index ] == nullptr )
+		if ( m_rigidBodies2D[ i ] == nullptr )
 		{
 			continue;
 		}
-		if ( m_colliders2D[ index ]->m_isGarbage )
-		{
-			delete m_colliders2D[ index ];
-			m_colliders2D[ index ] = nullptr;
-		}
+
+		m_rigidBodies2D[ i ]->m_verletVelocity = ( m_rigidBodies2D[ i ]->GetWorldPosition() - m_rigidBodies2D[ i ]->m_frameStartPosition ) / (float)m_fixedDeltaTime;
 	}
 
-	for ( int index = 0; index < m_rigidBodies2D.size(); index++ )
-	{
-		if ( m_rigidBodies2D[ index ] == nullptr )
-		{
-			continue;
-		}
-		if ( m_rigidBodies2D[ index ]->m_isGarbage )
-		{
-			if ( m_rigidBodies2D[ index ]->m_collider != nullptr )
-			{
-				m_rigidBodies2D[ index ]->m_collider->Destroy();
-			}
-			delete m_rigidBodies2D[ index ];
-			m_rigidBodies2D[ index ] = nullptr;
-		}
-	}
-	
-	m_frameCollisions.clear();
 }
 
 Rigidbody2D* Physics2D::CreateRigidbody()
@@ -224,23 +238,23 @@ void Physics2D::DetectCollissions()
 			}
 
 			
-				if ( m_rigidBodies2D[ i ]->m_collider->Intersects( m_rigidBodies2D[ j ]->m_collider ) )
+			if ( m_rigidBodies2D[ i ]->m_collider->Intersects( m_rigidBodies2D[ j ]->m_collider ) )
+			{
+				COLLIDER2D_TYPE myType = m_rigidBodies2D[ i ]->m_collider->m_colliderType;
+				COLLIDER2D_TYPE otherType = m_rigidBodies2D[ j ]->m_collider->m_colliderType;
+				int idx = otherType * NUM_COLLIDER_TYPES + myType;
+				manifoldGenerations check = gManifoldGenerations[ idx ];
+
+				if ( check != nullptr )
 				{
-					COLLIDER2D_TYPE myType = m_rigidBodies2D[ i ]->m_collider->m_colliderType;
-					COLLIDER2D_TYPE otherType = m_rigidBodies2D[ j ]->m_collider->m_colliderType;
-					int idx = otherType * NUM_COLLIDER_TYPES + myType;
-					manifoldGenerations check = gManifoldGenerations[ idx ];
-
-					if ( check != nullptr )
-					{
-						Collision2D collission;
-						collission.me = m_rigidBodies2D[ i ]->m_collider;
-						collission.them = m_rigidBodies2D[ j ]->m_collider;
-						collission.manifold = check( m_rigidBodies2D[ i ]->m_collider , m_rigidBodies2D[ j ]->m_collider );
-						m_frameCollisions.push_back( collission );
-					}
-
+					Collision2D collission;
+					collission.me = m_rigidBodies2D[ i ]->m_collider;
+					collission.them = m_rigidBodies2D[ j ]->m_collider;
+					collission.manifold = check( m_rigidBodies2D[ i ]->m_collider , m_rigidBodies2D[ j ]->m_collider );
+					m_frameCollisions.push_back( collission );
 				}
+
+			}
 		}
 	}
 }
@@ -307,13 +321,29 @@ void Physics2D::ResolveCollission( Collision2D collision )
 	float jn = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.me->GetRestitutionWith(collision.them) ) *
 		DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
 
+	float friction = collision.me->GetFrictionWith( collision.them );
+
+	float tjn = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.me->GetFrictionWith( collision.them ) ) *
+		DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal.GetRotated90Degrees() );
+
 	jn = ( jn < 0 ) ? 0 : jn;
+
+	if ( abs( tjn ) > friction * jn )
+	{
+		tjn = SignFloat( tjn ) * jn * friction;
+	}
+	else
+	{
+		tjn *= friction;
+	}
 
 
 	if ( ( collision.me->m_rigidbody->m_mode == DYNAMIC || collision.me->m_rigidbody->m_mode == KINAMETIC ) && ( collision.them->m_rigidbody->m_mode == DYNAMIC || collision.them->m_rigidbody->m_mode == KINAMETIC ) )
 	{
 		collision.me->m_rigidbody->ApplyImpulse( jn * collision.manifold.normal );
 		collision.them->m_rigidbody->ApplyImpulse( -jn * collision.manifold.normal );
+		collision.me->m_rigidbody->ApplyImpulse( tjn * collision.manifold.normal.GetRotated90Degrees() );
+		collision.them->m_rigidbody->ApplyImpulse( -tjn * collision.manifold.normal.GetRotated90Degrees() );
 	}
 
 
@@ -324,6 +354,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		j = ( j < 0 ) ? 0 : j;
 
 		collision.them->m_rigidbody->ApplyImpulse( -j * collision.manifold.normal );
+		collision.them->m_rigidbody->ApplyImpulse( -tjn * collision.manifold.normal.GetRotated90Degrees() );
 	}
 
 
@@ -334,6 +365,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		j = ( j < 0 ) ? 0 : j;
 
 		collision.me->m_rigidbody->ApplyImpulse( j* collision.manifold.normal );
+		collision.me->m_rigidbody->ApplyImpulse( tjn * collision.manifold.normal.GetRotated90Degrees() );
 	}
 
 }
@@ -377,8 +409,17 @@ void Physics2D::CleanUp()
 }
 
 
-
-
+void Physics2D::SetClock( Clock* clock )
+{
+	if ( clock == nullptr )
+	{
+		m_clock = &Clock::gMasterClock;
+	}
+	else
+	{
+		m_clock = clock;
+	}
+}
 
 Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 )
 {

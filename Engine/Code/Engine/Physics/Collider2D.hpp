@@ -37,6 +37,7 @@ public:
 	bool Intersects( Collider2D const* other ) const;
 
 	float GetRestitutionWith( Collider2D const* other ) const;
+	float GetFrictionWith( Collider2D const* other ) const;
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 

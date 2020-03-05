@@ -94,5 +94,7 @@ float SmoothStop4( float t );
 float SmoothStop5( float t );
 float SmoothStep3( float t );
 
+float SignFloat( float val );
+
 
 

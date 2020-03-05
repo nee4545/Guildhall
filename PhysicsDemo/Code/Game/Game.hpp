@@ -15,6 +15,7 @@ class Game
 	RandomNumberGenerator m_rng;
 	BitmapFont* m_BitmapFont = nullptr;
 	Camera* m_camera=nullptr;
+	Camera* m_devConsoleCamera = nullptr;
 	Physics2D* m_physicsSystem = nullptr;
 	std::vector<GameObject*> m_gameObjects;
 	GameObject* m_selectedObject = nullptr;
@@ -38,6 +39,7 @@ class Game
 	bool initialPointSet = false;
 	Vec2 throwFinalPoint;
 	bool finalPointSet = false;
+	bool devConsoleOpen = false;
 
 public:
 	
@@ -46,6 +48,7 @@ public:
 	Game();
 	~Game();
 	void StartUp();
+	void BeginFrame();
 	void EndFrame();
 	GameObject* CreateDisc();
 	GameObject* CreatePolygon(Polygon2D& polygon);
@@ -71,5 +74,7 @@ public:
 	void UpdateFramePositions();
 	void Update(float deltaseconds);
 	void Render();
+
+	void ToggleDevConsole();
 
 };

@@ -10,13 +10,49 @@
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Core/Polygon2D.hpp"
 
+#define UNUSED(x) (void)(x);
+
+
+bool Help( EventArgs& args )
+{
+	UNUSED( args );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Currently Supported Commands" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "help" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "quit" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "close" );
+	return false;
+}
+
+bool Quit( EventArgs& args )
+{
+	UNUSED( args );
+	g_theapp->HandleQuitRequested();
+	return false;
+}
+
+
+bool Close( EventArgs& args )
+{
+	UNUSED( args );
+	g_theConsole.SetIsOpen( false );
+	return false;
+}
 
 
 
 Game::Game()
 {
 	m_camera = new Camera();
+	m_devConsoleCamera = new Camera();
 	m_camera->SetOrthoView(Vec2(0.f,0.f), Vec2( 160.f , 90.f ) );
+	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
+	g_theConsole.TakeCamera( m_devConsoleCamera );
+	g_theConsole.SetTextSize( 2.5f );
+
+	g_theEventSystem.SubscribeToEvent( "help" , Help );
+	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
+	g_theEventSystem.SubscribeToEvent( "close" , Close );
+
 	m_cameraHeight = 90.f;
 	m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) );
 	//m_camera->SetPosition( Vec2( 0.f , 0.f ) );
@@ -33,13 +69,20 @@ Game::Game()
 Game::~Game()
 {
 	delete m_camera;
+	delete m_devConsoleCamera;
 }
 
 void Game::StartUp()
 {
 
 	m_physicsSystem = new Physics2D();
+	m_physicsSystem->StartUp();
 
+}
+
+void Game::BeginFrame()
+{
+	m_physicsSystem->BeginFrame();
 }
 
 void Game::EndFrame()
@@ -285,8 +328,8 @@ void Game::HandleThrow()
 		return;
 	}
 
-	Vec2 velocity = -throwFinalPoint+throwInitialPoint;
-	m_selectedObject->m_rigidbody->SetVelocity( velocity*10.f  );
+	Vec2 velocity = -throwFinalPoint + throwInitialPoint;
+	m_selectedObject->m_rigidbody->SetVelocity( velocity * 10.f );
 	initialPointSet = false;
 	finalPointSet = false;
 }
@@ -677,6 +720,12 @@ void Game::UpdateFramePositions( )
 void Game::Update( float deltaseconds )
 {
 
+	ToggleDevConsole();
+	if ( g_theConsole.IsOpen() )
+	{
+		return;
+	}
+
 	if ( !isDrawing )
 	{
 		if ( g_theInput->WasKeyJustPressed( 0x1B ) )
@@ -687,7 +736,7 @@ void Game::Update( float deltaseconds )
 
 	UpdateCameraMovement( deltaseconds );
 
-	m_physicsSystem->Update( deltaseconds );
+	m_physicsSystem->Update();
 	if ( !isDrawing )
 	{
 		HandleObjectCreationRequests();
@@ -758,5 +807,21 @@ void Game::Render()
 	
 	g_theRenderer->EndCamera( *m_camera );
 
+	if ( g_theConsole.IsOpen() )
+	{
+		g_theRenderer->BeginCamera( *m_devConsoleCamera );
+		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
+		g_theRenderer->EndCamera( *m_devConsoleCamera );
+	}
+
 	
+}
+
+void Game::ToggleDevConsole()
+{
+	if ( g_theInput->WasKeyJustPressed( 0xC0 ) )
+	{
+		devConsoleOpen = !devConsoleOpen;
+		g_theConsole.SetIsOpen( devConsoleOpen );
+	}
 }

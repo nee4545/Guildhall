@@ -10,6 +10,8 @@ class Rigidbody2D;
 class Collider2D;
 class PolygonCollider2D;
 class Polygon2D;
+class Clock;
+class Timer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +19,9 @@ class Physics2D
 {
 public:
 	void BeginFrame();
-	void Update(float deltaSeconds);
+	void StartUp();
+	void Update();
+	void AdvanceSimulation( double deltaSeconds );
 	void EndFrame();    // cleanup destroyed objects
 
 	Physics2D() {};
@@ -36,6 +40,7 @@ public:
 	void ResolveCollission( Collision2D collission );
 	void SetSceneGravity( float gravity );
 	void CleanUp();
+	void SetClock(Clock* clock);
 
 public:
 	// add members you may need to store these
@@ -45,6 +50,10 @@ public:
 	std::vector<Collider2D*>	m_colliders2D;
 	float m_gravityMultiplier = 9.8f;
 	std::vector<Collision2D> m_frameCollisions;
+
+	Clock* m_clock = nullptr;
+	Timer* m_stepTimer = nullptr;
+	double m_fixedDeltaTime = 0.1;
 
 
 };

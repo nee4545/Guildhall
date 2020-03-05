@@ -9,6 +9,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Core/Clock.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
@@ -31,6 +32,7 @@ void App::Startup()
 		thegame = new Game();
 	}
 	g_theConsole.Startup();
+	Clock::SystemStartup();
 }
 
 App::~App()
@@ -68,10 +70,9 @@ void App::Update( float deltaSeconds )
 
 	g_theInput->UpdateMouse();
 
-	thegame->Update( deltaSeconds );
+	thegame->Update( (float)Clock::gMasterClock.GetLastDeltaSeconds() );
 
 	g_theConsole.Update( deltaSeconds );
-	//thegame->Update(deltaSeconds);
 
 
 
@@ -81,12 +82,6 @@ void App::Update( float deltaSeconds )
 		HandleQuitRequested();
 	}
 
-	//HandleQuitRequested();
-
-	//if( input->WasKeyJustPressed( 0x77 ) )
-	//{
-	//	ResetGame();
-	//}
 
 }
 
@@ -111,6 +106,7 @@ void App::Render() const
 
 void App::BeginFrame()
 {
+	Clock::BeginFrame();
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
