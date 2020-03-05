@@ -260,6 +260,58 @@ void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 // 	}
 }
 
+void RenderContext::BindDepthStencil( Texture* dsv )
+{
+	ID3D11RenderTargetView* rtvCopy = m_texture->GetRenderTargetView()->GetRTVHandle();
+	ID3D11RenderTargetView* const* rtv = &rtvCopy;
+
+	if ( dsv == nullptr )
+	{
+		m_context->OMSetRenderTargets( 1 , rtv , nullptr );
+		return;
+	}
+
+	TextureView* tempDsv = dsv->GetOrCreateDepthBuffer( m_texture->GetTexelSizeCoords() , this );
+	m_context->OMSetRenderTargets( 1 , rtv , tempDsv->m_dsv );
+}
+
+void RenderContext::SetDepthTest()
+{
+	if ( m_depthStencilState )
+	{
+		DX_SAFE_RELEASE( m_depthStencilState );
+	}
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	// Depth test parameters
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	// Stencil test parameters
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+	// Stencil operations if pixel is front-facing
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	// Stencil operations if pixel is back-facing
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	// Create depth stencil state
+	m_device->CreateDepthStencilState( &dsDesc , &m_depthStencilState );
+	m_context->OMSetDepthStencilState( m_depthStencilState , 1 );
+}
+
+void RenderContext::ClearDepth( Texture* dsTarget , float depth )
+{
+	TextureView* view = dsTarget->GetOrCreateDepthBuffer( m_texture->GetTexelSizeCoords() , this );
+	ID3D11DepthStencilView* dsv = view->GetDsvHandle();
+	m_context->ClearDepthStencilView( dsv,D3D11_CLEAR_DEPTH,depth,0 );
+}
+
 Shader* RenderContext::GetOrCreateShader( char const* filename )
 {
 	Shader* temp = m_loadedShaders[ filename ];
@@ -400,34 +452,6 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	//Create depth stencil state
-	D3D11_DEPTH_STENCIL_DESC dsDesc;
-
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	dsDesc.StencilEnable = FALSE;
-	dsDesc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-	dsDesc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-
-	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	ID3D11DepthStencilState* pDSState;
-	m_device->CreateDepthStencilState( &dsDesc , &pDSState );
-	m_depthStencilState = pDSState;
-
-
-
-
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
@@ -553,6 +577,11 @@ void RenderContext::BeginCamera( Camera &camera)
 		}
 	}
 
+	if ( camera.m_backBuffer && ( camera.m_clearMode && CLEAR_DEPTH_BIT ) )
+	{
+		ClearDepth( camera.m_backBuffer , 1.f );
+	}
+
 	TextureView* view = colorTarget->GetRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
 
@@ -569,6 +598,13 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
 
+	if ( camera.m_backBuffer == nullptr )
+	{
+		Texture* dsTarget = new Texture();
+		dsTarget->GetOrCreateDepthBuffer( textureDimensions , this );
+		camera.m_backBuffer = dsTarget;
+	}
+
 	D3D11_VIEWPORT viewport;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
@@ -579,7 +615,10 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	m_context->RSSetViewports( 1 , &viewport );
 
-	ClaerScreen(camera.GetClearColor());
+	if ( camera.m_clearMode & CLEAR_COLOR_BIT )
+	{
+		ClaerScreen(camera.GetClearColor());
+	}
 	BindShader( "" );
 
 	m_lastBoundVBO = nullptr;
@@ -595,6 +634,8 @@ void RenderContext::BeginCamera( Camera &camera)
 	BindSampler( m_defaultSampler );
 
 	SetBlendMode( BlendMode::ALPHA );
+	SetDepthTest();
+	BindDepthStencil( camera.m_backBuffer );
 
 }
 

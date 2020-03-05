@@ -122,6 +122,9 @@ public:
 	void BindShader( std::string filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
+	void BindDepthStencil( Texture* dsv );
+	void SetDepthTest();
+	void ClearDepth( Texture* dsTarget , float depth );
 
 	Shader* GetOrCreateShader( char const* filename );
 	void SetModalMatrix( Mat44 mat );

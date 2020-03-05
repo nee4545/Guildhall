@@ -46,8 +46,10 @@ Game::Game()
 	//m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(160.f,90.f));
 	m_camera->SetProjectionPerspective( 60.f ,16.f/9.f, -0.1f , -100.f );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
+	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 127 , 127, 127 , 255 ) , 0.f , 0 );
+	m_camera->SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , 0 );
 
-	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8(  0 , 0 , 0 , 0 ) );
+	//m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8(  0 , 0 , 0 , 0 ) );
    
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
@@ -78,25 +80,25 @@ Game::Game()
 		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
 		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
 
-		Vertex_PCU( Vec3( -0.5f,-0.5f,0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
-		Vertex_PCU( Vec3( 0.5f,-0.5f,0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
-		Vertex_PCU( Vec3( 0.5f,0.5f,0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
-		Vertex_PCU( Vec3( -0.5f,0.5f,0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,0.5f ) ,GREEN, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,0.5f ) , GREEN, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,0.5f ) , GREEN, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,0.5f ) , GREEN, Vec2( 0.f, 1.f ) ),
 
-		Vertex_PCU( Vec3( -0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
-		Vertex_PCU( Vec3( -0.5f,-0.5f,0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
-		Vertex_PCU( Vec3( -0.5f,0.5f,0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
-		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,-0.5f ) ,BLUE, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f,-0.5f,0.5f ) , BLUE, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,0.5f ) , BLUE, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , BLUE, Vec2( 0.f, 1.f ) ),
 
-		Vertex_PCU( Vec3( 0.5f,-0.5f,-0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
-		Vertex_PCU( Vec3( 0.5f,-0.5f,0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
-		Vertex_PCU( Vec3( 0.5f,0.5f,0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
-		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,-0.5f ) ,RED, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,-0.5f,0.5f ) , RED, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,0.5f ) , RED, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , RED, Vec2( 0.f, 1.f ) ),
 
-		Vertex_PCU( Vec3( -0.5f, 0.5f, 0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
-		Vertex_PCU( Vec3( 0.5f, 0.5f, 0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
-		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , WHITE, Vec2( 1.f, 1.f ) ),
-		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , WHITE, Vec2( 0.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f, 0.5f, 0.5f ) ,YELLOW, Vec2( 0.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f, 0.5f, 0.5f ) , YELLOW, Vec2( 1.f, 0.f ) ),
+		Vertex_PCU( Vec3( 0.5f,0.5f,-0.5f ) , YELLOW, Vec2( 1.f, 1.f ) ),
+		Vertex_PCU( Vec3( -0.5f,0.5f,-0.5f ) , YELLOW, Vec2( 0.f, 1.f ) ),
 
 		Vertex_PCU( Vec3( -0.5f, -0.5f, 0.5f ) , WHITE, Vec2( 0.f, 0.f ) ),
 		Vertex_PCU( Vec3( 0.5f, -0.5f, 0.5f ) , WHITE, Vec2( 1.f, 0.f ) ),
@@ -173,6 +175,8 @@ void Game::Update( float deltaseconds )
 		cubeTransform.m_rotationPitchRollYawDegrees.x = 0.f;
 	}
 
+	cubeTransform.m_position = Vec3( 1.f , 0.5f , -12.f );
+
 	//cubeTransform.SetRotationFromPitchRollYawDegrees( 0.f , 30.f , 0.f );
 
 	m_camera->m_transform.SetRotationFromPitchRollYawDegrees( m_cameraRotation.x , m_cameraRotation.y , m_cameraRotation.z );
@@ -209,7 +213,7 @@ void Game::Render()
 	g_theRenderer->BindTexture( nullptr );
 
 	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( tex );
+	//g_theRenderer->BindTexture( tex );
 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( mesh );
 	
@@ -220,9 +224,7 @@ void Game::Render()
 
 	if ( g_theConsole.IsOpen() )
 	{
-		g_theRenderer->BeginCamera( *m_devConsoleCamera );
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
-		g_theRenderer->EndCamera( *m_devConsoleCamera );
 	}
 
 	

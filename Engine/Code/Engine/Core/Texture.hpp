@@ -16,6 +16,7 @@ private:
 	ID3D11Texture2D* m_handle = nullptr;
 	TextureView* m_renderTargetView = nullptr;
 	TextureView* m_shaderResourceView = nullptr;
+	TextureView* m_depthStencilView = nullptr;
 	IntVec2 m_texelSizeCoords;
 	IntVec2 m_dimensions;
 	
@@ -30,7 +31,7 @@ public:
 	TextureView* GetOrCreateShaderResourceView();
 	unsigned int GetTextureID()const;
 	const IntVec2 GetDimensions() const { return m_texelSizeCoords;}
-	static Texture* CreateDepthBuffer(IntVec2 dimensions, RenderContext* ctx );
+	TextureView* GetOrCreateDepthBuffer(IntVec2 dimensions, RenderContext* ctx );
 
 	IntVec2 GetTexelSizeCoords() const;
 };

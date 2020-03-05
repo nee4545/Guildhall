@@ -25,4 +25,6 @@ public:
 	};
 	
 
+	ID3D11DepthStencilView* GetDsvHandle() const { return m_dsv; }
+
 };

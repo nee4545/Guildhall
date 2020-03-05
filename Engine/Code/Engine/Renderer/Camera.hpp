@@ -22,14 +22,16 @@ class Camera
 private:
 	Vec2 bottom_Left;
 	Vec2 top_Right;
-	unsigned int m_clearMode = 0;
 	Rgba8 m_clearColor;
 	RenderBuffer* m_cameraUBO = nullptr;
+	float m_clearStencil = 0.f;
+	float m_clearDepth = 1.f;
 
 	Mat44 m_projection;
 	Mat44 m_view;
 	
 public:
+	unsigned int m_clearMode = 0;
 	Transform m_transform;
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip );
@@ -43,7 +45,7 @@ public:
 
 	void SetPosition( const Vec3& position );
 	void Translate( const Vec3& translation );
-	void CreateDepthStencilTarget( RenderContext* ctx );
+	//void CreateDepthStencilTarget( RenderContext* ctx );
 
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
