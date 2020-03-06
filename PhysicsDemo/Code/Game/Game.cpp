@@ -375,6 +375,8 @@ void Game::HandleThrow()
 	}
 
 	Vec2 velocity = -throwFinalPoint + throwInitialPoint;
+	velocity.x = Clamp( velocity.x , -20.f , 20.f );
+	velocity.y = Clamp( velocity.y , -20.f , 20.f );
 	m_selectedObject->m_rigidbody->SetVelocity( velocity * 10.f );
 	initialPointSet = false;
 	finalPointSet = false;
