@@ -70,11 +70,18 @@ void Camera::Translate( const Vec3& translation )
 	m_transform.m_position += translation;
 }
 
-//void Camera::CreateDepthStencilTarget(RenderContext* ctx)
-//{
-//	
-//	//m_backBuffer = Texture::GetOrCreateDepthBuffer( m_texture->GetDimensions(),ctx );
-//}
+
+
+void Camera::CreateDepthStencilTarget( RenderContext* ctx )
+{
+	if ( m_backBuffer == nullptr )
+	{
+		Texture* dsTarget = new Texture();
+		IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
+		dsTarget->GetOrCreateDepthBuffer( textureDimensions , ctx );
+		m_backBuffer = dsTarget;
+	}
+}
 
 Rgba8 Camera::GetClearColor() const
 {
@@ -157,7 +164,7 @@ Camera::~Camera()
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
 
-	delete m_texture;
+	//delete m_texture;
 	m_texture = nullptr;
 
 	delete m_backBuffer;

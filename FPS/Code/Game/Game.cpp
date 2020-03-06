@@ -7,6 +7,8 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Renderer/MeshUtils.hpp"
+#include "Engine/Core/Time.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -43,14 +45,11 @@ Game::Game()
 	m_camera=new Camera();
 	m_devConsoleCamera = new Camera();
 
-	//m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(160.f,90.f));
 	m_camera->SetProjectionPerspective( 60.f ,16.f/9.f, -0.1f , -100.f );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
 	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 127 , 127, 127 , 255 ) , 0.f , 0 );
 	m_camera->SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , 0 );
 
-	//m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8(  0 , 0 , 0 , 0 ) );
-   
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
 
@@ -61,10 +60,6 @@ Game::Game()
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
 
-	mesh = new GPUMesh( g_theRenderer );
-
-	std::vector<Vertex_PCU> verices;
-
 	Rgba8 WHITE = Rgba8( 255 , 255 , 255 , 255 );
 	Rgba8 GREEN = Rgba8( 0 , 255 , 0 , 255 );
 	Rgba8 BLUE = Rgba8( 0 , 0 , 255 , 255 );
@@ -72,6 +67,20 @@ Game::Game()
 	Rgba8 RED = Rgba8( 255 , 0 , 0 , 255 );
 	Rgba8 YELLOW = Rgba8( 255 , 255 , 0 , 255 );
 
+	mesh = new GPUMesh( g_theRenderer );
+	sphere = new GPUMesh( g_theRenderer );
+
+	std::vector<Vertex_PCU> sphereVerts;
+	std::vector<unsigned int> sphereIndices;
+	Vec3 centre = Vec3( 0.f , 0.f , 1.f );
+
+	AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 3.f , 64 , 32 , WHITE );
+
+	sphere->UpdateVertices((unsigned int) sphereVerts.size() , &sphereVerts[0] );
+	sphere->UpdateIndices((unsigned int) sphereIndices.size() , &sphereIndices[0] );
+
+
+	std::vector<Vertex_PCU> verices;
 
 	Vertex_PCU cube[] =
 	{
@@ -136,7 +145,6 @@ Game::Game()
 	mesh->UpdateIndices( 36 , cubeInd );
 
 	g_theInput->ClipSystemCursor();
-	g_theInput->UnClipSystemCursor();
 	g_theInput->SetCursorMode( MODE_RELATIVE );
 }
 
@@ -145,6 +153,7 @@ Game::~Game()
 	delete m_devConsoleCamera;
 	delete m_camera;
 	delete mesh;
+	delete sphere;
 }
 
 void Game::Update( float deltaseconds )
@@ -161,12 +170,22 @@ void Game::Update( float deltaseconds )
 	}
 
 	UNUSED( deltaseconds );
+
+	float speedMultiplier = 1.f;
+	if ( g_theInput->IsKeyPressed( 0x10 ) )
+	{
+		speedMultiplier = 2.f;
+	}
+	else
+	{
+		speedMultiplier = 1.f;
+	}
 	
 
-	m_cameraRotation.y += g_theInput->m_relativeMovement.x;
-	m_cameraRotation.x += g_theInput->m_relativeMovement.y;
-	m_cameraRotation.y = Clamp( m_cameraRotation.y , -180.f , 180.f );
-	m_cameraRotation.x = Clamp( m_cameraRotation.x , -180.f , 180.f );
+	m_cameraRotation.y += g_theInput->m_relativeMovement.x*0.1f;
+	m_cameraRotation.x += g_theInput->m_relativeMovement.y*0.1f;
+	m_cameraRotation.y = Clamp( m_cameraRotation.y , -90.f , 90.f );
+	m_cameraRotation.x = Clamp( m_cameraRotation.x , -85.f , 85.f );
 
 	cubeTransform.m_rotationPitchRollYawDegrees.x += deltaseconds*10.f;
 
@@ -176,22 +195,41 @@ void Game::Update( float deltaseconds )
 	}
 
 	cubeTransform.m_position = Vec3( 1.f , 0.5f , -12.f );
-
-	//cubeTransform.SetRotationFromPitchRollYawDegrees( 0.f , 30.f , 0.f );
+	
+	sphereTransform.SetRotationFromPitchRollYawDegrees( 0.f , 10.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 
 	m_camera->m_transform.SetRotationFromPitchRollYawDegrees( m_cameraRotation.x , m_cameraRotation.y , m_cameraRotation.z );
 	
 	if ( g_theInput->IsKeyPressed( 'W' ) )
 	{
-		m_camera->m_transform.m_position.z += 1.f;
+		m_camera->m_transform.m_position.z -= 1.f * deltaseconds * 4.f *speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'S' ) )
 	{
-		m_camera->m_transform.m_position.z -= 1.f;
+		m_camera->m_transform.m_position.z += 1.f * deltaseconds * 4.f * speedMultiplier;
 	}
 
-	
+	if ( g_theInput->IsKeyPressed( 'A' ) )
+	{
+		m_camera->m_transform.m_position.x -= 1.f * deltaseconds * 4.f * speedMultiplier;
+	}
+
+	if ( g_theInput->IsKeyPressed( 'D' ) )
+	{
+		m_camera->m_transform.m_position.x += 1.f * deltaseconds * 4.f * speedMultiplier;
+	}
+
+	if ( g_theInput->IsKeyPressed( 'C' ) )
+	{
+		m_camera->m_transform.m_position.y += 1.f * deltaseconds * 4.f * speedMultiplier;
+	}
+
+	if ( g_theInput->IsKeyPressed( 0x20 ) )
+	{
+		m_camera->m_transform.m_position.y -= 1.f * deltaseconds * 4.f * speedMultiplier;
+	}
+
 }
 
 void Game::Render()
@@ -199,35 +237,46 @@ void Game::Render()
 	
 
 	g_theRenderer->BeginCamera(*m_camera);
+	m_camera->CreateDepthStencilTarget( g_theRenderer );
+	g_theRenderer->SetDepthTest();
+	g_theRenderer->BindDepthStencil( m_camera->m_backBuffer );
 	
-	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/asd.png" );
+	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
+
+	Transform quadTransform;
+	quadTransform.m_position.z = -10.f;
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
+	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
 
 	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( tex );
-	g_theRenderer->DrawAABB2D( AABB2( 10.5f , 10.5f , 20.5f , 20.5f ) , Rgba8( 255 , 255 , 255 , 255 ) );
-	g_theRenderer->BindTexture( nullptr );
-
-	g_theRenderer->BindShader( "Data/Shaders/Inverse.hlsl" );
-	g_theRenderer->BindTexture( tex );
-	g_theRenderer->DrawAABB2D( AABB2( 20.5f , 20.5f , 30.5f , 30.5f ) , Rgba8( 255 , 255 , 255 , 255 ) );
-	g_theRenderer->BindTexture( nullptr );
-
-	g_theRenderer->BindShader( nullptr );
-	//g_theRenderer->BindTexture( tex );
 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( mesh );
+
+	g_theRenderer->BindShader( nullptr );
+	//g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
+
+	float deltaPhi = 360.f / 10.f;
+	Transform ring;
+
+	for ( float index = 0; index <= 360.f ; index += deltaPhi )
+	{
+		Vec3 position = GetSphericalCoordinates( 0.f , 20.f * (float)GetCurrentTimeSeconds() +  index , 15.f );
+		position.z -= 30.f;
+		ring.SetPosition( position );
+		ring.SetRotationFromPitchRollYawDegrees( 0.f , 20.f * (float)GetCurrentTimeSeconds() + index , 0.f );
+		g_theRenderer->SetModalMatrix( ring.ToMatrix() );
+		g_theRenderer->BindTexture( tex );
+		g_theRenderer->DrawMesh( sphere );
+	}
+
 	
-
-	//g_theRenderer->DrawDisc( Vec2( 0.f , 0.f ) , 3.f , Rgba8( 255 , 0 , 0 , 255 ) );
 	g_theRenderer->EndCamera(*m_camera);
-
 
 	if ( g_theConsole.IsOpen() )
 	{
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
-
-	
 
 }
 
@@ -249,6 +298,19 @@ void Game::ToggleDevConsole()
 	{
 		devConsoleOpen = !devConsoleOpen;
 		g_theConsole.SetIsOpen(devConsoleOpen);
+	}
+
+	if ( g_theConsole.IsOpen() )
+	{
+		g_theInput->UnClipSystemCursor();
+		g_theInput->SetCursorMode( MODE_ABSOLUTE );
+		g_theInput->ShowSystemCursor();
+	}
+	else
+	{
+		g_theInput->ClipSystemCursor();
+		g_theInput->SetCursorMode( MODE_RELATIVE );
+		g_theInput->HideSystemCursor();
 	}
 }
 

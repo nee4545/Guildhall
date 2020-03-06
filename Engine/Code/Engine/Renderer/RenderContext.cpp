@@ -64,8 +64,10 @@ void RenderContext::DrawIndexed( unsigned int indexCount , unsigned int startInd
 	m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
 
-	//ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
-	//m_context->IASetInputLayout( inputLayout );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
+	m_context->IASetInputLayout( inputLayout );
+
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	m_context->DrawIndexed( indexCount , startIndex , indexStride );
 }
@@ -594,17 +596,11 @@ void RenderContext::BeginCamera( Camera &camera)
 	} else
 	{
 		m_texture = m_swapChain->GetBackBuffer();
+		camera.m_texture = m_swapChain->GetBackBuffer();
 	}
 
 	IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
-
-	if ( camera.m_backBuffer == nullptr )
-	{
-		Texture* dsTarget = new Texture();
-		dsTarget->GetOrCreateDepthBuffer( textureDimensions , this );
-		camera.m_backBuffer = dsTarget;
-	}
-
+	   
 	D3D11_VIEWPORT viewport;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
@@ -634,8 +630,8 @@ void RenderContext::BeginCamera( Camera &camera)
 	BindSampler( m_defaultSampler );
 
 	SetBlendMode( BlendMode::ALPHA );
-	SetDepthTest();
-	BindDepthStencil( camera.m_backBuffer );
+	//SetDepthTest();
+	//BindDepthStencil( camera.m_backBuffer );
 
 }
 

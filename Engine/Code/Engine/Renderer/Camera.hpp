@@ -45,7 +45,7 @@ public:
 
 	void SetPosition( const Vec3& position );
 	void Translate( const Vec3& translation );
-	//void CreateDepthStencilTarget( RenderContext* ctx );
+	void CreateDepthStencilTarget( RenderContext* ctx );
 
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );

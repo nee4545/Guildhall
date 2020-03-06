@@ -65,6 +65,32 @@ void App::Update(float deltaSeconds)
 		deltaSeconds*=0.1f;
 	}
 
+	if ( g_theInput->WasKeyJustPressed( 'G' ) )
+	{
+		HICON icon = LoadIcon( NULL , IDI_WARNING );
+
+		SendMessage( ( HWND ) g_theWindow->m_hwnd , WM_SETICON , ICON_BIG , ( LPARAM ) icon );
+	}
+	
+	if ( g_theInput->WasKeyJustPressed( 'H' ) )
+	{
+		SetWindowText( ( HWND ) g_theWindow->m_hwnd , L"New Title" );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'J' ) )
+	{
+		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+			WS_POPUP );
+		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWDEFAULT );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'K' ) )
+	{
+		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+			WS_POPUP );
+		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWMAXIMIZED );
+	}
+
 	g_theInput->UpdateMouse();
 
 	if ( g_theInput->GetCursorMode() == MODE_RELATIVE )
@@ -75,9 +101,7 @@ void App::Update(float deltaSeconds)
 	thegame->Update( deltaSeconds );
 	
 	g_theConsole.Update( deltaSeconds );
-	//thegame->Update(deltaSeconds);
 
-	
 
 	if ( g_theWindow->m_quitRequested == true )
 	{
@@ -85,12 +109,6 @@ void App::Update(float deltaSeconds)
 		HandleQuitRequested();
 	}
 
-	//HandleQuitRequested();
-	
-	//if( input->WasKeyJustPressed( 0x77 ) )
-	//{
-	//	ResetGame();
-	//}
 
 }
 

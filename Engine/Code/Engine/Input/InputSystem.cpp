@@ -154,8 +154,13 @@ bool InputSystem::PopCharacter( char* outCharacter )
 
 void InputSystem::HideSystemCursor()
 {
-	m_hideCursorIndex++;
-	ShowCursor( m_hideCursorIndex );
+	while ( ShowCursor( FALSE ) >= 0 );
+	
+}
+
+void InputSystem::ShowSystemCursor()
+{
+	while ( ShowCursor( TRUE ) <= 0 );
 }
 
 void InputSystem::UnClipSystemCursor()

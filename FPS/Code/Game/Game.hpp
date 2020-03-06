@@ -13,14 +13,16 @@ class GPUMesh;
 class Game
 {
 	RandomNumberGenerator rng;
-	Camera* m_camera = nullptr;
+	mutable Camera* m_camera = nullptr;
 	Camera* m_devConsoleCamera = nullptr;
 	float m_rColorValue = 0.f;
 	BitmapFont* m_font;
 	bool devConsoleOpen = false;
 	Texture* tex = nullptr;
 	GPUMesh* mesh = nullptr;
+	GPUMesh* sphere = nullptr;
 	Transform cubeTransform;
+	Transform sphereTransform;
 
 public:
 
@@ -41,15 +43,4 @@ public:
 	void ToggleDebugCamera();
 	void ToggleDevConsole();
 	void ToggleDebugging();
-
-
-
-
-
-
-
-
-
-
-
 };
