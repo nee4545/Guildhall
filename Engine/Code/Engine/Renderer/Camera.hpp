@@ -22,7 +22,6 @@ class Camera
 private:
 	Vec2 bottom_Left;
 	Vec2 top_Right;
-	unsigned int m_clearMode = 0;
 	Rgba8 m_clearColor;
 	RenderBuffer* m_cameraUBO = nullptr;
 	Vec2 m_outpitsize;
@@ -33,6 +32,7 @@ private:
 	Mat44 m_view;
 	
 public:
+	unsigned int m_clearMode = 0;
 	Transform m_transform;
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip );

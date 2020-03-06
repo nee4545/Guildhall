@@ -57,6 +57,7 @@ Game::Game()
 	m_camera->SetOrthoView(Vec2(-80.f,-45.f), Vec2( 80.f , 45.f ) );
 	m_camera->SetOutputsize( Vec2( 160.f , 90.f ) );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
+	m_devConsoleCamera->SetClearMode( 0|CLEAR_STENCIL_BIT|CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 0 ) );
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
 
@@ -66,10 +67,11 @@ Game::Game()
 	g_theEventSystem.SubscribeToEvent( "set_physics_update_freq" , SetPhysicsUpdateStep );
 
 	m_cameraHeight = 90.f;
-	m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) );
+	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( 0 , 0 , 0 , 255 ) );
+	//m_devConsoleCamera->SetClearMode( 0 , Rgba8(0,0,0,127) );
 	//m_camera->SetPosition( Vec2( 0.f , 0.f ) );
-	m_maxZoomIn = 0.1f * m_cameraHeight;
-	m_maxZoomOut = 3.f * m_cameraHeight;
+	m_maxZoomIn = 0.5f * m_cameraHeight;
+	m_maxZoomOut = 2.f * m_cameraHeight;
 	m_rng = RandomNumberGenerator();
 	StartUp();
 	PopulateInitialObjects();
@@ -650,12 +652,12 @@ void Game::HandleClockChanges()
 
 	if ( g_theInput->WasKeyJustPressed( '8' ) )
 	{
-		physicsSystem->m_clock->SetScale( 2.0 );
+		physicsSystem->m_clock->SetScale( 2.0 * physicsSystem->m_clock->m_scale );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '9' ) )
 	{
-		physicsSystem->m_clock->SetScale( 0.5 );
+		physicsSystem->m_clock->SetScale( 0.5 * physicsSystem->m_clock->m_scale );
 	}
 }
 
@@ -860,9 +862,6 @@ void Game::DisplayToolTip()
 	dragStr += temp;
 	dragStr += "(Z,X->dec/incr)";
 
-
-	
-
 	m_BitmapFont->AddVertsForTextInBox2D( massInfo , tooltipBox , 1.f , massStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.02f ));
 	m_BitmapFont->AddVertsForTextInBox2D( frictionInfo , tooltipBox , 1.f , frictionStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.12f ) );
 	m_BitmapFont->AddVertsForTextInBox2D( bounceInfo , tooltipBox , 1.f , bounceStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.22f ) );
@@ -1041,9 +1040,7 @@ void Game::Render()
 
 	if ( g_theConsole.IsOpen() )
 	{
-		g_theRenderer->BeginCamera( *m_devConsoleCamera );
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
-		g_theRenderer->EndCamera( *m_devConsoleCamera );
 	}
 
 	
@@ -1055,5 +1052,14 @@ void Game::ToggleDevConsole()
 	{
 		devConsoleOpen = !devConsoleOpen;
 		g_theConsole.SetIsOpen( devConsoleOpen );
+	}
+
+	if ( g_theConsole.IsOpen() )
+	{
+		physicsSystem->m_clock->isPaused = true;
+	}
+	else
+	{
+		physicsSystem->m_clock->isPaused = false;
 	}
 }

@@ -592,7 +592,10 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	m_context->RSSetViewports( 1 , &viewport );
 
-	ClaerScreen(camera.GetClearColor());
+	if ( camera.m_clearMode & CLEAR_COLOR_BIT )
+	{
+		ClaerScreen( camera.GetClearColor() );
+	}
 	BindShader( "" );
 
 	m_lastBoundVBO = nullptr;
