@@ -93,7 +93,9 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t* attribute
 		return m_inputLayout;
 	}
 
+	//int numAttributes = sizeof(attribute)/sizeof(buffer_attribute_t);
 	D3D11_INPUT_ELEMENT_DESC vertexDescription[3];
+	
 
 	buffer_attribute_t *current_ele = &attribute[ 0 ];
 	int i = 0;
