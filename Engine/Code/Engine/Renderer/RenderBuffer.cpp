@@ -74,7 +74,7 @@ bool RenderBuffer::Update( void const* data , size_t dataByteSize , size_t eleme
 	}
 
 	// if no buffer create 
-
+	if(!m_handle )
 	Create( dataByteSize , elementByteSize );
 
 	ID3D11DeviceContext* ctx = m_owner->m_context;
