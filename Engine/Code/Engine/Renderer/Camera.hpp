@@ -27,6 +27,8 @@ private:
 	Vec2 m_outpitsize;
 	Vec2 m_pos;
 
+	float m_clearStencil = 0.f;
+	float m_clearDepth = 1.f;
 
 	Mat44 m_projection;
 	Mat44 m_view;
@@ -54,6 +56,7 @@ public:
 
 	void SetPosition( const Vec3& position );
 	void Translate( const Vec3& translation );
+	void CreateDepthStencilTarget( RenderContext* ctx );
 
 	Rgba8 GetClearColor() const;
 	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
@@ -72,4 +75,5 @@ public:
 	~Camera();
 
 	Texture* m_texture = nullptr;
+	Texture* m_backBuffer = nullptr;
 };

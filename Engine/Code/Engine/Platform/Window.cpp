@@ -113,13 +113,15 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 static void RegisterWindowClass()
 {
 	// Define a window style/class
+	HICON icon = LoadIcon( NULL , IDI_QUESTION );
+
 	WNDCLASSEX windowClassDescription;
 	memset( &windowClassDescription , 0 , sizeof( windowClassDescription ) );
 	windowClassDescription.cbSize = sizeof( windowClassDescription );
 	windowClassDescription.style = CS_OWNDC; // Redraw on move, request own Display Context
 	windowClassDescription.lpfnWndProc = static_cast< WNDPROC >( WindowsMessageHandlingProcedure ); // Register our Windows message-handling function
 	windowClassDescription.hInstance = GetModuleHandle( NULL );
-	windowClassDescription.hIcon = NULL;
+	windowClassDescription.hIcon = icon;
 	windowClassDescription.hCursor = NULL;
 	windowClassDescription.lpszClassName = WND_CLASS_NAME;
 	::RegisterClassEx( &windowClassDescription );

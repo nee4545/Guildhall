@@ -75,6 +75,7 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 {
 	
 	renderer.BeginCamera(camera);
+	renderer.BindDepthStencil( nullptr );
 	AABB2 consoleBox = AABB2(camera.GetOrthoBottomLeft(),camera.GetOrthoTopRight());
 	float dimensionOfBox = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
 	consoleBox.CarveBoxOffTop( 0.9f );

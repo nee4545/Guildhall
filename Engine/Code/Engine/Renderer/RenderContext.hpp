@@ -24,6 +24,7 @@ class SwapChain;
 class RenderBuffer;
 struct Mat44;
 struct ID3D11BlendState;
+struct ID3D11DepthStencilState;
 class Sampler;
 struct IDXGIDebug;
 
@@ -91,6 +92,7 @@ public:
 	ID3D11BlendState* m_alphaBlendState;
 	ID3D11BlendState* m_additiveBlendState;
 	ID3D11BlendState* m_opaqueBlendState;
+	ID3D11DepthStencilState* m_depthStencilState;
 	bool m_isDrawing = false;
 	
 
@@ -122,6 +124,9 @@ public:
 	void BindShader( std::string filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
+	void BindDepthStencil( Texture* dsv );
+	void SetDepthTest();
+	void ClearDepth( Texture* dsTarget , float depth );
 
 	Shader* GetOrCreateShader( char const* filename );
 	void SetModalMatrix( Mat44 mat );

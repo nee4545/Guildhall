@@ -3,6 +3,7 @@
 struct ID3D11RenderTargetView;
 struct ID3D11ShaderResourceView;
 struct ID3D11Resource;
+struct ID3D11DepthStencilView;
 
 class TextureView
 {
@@ -20,8 +21,10 @@ public:
 		ID3D11Resource* m_handle;
 		ID3D11RenderTargetView* m_rtv;
 		ID3D11ShaderResourceView* m_srv;
-
+		ID3D11DepthStencilView* m_dsv;
 	};
 	
+
+	ID3D11DepthStencilView* GetDsvHandle() const { return m_dsv; }
 
 };

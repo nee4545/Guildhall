@@ -99,9 +99,9 @@ void Camera::Translate2D( Vec2 translation2D )
 void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*=0.f */ , unsigned int stencil/*=0.f */ )
 {
 	m_clearColor = color;
-	m_clearMode = clearFlags;
-	UNUSED( depth );
-	UNUSED( stencil );
+	m_clearMode = (eCameraClearBitFlag)clearFlags;
+	m_clearStencil = (float)stencil;
+	m_clearDepth = depth;
 }
 
 void Camera::SetPosition( const Vec3& position )
@@ -112,6 +112,19 @@ void Camera::SetPosition( const Vec3& position )
 void Camera::Translate( const Vec3& translation )
 {
 	m_transform.m_position += translation;
+}
+
+
+
+void Camera::CreateDepthStencilTarget( RenderContext* ctx )
+{
+	if ( m_backBuffer == nullptr )
+	{
+		Texture* dsTarget = new Texture();
+		IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
+		dsTarget->GetOrCreateDepthBuffer( textureDimensions , ctx );
+		m_backBuffer = dsTarget;
+	}
 }
 
 Rgba8 Camera::GetClearColor() const
@@ -195,7 +208,10 @@ Camera::~Camera()
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
 
-	delete m_texture;
+	//delete m_texture;
 	m_texture = nullptr;
+
+	delete m_backBuffer;
+	m_backBuffer = nullptr;
 }
 

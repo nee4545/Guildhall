@@ -46,6 +46,7 @@ public:
 	bool PopCharacter( char* outCharacter );
 
 	void HideSystemCursor();
+	void ShowSystemCursor();
 	void UnClipSystemCursor();
 	void ClipSystemCursor();
 	void UpdateRelativeMode();
