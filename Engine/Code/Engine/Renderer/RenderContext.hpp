@@ -84,7 +84,6 @@ public:
 	VertexBuffer* m_immediateVBO = nullptr;
 
 	ID3D11Buffer* m_lastBoundVBO = nullptr;
-	//ID3D11Buffer* m_lastBoundIBO = nullptr;
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;
 
