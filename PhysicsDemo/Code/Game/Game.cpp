@@ -295,12 +295,12 @@ void Game::HandleDrag()
 				m_selectedObject->m_rigidbody->m_collider->IncreamentFriction( 0.1f );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'D' ) )
+			if ( g_theInput->WasKeyJustPressed( 'N' ) )
 			{
 				m_selectedObject->m_rigidbody->DecreamentMass( 0.1f );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'F' ) )
+			if ( g_theInput->WasKeyJustPressed( 'M' ) )
 			{
 				m_selectedObject->m_rigidbody->IncreamentMass( 0.1f );
 			}
@@ -823,7 +823,7 @@ void Game::DisplayToolTip()
 
 	temp = std::to_string(m_selectedObject->m_rigidbody->m_mass);
 	massStr += temp;
-	massStr += "(D,F->dec/incr)";
+	massStr += "(N,M->dec/incr)";
 
 	temp = "";
 	temp = std::to_string( m_selectedObject->m_rigidbody->m_collider->m_material.friction );

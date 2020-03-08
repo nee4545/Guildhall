@@ -15,7 +15,7 @@ Some example code for how the system will be used in this assignment;
 
 ## Checklist
 - [x] Allow user to adjust mass when selected [can not be 0, so clamp at 0.001 on the low end.  No high end limitation]
-    - [x] Suggested keys are `[` and `]`(my keys: D & F )
+    - [x] Suggested keys are `[` and `]`(my keys: N & M )
 - [x] Add `friction` to the physics material, defaulted to 0
 - [x] Allow user to adjust friction when selected [0 to 1]
     - [x] Suggested keys are `<` and `>'`(my keys: J & K)

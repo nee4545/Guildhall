@@ -68,8 +68,8 @@ void Camera::SetPosition( Vec2 position )
 
 void Camera::SetOrthoViewForCameraPosition()
 {
-	bottom_Left = Vec2(m_transform.m_position.x,m_transform.m_position.y) -m_outpitsize / 2.f;
-	top_Right = Vec2( m_transform.m_position.x , m_transform.m_position.y ) + m_outpitsize / 2.f;
+	bottom_Left =  -m_outpitsize / 2.f;
+	top_Right =   m_outpitsize / 2.f;
 	m_projection = Mat44::CreateOrthographicProjection( Vec3( bottom_Left , 0.f ) , Vec3( top_Right , 1.f ) );
 }
 
@@ -90,10 +90,8 @@ float Camera::GetAspectRatio() const
 
 void Camera::Translate2D( Vec2 translation2D )
 {
-	bottom_Left+=translation2D;
-	top_Right+=translation2D;
-
-	m_pos += translation2D;
+	m_transform.m_position.x += translation2D.x;
+	m_transform.m_position.y += translation2D.y;
 }
 
 void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*=0.f */ , unsigned int stencil/*=0.f */ )
