@@ -1015,7 +1015,6 @@ void Game::Render()
 
 	
 	g_theRenderer->BeginCamera( *m_camera );
-
 	
 	
 	DrawModeRender();
@@ -1054,12 +1053,12 @@ void Game::ToggleDevConsole()
 		g_theConsole.SetIsOpen( devConsoleOpen );
 	}
 
-	if ( g_theConsole.IsOpen() )
+	/*if ( g_theConsole.IsOpen() )
 	{
 		physicsSystem->m_clock->isPaused = true;
 	}
 	else
 	{
 		physicsSystem->m_clock->isPaused = false;
-	}
+	}*/
 }

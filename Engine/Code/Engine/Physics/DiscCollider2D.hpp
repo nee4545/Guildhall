@@ -1,12 +1,15 @@
 #pragma once
+#include <vector>
 #include <Engine/Physics/Collider2D.hpp>
 #include <Engine/Math/Vec2.hpp>
+#include "Engine/Core/Vertex_PCU.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class RenderContext;
 class Physics2D;
 class Rigidbody2D;
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +34,8 @@ private:
 public:
 	Vec2	m_localPosition = Vec2(0.f,0.f); // my local offset from my parent
 	Vec2	m_worldPosition = Vec2(0.f,0.f); // calculated from local position and owning rigidbody if present
+	std::vector<Vertex_PCU> m_verts;
+
 	
 	float	m_radius =0;
 

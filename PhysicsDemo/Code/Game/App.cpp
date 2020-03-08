@@ -58,30 +58,16 @@ void App::Update( float deltaSeconds )
 
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
 
-	if ( g_theInput->IsKeyPressed( 'Y' ) )
-	{
-		deltaSeconds *= 4.f;
-	}
-
-	if ( g_theInput->IsKeyPressed( 'T' ) )
-	{
-		deltaSeconds *= 0.1f;
-	}
-
 	g_theInput->UpdateMouse();
 
 	thegame->Update( (float)Clock::gMasterClock.GetLastDeltaSeconds() );
 
 	g_theConsole.Update( deltaSeconds );
 
-
-
 	if ( g_theWindow->m_quitRequested == true )
 	{
-
 		HandleQuitRequested();
 	}
-
 
 }
 

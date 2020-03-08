@@ -15,6 +15,8 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 	m_polygonLocal->m_localPos = localPosition;
 	m_localPosition = localPosition;
 	boundingDiscRadius = m_polygonLocal->GetBoundingDiscRadius();
+
+	AppendPolygon2( m_verts , m_polygonLocal );
 	//UpdateWorldShape();
 	
 }
@@ -38,9 +40,18 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 
 void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
-	ctx->DrawPolygonFilled( *m_polygonLocal , fillColor );
+	//ctx->DrawPolygonFilled( *m_polygonLocal , fillColor );
+	std::vector<Vertex_PCU> verts = m_verts;
+
+	for ( int i = 0; i < verts.size(); i++ )
+	{
+		verts[ i ].m_color = fillColor;
+	}
+
+	TransformVertexArray( verts , 1.f , 0.f , m_worldPosition-m_localPosition );
+	ctx->DrawVertexArray( verts );
 	ctx->DrawPolygonUnfilled( *m_polygonLocal , borderColor , 0.2f );
-	//ctx->DrawDisc( m_polygonLocal->GetCentre() , boundingDiscRadius , Rgba8( 100 , 0 , 0 , 100 ) );
+	
 }
 
 void PolygonCollider2D::MarkForDestroy()

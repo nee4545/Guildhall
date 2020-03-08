@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Physics/Collider2D.hpp>
 #include <Engine/Math/Vec2.hpp>
-
+#include "Engine/Core/Vertex_PCU.hpp"
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class RenderContext;
@@ -33,6 +33,7 @@ public:
 	Vec2	m_worldPosition = Vec2( 0.f , 0.f ); // calculated from local position and owning rigidbody if present
 	Polygon2D* m_polygonLocal;
 	float   boundingDiscRadius = 0.f;
+	std::vector<Vertex_PCU> m_verts;
 	
 
 protected:

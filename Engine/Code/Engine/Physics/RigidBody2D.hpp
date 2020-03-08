@@ -52,11 +52,12 @@ public:
 	Vec2 m_velocity = Vec2(0.f,0.f);
 	Vec2 m_verletVelocity = Vec2(0.f,0.f);
 	eSimulationMode m_mode = DYNAMIC;
-	float m_mass=1.f;
-	float m_drag = 0.f;
 	Vec2 m_gravityDirection = Vec2( 0.f , -1.f );
 	Vec2 m_gravityVector = Vec2( 0.f , 0.f );
 	Vec2 m_frameStartPosition = Vec2( 0.f , 0.f );
+	float m_drag = 0.f;
+	float m_mass=1.f;
+
 	void ApplyGravity( float deltaTime, float gravityMultiplier );
 	void ApplyDrag( float deltaTime );
 	void ApplyImpulse( Vec2 impulse );

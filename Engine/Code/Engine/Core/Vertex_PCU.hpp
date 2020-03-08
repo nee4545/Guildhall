@@ -5,6 +5,8 @@
 #include <vector>
 
 struct AABB2;
+class Polygon2D;
+
 
 enum eBufferFormatType
 {
@@ -43,3 +45,6 @@ struct Vertex_PCU
 
 void AppendAABB2(std::vector<Vertex_PCU>& verts,AABB2& aabb, const Rgba8& tint);
 void AppendAABB2(std::vector<Vertex_PCU>& verts, AABB2& aabb, const Rgba8& tint, Vec2 minUVs, Vec2 maxUVs);
+void AppendDisc2( std::vector<Vertex_PCU>& verts , float radius , const Rgba8& tint );
+void AppendPolygon2(std::vector<Vertex_PCU>& verts,const Polygon2D* poly);
+void TransformVertexArray( std::vector<Vertex_PCU>& vertices , float scale , float rotationDegrees , const Vec2& translation );

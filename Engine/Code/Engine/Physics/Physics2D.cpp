@@ -23,7 +23,7 @@ void Physics2D::BeginFrame()
 
 void Physics2D::StartUp()
 {
-	m_clock = new Clock();
+	m_clock = &Clock::gMasterClock;
 	m_stepTimer = new Timer();
 	m_fixedDeltaTime = 1.0/120.0;
 	//m_clock->m_scale = 5.f;

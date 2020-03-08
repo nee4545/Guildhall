@@ -20,6 +20,7 @@ DiscCollider2D::DiscCollider2D( Vec2 localPosition , float radius )
 	m_radius = radius;
 	m_colliderType = COLLIDER2D_DISC;
 	m_material.bounciness = 0.5f;
+	AppendDisc2( m_verts , radius , Rgba8( 255 , 255 , 255 , 255 ) );
 }
 
 DiscCollider2D::~DiscCollider2D()
@@ -47,36 +48,26 @@ Vec2 DiscCollider2D::GetClosestPoint( Vec2 pos ) const
 bool DiscCollider2D::Contains( Vec2 pos ) const
 {
 	return IsPointInsideDisc2D( pos , m_worldPosition , m_radius );
-
 }
 
-//bool DiscCollider2D::Intersects( Collider2D const* other ) const
-//{
-//	
-//
-//	switch ( other->m_colliderType )
-//	{
-//	case COLLIDER2D_DISC:
-//	{
-//		DiscCollider2D* temp = ( DiscCollider2D* ) other;
-//		return DoDiscsOverlap( m_worldPosition , m_radius , temp->m_worldPosition , temp->m_radius );
-//	}
-//
-//	case  COLLIDER2D_POLYGON:
-//	{
-//		PolygonCollider2D* temp = ( PolygonCollider2D* ) other;
-//		return DoDiscAndPolygonOverlap( m_worldPosition , m_radius , *temp->m_polygonLocal );
-//	}
-//	default:
-//		return false;
-//		break;
-//	}
-//}
 
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
 	ctx->DrawRing( m_worldPosition , m_radius , borderColor , 0.3f );
-	ctx->DrawDisc( m_worldPosition , m_radius , fillColor );
+	//ctx->DrawDisc( m_worldPosition , m_radius , fillColor );
+
+	std::vector<Vertex_PCU> verts = m_verts;
+ 
+	for ( int i = 0; i < verts.size(); i++ )
+	{
+		verts[ i ].m_color = fillColor;
+	}
+
+	TransformVertexArray( verts , 1.f , 0.f , m_worldPosition );
+	ctx->DrawVertexArray( verts );
+
+	ctx->DrawLine( Vec2( verts[ 0 ].m_position.x , verts[ 0 ].m_position.y ) , Vec2( verts[ 1 ].m_position.x , verts[ 1 ].m_position.y ) , borderColor , 0.3f );
+
 }
 
 void DiscCollider2D::MarkForDestroy()
