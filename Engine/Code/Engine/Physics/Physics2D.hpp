@@ -35,6 +35,7 @@ public:
 	void DestroyCollider( Collider2D* collider );
 	void ApplyAffectors( float deltaSeconds );
 	void MoveRigidBodies( float deltaSeconds );
+	void RotateRigidBodies( float deltaSeconds );
 	void DetectCollissions();
 	void ResolveCollissions();
 	void ResolveCollission( Collision2D collission );

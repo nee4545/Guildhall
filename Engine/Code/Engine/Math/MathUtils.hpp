@@ -98,5 +98,9 @@ float SmoothStep3( float t );
 
 float SignFloat( float val );
 
+Vec2 RotateAroundArbitartPoint( Vec2 arbitaryPoint ,Vec2 point, float rotationDegrees );
 
+float GetMomentOfInertiaOfTriangle( Vec2 point0 , Vec2 point1 , Vec2 point2, float mass );
+float GetAreaOfTriangele( Vec2 point0 , Vec2 point1 , Vec2 point2 );
+float GetAreaOfPolygon( Polygon2D polygon );
 

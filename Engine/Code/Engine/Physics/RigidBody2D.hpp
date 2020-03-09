@@ -57,14 +57,21 @@ public:
 	Vec2 m_frameStartPosition = Vec2( 0.f , 0.f );
 	float m_drag = 0.f;
 	float m_mass=1.f;
+	
+	float m_rotationInRadians = 0.0f;
+	float m_angularVelocity = 0.0f;
+	float m_frameTorque = 0.f;
+	float m_moment = 0.f;
 
 	void ApplyGravity( float deltaTime, float gravityMultiplier );
 	void ApplyDrag( float deltaTime );
 	void ApplyImpulse( Vec2 impulse );
 	void MoveRigidBody( float deltaSeconds );
+	void RotateRigidBody( float deltaSeconds );
 	void Move(Vec2 movement);
 	void ReverseVelocityYAxis();
 	void SetSimulationMode( eSimulationMode mode );
+	void Rotate( float deltaRoationDegrees );
 	Vec2 m_worldPosition =Vec2(0.f,0.f);				// where in the world is this rigidbody
 
 private:

@@ -53,6 +53,7 @@ void Physics2D::Update()
 
 void Physics2D::AdvanceSimulation( double deltaSeconds )
 {
+	RotateRigidBodies( ( float ) deltaSeconds );
 	ApplyAffectors( (float)deltaSeconds );
 	MoveRigidBodies( (float)deltaSeconds );
 	DetectCollissions();
@@ -212,6 +213,25 @@ void Physics2D::MoveRigidBodies( float deltaSeconds )
 	}
 }
 
+void Physics2D::RotateRigidBodies( float deltaSeconds )
+{
+	for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
+	{
+		if ( m_rigidBodies2D[ i ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_rigidBodies2D[ i ]->enableSimulation == false )
+		{
+			continue;
+		}
+
+		m_rigidBodies2D[ i ]->RotateRigidBody( deltaSeconds );
+
+	}
+}
+
 void Physics2D::DetectCollissions()
 {
 	for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
@@ -347,7 +367,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 
 	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
 	{
-		float j = ( theirMass + collision.me->GetRestitutionWith( collision.them )) * DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
+		float j = theirMass*( 1 + collision.me->GetRestitutionWith( collision.them )) * DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
 
 		j = ( j < 0 ) ? 0 : j;
 
@@ -361,7 +381,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 
 	if ( collision.them->m_rigidbody->m_mode == STATIC && ( collision.me->m_rigidbody->m_mode == KINAMETIC || collision.me->m_rigidbody->m_mode == DYNAMIC ) )
 	{
-		float j = ( myMass + collision.me->GetRestitutionWith( collision.them )) * DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
+		float j = myMass*( 1 + collision.me->GetRestitutionWith( collision.them )) * DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal );
 
 		j = ( j < 0 ) ? 0 : j;
 

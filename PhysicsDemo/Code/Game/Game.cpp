@@ -161,6 +161,21 @@ void Game::PopulateInitialObjects()
 
 	m_gameObjects.push_back( obj2 );
 
+
+	GameObject* obj3 = new GameObject();
+	obj3->m_rigidbody = physicsSystem->CreateRigidbody();
+	obj3->m_rigidbody->SetPosition( Vec2( 10.f , 10.f ) );
+
+	Polygon2D* poly = new Polygon2D();
+	poly->m_points.push_back( Vec2( -4.f , -4.f ) );
+	poly->m_points.push_back( Vec2( 4.f , -4.f ) );
+	poly->m_points.push_back( Vec2( 4.f , 4.f ) );
+	poly->m_points.push_back( Vec2( -4.f , 4.f ) );
+
+	PolygonCollider2D* collider3 = physicsSystem->CreatePolygonCollider( Vec2( 0.f , 0.f ) , poly );
+	obj3->m_rigidbody->TakeCollider( collider3 );
+
+	m_gameObjects.push_back( obj3 );
 }
 
 
@@ -295,12 +310,12 @@ void Game::HandleDrag()
 				m_selectedObject->m_rigidbody->m_collider->IncreamentFriction( 0.1f );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'D' ) )
+			if ( g_theInput->WasKeyJustPressed( 'N' ) )
 			{
 				m_selectedObject->m_rigidbody->DecreamentMass( 0.1f );
 			}
 
-			if ( g_theInput->WasKeyJustPressed( 'F' ) )
+			if ( g_theInput->WasKeyJustPressed( 'M' ) )
 			{
 				m_selectedObject->m_rigidbody->IncreamentMass( 0.1f );
 			}
@@ -315,6 +330,25 @@ void Game::HandleDrag()
 				m_selectedObject->m_rigidbody->IncreamentDrag( 0.1f );
 			}
 
+			if ( g_theInput->IsKeyPressed( 'R' ))
+			{
+				m_selectedObject->m_rigidbody->Rotate(1.f);
+			}
+
+			if ( g_theInput->IsKeyPressed( 'F' ) )
+			{
+				m_selectedObject->m_rigidbody->Rotate( -1.f );
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'T' ) )
+			{
+				m_selectedObject->m_rigidbody->m_angularVelocity+=1.f;
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'Y' ) )
+			{
+				m_selectedObject->m_rigidbody->m_angularVelocity -= 1.f;
+			}
 			
 			
 			if ( !m_offsetSet )
@@ -821,7 +855,7 @@ void Game::DisplayToolTip()
 
 	temp = std::to_string(m_selectedObject->m_rigidbody->m_mass);
 	massStr += temp;
-	massStr += "(D,F->dec/incr)";
+	massStr += "(N,M->dec/incr)";
 
 	temp = "";
 	temp = std::to_string( m_selectedObject->m_rigidbody->m_collider->m_material.friction );

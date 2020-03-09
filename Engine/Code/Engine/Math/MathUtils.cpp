@@ -596,6 +596,76 @@ float SignFloat( float val )
 	return ( val >= 0.0f ) ? 1.0f : -1.0f;
 }
 
+
+Vec2 RotateAroundArbitartPoint( Vec2 arbitaryPoint , Vec2 point , float rotationDegrees )
+{
+	Vec2 vec = point - arbitaryPoint;
+	vec.RotateDegrees( rotationDegrees );
+	vec += arbitaryPoint;
+	return vec;
+}
+
+float GetMomentOfInertiaOfTriangle( Vec2 point0 , Vec2 point1 , Vec2 point2, float mass )
+{
+	Vec2 u = point1 - point0;
+	Vec2 v = point2 - point0;
+
+	float projectedDistance = GetProjectedLength2D( v , u );
+
+	Vec2 uNormal = u.GetNormalized();
+	Vec2 point = point0 + uNormal * projectedDistance;
+
+	float height = ( point2 - point ).GetLength();
+	float a = ( point0 - point ).GetLength();
+	float b = u.GetLength();
+
+	return (mass / 18.f)*( ( u.GetLengthSquared() ) - ( a * b ) + ( a * a ) + ( height * height ) );
+	
+}
+
+float GetAreaOfTriangele( Vec2 point0 , Vec2 point1 , Vec2 point2 )
+{
+	Vec2 u = point1 - point0;
+	Vec2 v = point2 - point0;
+
+	float projectedDistance = GetProjectedLength2D( v , u );
+
+	Vec2 uNormal = u.GetNormalized();
+	Vec2 point = point0 + uNormal * projectedDistance;
+
+	float height = ( point2 - point ).GetLength();
+	float b = u.GetLength();
+
+	return 0.5f * height * b;
+}
+
+float GetAreaOfPolygon( Polygon2D polygon )
+{
+	float area = 0;
+
+	Vec2 commonVert = polygon.m_points[ 0 ];
+
+	int totalTriangles = ( int ) polygon.m_points.size() - 2;
+	int counter = 0;
+	int i = 1;
+	int j = 2;
+
+	while ( counter < totalTriangles )
+	{
+		
+		Vec2 nextVert1 = polygon.m_points[ i ];
+		Vec2 nextVert2 = polygon.m_points[ j ];
+
+		area += GetAreaOfTriangele( commonVert , nextVert1 , nextVert2 );
+
+		i++;
+		j++;
+		counter++;
+	}
+
+	return area;
+}
+
 float GetProjectedLength2D( const Vec2& sourceVector, const Vec2& ontoVector )
 {
 	Vec2 temp = ontoVector.GetNormalized();

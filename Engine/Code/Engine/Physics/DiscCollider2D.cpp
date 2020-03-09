@@ -51,6 +51,11 @@ bool DiscCollider2D::Contains( Vec2 pos ) const
 }
 
 
+void DiscCollider2D::CalculateMoment()
+{
+	m_rigidbody->m_moment = 0.5f * m_rigidbody->m_mass * m_radius * m_radius;
+}
+
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
 	ctx->DrawRing( m_worldPosition , m_radius , borderColor , 0.3f );
@@ -63,7 +68,7 @@ void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor 
 		verts[ i ].m_color = fillColor;
 	}
 
-	TransformVertexArray( verts , 1.f , 0.f , m_worldPosition );
+	TransformVertexArray( verts , 1.f , ConvertRadiansToDegrees(m_rigidbody->m_rotationInRadians) , m_worldPosition );
 	ctx->DrawVertexArray( verts );
 
 	ctx->DrawLine( Vec2( verts[ 0 ].m_position.x , verts[ 0 ].m_position.y ) , Vec2( verts[ 1 ].m_position.x , verts[ 1 ].m_position.y ) , borderColor , 0.3f );

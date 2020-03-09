@@ -34,6 +34,7 @@ public:
 
 	virtual Vec2 GetClosestPoint( Vec2 pos ) const = 0;
 	virtual bool Contains( Vec2 pos ) const = 0;
+	virtual void CalculateMoment() = 0;
 	bool Intersects( Collider2D const* other ) const;
 
 	float GetRestitutionWith( Collider2D const* other ) const;

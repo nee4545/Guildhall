@@ -74,7 +74,7 @@ bool RenderBuffer::Update( void const* data , size_t dataByteSize , size_t eleme
 	}
 
 	// if no buffer create 
-	if ( !m_handle )
+	if ( m_handle == nullptr )
 	{
 		Create( dataByteSize , elementByteSize );
 	}
@@ -160,6 +160,9 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 
 	desc.MiscFlags =0;
 	desc.StructureByteStride = (unsigned int)elementByteSize;
+
+	m_elementByteSize = elementByteSize;
+	m_bufferByteSize = dataByteSize;
 
 	device->CreateBuffer( &desc , nullptr , &m_handle );
 

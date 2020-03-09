@@ -2,6 +2,7 @@
 #include <Engine/Physics/Collider2D.hpp>
 #include <Engine/Math/Vec2.hpp>
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Core/Polygon2D.hpp"
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class RenderContext;
@@ -20,6 +21,8 @@ public:
 
 	virtual Vec2 GetClosestPoint( Vec2 pos ) const override;
 	virtual bool Contains( Vec2 pos ) const override;
+	virtual void CalculateMoment();
+	void Rotate( float deltaRotation );
 	/*virtual bool Intersects( Collider2D const* other ) const override;*/
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) override;
@@ -32,6 +35,7 @@ public:
 	Vec2	m_localPosition = Vec2( 0.f , 0.f ); // my local offset from my parent
 	Vec2	m_worldPosition = Vec2( 0.f , 0.f ); // calculated from local position and owning rigidbody if present
 	Polygon2D* m_polygonLocal;
+	Polygon2D m_rendringPolygon;
 	float   boundingDiscRadius = 0.f;
 	std::vector<Vertex_PCU> m_verts;
 	
