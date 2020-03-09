@@ -199,35 +199,43 @@ void Game::Update( float deltaseconds )
 	sphereTransform.SetRotationFromPitchRollYawDegrees( 0.f , 10.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 
 	m_camera->m_transform.SetRotationFromPitchRollYawDegrees( m_cameraRotation.x , m_cameraRotation.y , m_cameraRotation.z );
+
+	Mat44 modal = m_camera->m_transform.ToMatrix();
+	Vec3 forwardVec = modal.GetKBasis3D();
+	Vec3 rightVec = modal.GetIBasis3D();
 	
 	if ( g_theInput->IsKeyPressed( 'W' ) )
 	{
-		m_camera->m_transform.m_position.z -= 1.f * deltaseconds * 4.f *speedMultiplier;
+		//m_camera->m_transform.m_position.z -= 1.f * deltaseconds * 4.f *speedMultiplier;
+		m_camera->m_transform.m_position -= forwardVec * deltaseconds * 8.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'S' ) )
 	{
-		m_camera->m_transform.m_position.z += 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position += forwardVec * deltaseconds * 8.f * speedMultiplier;
+		//m_camera->m_transform.m_position.z += 1.f * deltaseconds * 4.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'A' ) )
 	{
-		m_camera->m_transform.m_position.x -= 1.f * deltaseconds * 4.f * speedMultiplier;
+		//m_camera->m_transform.m_position.x -= 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position -= rightVec * deltaseconds * 8.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'D' ) )
 	{
-		m_camera->m_transform.m_position.x += 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position += rightVec * deltaseconds * 8.f * speedMultiplier;
+		//m_camera->m_transform.m_position.x += 1.f * deltaseconds * 4.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'C' ) )
 	{
-		m_camera->m_transform.m_position.y += 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position.y += 1.f * deltaseconds * 8.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 0x20 ) )
 	{
-		m_camera->m_transform.m_position.y -= 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position.y -= 1.f * deltaseconds * 8.f * speedMultiplier;
 	}
 
 }
