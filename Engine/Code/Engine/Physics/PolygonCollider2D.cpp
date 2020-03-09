@@ -12,12 +12,11 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 
 	m_colliderType = COLLIDER2D_POLYGON;
 	m_polygonLocal = polygon;
-	m_rendringPolygon = *polygon;
 	m_polygonLocal->m_localPos = localPosition;
 	m_localPosition = localPosition;
 	boundingDiscRadius = m_polygonLocal->GetBoundingDiscRadius();
 
-	AppendPolygon2( m_verts , &m_rendringPolygon );
+	
 	//UpdateWorldShape();
 	
 }

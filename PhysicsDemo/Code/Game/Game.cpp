@@ -117,6 +117,7 @@ GameObject* Game::CreateDisc()
 	DiscCollider2D* collider = physicsSystem->CreateDiscCollider( Vec2(0.f,0.f) , discRadius );
 	obj->m_rigidbody->TakeCollider( collider );
 
+	obj->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj );
 
 	return obj;
@@ -136,7 +137,9 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 	obj->m_rigidbody->TakeCollider( collider );
 	obj->m_rigidbody->SetPosition( mousePos );
 
+	obj->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj );
+	
 
 	return obj;
 }
@@ -149,7 +152,7 @@ void Game::PopulateInitialObjects()
 
 	DiscCollider2D* collider1 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 4.f );
 	obj1->m_rigidbody->TakeCollider( collider1 );
-
+	obj1->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj1 );
 
 	GameObject* obj2 = new GameObject();
@@ -158,7 +161,7 @@ void Game::PopulateInitialObjects()
 
 	DiscCollider2D* collider2 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
 	obj2->m_rigidbody->TakeCollider( collider2 );
-
+	obj2->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj2 );
 
 
@@ -174,7 +177,7 @@ void Game::PopulateInitialObjects()
 
 	PolygonCollider2D* collider3 = physicsSystem->CreatePolygonCollider( Vec2( 0.f , 0.f ) , poly );
 	obj3->m_rigidbody->TakeCollider( collider3 );
-
+	obj3->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj3 );
 }
 

@@ -43,6 +43,7 @@ void Rigidbody2D::SetVelocity( Vec2 velocity )
 void Rigidbody2D::IncreamentMass( float increament )
 {
 	m_mass += increament;
+	m_collider->CalculateMoment();
 }
 
 void Rigidbody2D::DecreamentMass( float decreament )
@@ -53,6 +54,8 @@ void Rigidbody2D::DecreamentMass( float decreament )
 	{
 		m_mass = 0.001f;
 	}
+
+	m_collider->CalculateMoment();
 }
 
 void Rigidbody2D::IncreamentDrag( float increament )

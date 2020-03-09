@@ -35,9 +35,7 @@ public:
 	Vec2	m_localPosition = Vec2( 0.f , 0.f ); // my local offset from my parent
 	Vec2	m_worldPosition = Vec2( 0.f , 0.f ); // calculated from local position and owning rigidbody if present
 	Polygon2D* m_polygonLocal;
-	Polygon2D m_rendringPolygon;
 	float   boundingDiscRadius = 0.f;
-	std::vector<Vertex_PCU> m_verts;
 	
 
 protected:
