@@ -321,7 +321,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 
 	float friction = collision.me->GetFrictionWith( collision.them );
 
-	float tjn = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.me->GetFrictionWith( collision.them ) ) *
+	float tjn = ( myMass * theirMass ) / ( myMass + theirMass ) * (  collision.me->GetFrictionWith( collision.them ) ) *
 		DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal.GetRotated90Degrees() );
 
 	jn = ( jn < 0 ) ? 0 : jn;
