@@ -384,8 +384,8 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		collision.me->m_rigidbody->ApplyImpulse( tjn * collision.manifold.normal.GetRotated90Degrees() );
 		collision.them->m_rigidbody->ApplyImpulse( -tjn * collision.manifold.normal.GetRotated90Degrees() );
 
-		//collision.me->m_rigidbody->ApplyTorque( tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
-		//collision.them->m_rigidbody->ApplyTorque( -tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
+		collision.me->m_rigidbody->ApplyTorque( tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
+		collision.them->m_rigidbody->ApplyTorque( -tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
 	}
 
 

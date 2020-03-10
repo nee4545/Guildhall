@@ -109,9 +109,9 @@ void Rigidbody2D::ApplyTorque( Vec2 impulse , Vec2 point )
 		d = point - m_worldPosition;
 	}
 
-	float torque = DotProduct2D( impulse , d );
+	float torque = CrossProduct2D( d , impulse );
 
-	m_angularVelocity += torque * m_moment;
+	m_angularVelocity += torque / m_moment;
 }
 
 void Rigidbody2D::ApplyAngularAccleration( float deltaSeconds )

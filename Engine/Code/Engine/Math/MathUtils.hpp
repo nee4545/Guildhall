@@ -78,6 +78,7 @@ FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const V
 //Dot Product
 
 float DotProduct2D(const Vec2& a, const Vec2& b);
+float CrossProduct2D(const Vec2& a, const Vec2& b);
 float DotProduct3D( const Vec3& a , const Vec3& b);
 float DotProduct4D( const Vec4& a , const Vec4& b );
 float GetAngleDegreesBetweenVectors2D( const Vec2& vectorA, const Vec2& vectorB );
