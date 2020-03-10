@@ -100,6 +100,25 @@ void Rigidbody2D::ApplyImpulse( Vec2 impulse )
 	m_velocity += impulse / m_mass;
 }
 
+void Rigidbody2D::ApplyTorque( Vec2 impulse , Vec2 point )
+{
+	Vec2 d;
+
+	if ( m_collider->m_colliderType == COLLIDER2D_DISC )
+	{
+		d = point - m_worldPosition;
+	}
+
+	float torque = DotProduct2D( impulse , d );
+
+	m_angularVelocity += torque * m_moment;
+}
+
+void Rigidbody2D::ApplyAngularAccleration( float deltaSeconds )
+{
+	m_angularVelocity += m_angularAccleration * deltaSeconds;
+}
+
 void Rigidbody2D::MoveRigidBody( float deltaSeconds )
 {
 	if ( !enableSimulation )

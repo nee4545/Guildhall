@@ -59,6 +59,7 @@ public:
 	float m_mass=1.f;
 	
 	float m_rotationInRadians = 0.0f;
+	float m_angularAccleration = 0.f;
 	float m_angularVelocity = 0.0f;
 	float m_frameTorque = 0.f;
 	float m_moment = 0.f;
@@ -66,6 +67,8 @@ public:
 	void ApplyGravity( float deltaTime, float gravityMultiplier );
 	void ApplyDrag( float deltaTime );
 	void ApplyImpulse( Vec2 impulse );
+	void ApplyTorque( Vec2 impulse , Vec2 point );
+	void ApplyAngularAccleration( float deltaSeconds );
 	void MoveRigidBody( float deltaSeconds );
 	void RotateRigidBody( float deltaSeconds );
 	void Move(Vec2 movement);

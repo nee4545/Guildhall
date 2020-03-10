@@ -60,14 +60,14 @@ void PolygonCollider2D::CalculateMoment()
 		Vec2 nextVert2 = m_polygonLocal->m_points[ j ];
 
 		float areaOfTriangle = GetAreaOfTriangele( commonVert , nextVert1 , nextVert2 );
-		moment += GetMomentOfInertiaOfTriangle( commonVert , nextVert1 , nextVert2 , m_rigidbody->m_mass * ( areaOfTriangle / areaOfPolygon ) );
+		moment += GetMomentOfInertiaOfTriangle( commonVert , nextVert1 , nextVert2 , m_rigidbody->m_mass*( areaOfTriangle / areaOfPolygon ) );
 
 		i++;
 		j++;
 		counter++;
 	}
 
-	m_rigidbody->m_moment = moment;
+	m_rigidbody->m_moment =moment;
 }
 
 void PolygonCollider2D::Rotate( float deltaRotation )

@@ -53,6 +53,7 @@ void Physics2D::Update()
 
 void Physics2D::AdvanceSimulation( double deltaSeconds )
 {
+	ApplyAngularAccletation( deltaSeconds );
 	RotateRigidBodies( ( float ) deltaSeconds );
 	ApplyAffectors( (float)deltaSeconds );
 	MoveRigidBodies( (float)deltaSeconds );
@@ -213,6 +214,25 @@ void Physics2D::MoveRigidBodies( float deltaSeconds )
 	}
 }
 
+void Physics2D::ApplyAngularAccletation( float detaSeconds )
+{
+	for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
+	{
+		if ( m_rigidBodies2D[ i ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_rigidBodies2D[ i ]->enableSimulation == false )
+		{
+			continue;
+		}
+
+		m_rigidBodies2D[ i ]->ApplyAngularAccleration( detaSeconds );
+
+	}
+}
+
 void Physics2D::RotateRigidBodies( float deltaSeconds )
 {
 	for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
@@ -341,7 +361,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 
 	float friction = collision.me->GetFrictionWith( collision.them );
 
-	float tjn = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.me->GetFrictionWith( collision.them ) ) *
+	float tjn = ( myMass * theirMass ) / ( myMass + theirMass ) * ( collision.me->GetFrictionWith( collision.them ) ) *
 		DotProduct2D( ( collision.them->m_rigidbody->m_velocity - collision.me->m_rigidbody->m_velocity ) , collision.manifold.normal.GetRotated90Degrees() );
 
 	jn = ( jn < 0 ) ? 0 : jn;
@@ -352,8 +372,9 @@ void Physics2D::ResolveCollission( Collision2D collision )
 	}
 	else
 	{
-		tjn *= friction;
+		//tjn *= friction;
 	}
+
 
 
 	if ( ( collision.me->m_rigidbody->m_mode == DYNAMIC || collision.me->m_rigidbody->m_mode == KINAMETIC ) && ( collision.them->m_rigidbody->m_mode == DYNAMIC || collision.them->m_rigidbody->m_mode == KINAMETIC ) )
@@ -362,6 +383,9 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		collision.them->m_rigidbody->ApplyImpulse( -jn * collision.manifold.normal );
 		collision.me->m_rigidbody->ApplyImpulse( tjn * collision.manifold.normal.GetRotated90Degrees() );
 		collision.them->m_rigidbody->ApplyImpulse( -tjn * collision.manifold.normal.GetRotated90Degrees() );
+
+		//collision.me->m_rigidbody->ApplyTorque( tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
+		//collision.them->m_rigidbody->ApplyTorque( -tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
 	}
 
 
@@ -376,6 +400,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		{
 			collision.them->m_rigidbody->ApplyImpulse( -tjn * collision.manifold.normal.GetRotated90Degrees() );
 		}
+		collision.them->m_rigidbody->ApplyTorque( -tjn * collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
 	}
 
 
@@ -390,6 +415,7 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		{
 			collision.me->m_rigidbody->ApplyImpulse( tjn * collision.manifold.normal.GetRotated90Degrees() );
 		}
+		collision.me->m_rigidbody->ApplyTorque( tjn* collision.manifold.normal.GetRotated90Degrees() , collision.manifold.centre );
 	}
 
 }
