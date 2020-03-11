@@ -40,6 +40,9 @@ public:
 	void DetectCollissions();
 	void ResolveCollissions();
 	void ResolveCollission( Collision2D collission );
+
+	Vec2 GetImpulse( Collision2D& collision );
+
 	void SetSceneGravity( float gravity );
 	void CleanUp();
 	void SetClock(Clock* clock);

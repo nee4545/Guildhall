@@ -69,6 +69,7 @@ public:
 	void ApplyImpulse( Vec2 impulse );
 	void ApplyTorque( Vec2 impulse , Vec2 point );
 	void ApplyAngularAccleration( float deltaSeconds );
+	Vec2 GetImapctVeclocity( Vec2 point );
 	void MoveRigidBody( float deltaSeconds );
 	void RotateRigidBody( float deltaSeconds );
 	void Move(Vec2 movement);

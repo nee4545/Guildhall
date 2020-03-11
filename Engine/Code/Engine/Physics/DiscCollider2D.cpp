@@ -19,7 +19,7 @@ DiscCollider2D::DiscCollider2D( Vec2 localPosition , float radius )
 	m_localPosition = localPosition;
 	m_radius = radius;
 	m_colliderType = COLLIDER2D_DISC;
-	m_material.bounciness = 0.5f;
+	m_material.bounciness = 1.0f;
 	AppendDisc2( m_verts , radius , Rgba8( 255 , 255 , 255 , 255 ) );
 }
 

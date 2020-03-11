@@ -155,30 +155,7 @@ void Game::PopulateInitialObjects()
 	obj1->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj1 );
 
-	GameObject* obj2 = new GameObject();
-	obj2->m_rigidbody = physicsSystem->CreateRigidbody();
-	obj2->m_rigidbody->SetPosition( Vec2( 0.f , 0.f ) );
 
-	DiscCollider2D* collider2 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 3.f );
-	obj2->m_rigidbody->TakeCollider( collider2 );
-	obj2->m_rigidbody->m_collider->CalculateMoment();
-	m_gameObjects.push_back( obj2 );
-
-
-	GameObject* obj3 = new GameObject();
-	obj3->m_rigidbody = physicsSystem->CreateRigidbody();
-	obj3->m_rigidbody->SetPosition( Vec2( 10.f , 10.f ) );
-
-	Polygon2D* poly = new Polygon2D();
-	poly->m_points.push_back( Vec2( -4.f , -4.f ) );
-	poly->m_points.push_back( Vec2( 4.f , -4.f ) );
-	poly->m_points.push_back( Vec2( 4.f , 4.f ) );
-	poly->m_points.push_back( Vec2( -4.f , 4.f ) );
-
-	PolygonCollider2D* collider3 = physicsSystem->CreatePolygonCollider( Vec2( 0.f , 0.f ) , poly );
-	obj3->m_rigidbody->TakeCollider( collider3 );
-	obj3->m_rigidbody->m_collider->CalculateMoment();
-	m_gameObjects.push_back( obj3 );
 }
 
 
@@ -406,7 +383,7 @@ void Game::HandleObjectCreationRequests()
 
 void Game::HandleThrow()
 {
-	if ( !initialPointSet || !finalPointSet )
+	if ( !initialPointSet || !finalPointSet || m_selectedObject==nullptr)
 	{
 		return;
 	}
@@ -833,7 +810,7 @@ void Game::DisplayToolTip()
 {
 	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
-	AABB2 tooltipBox = AABB2( mousePos , Vec2( mousePos.x + 38.f , mousePos.y + 18.f ) );
+	AABB2 tooltipBox = AABB2( mousePos , Vec2( mousePos.x + 48.f , mousePos.y + 18.f ) );
 
 	g_theRenderer->DrawAABB2D( tooltipBox , Rgba8( 100 , 100 , 100 , 200 ) );
 
@@ -845,6 +822,8 @@ void Game::DisplayToolTip()
 	std::vector<Vertex_PCU> bounceInfo;
 	std::vector<Vertex_PCU> frictionInfo;
 	std::vector<Vertex_PCU> dragInfo;
+	std::vector<Vertex_PCU> roationInfo;
+	std::vector<Vertex_PCU> angualrVelocityInfo;
 
 	std::string temp = "";
 	
@@ -855,6 +834,8 @@ void Game::DisplayToolTip()
 	std::string verletStr = "Verlet Velocity:";
 	std::string simStr = "Simulation Mode: ";
 	std::string dragStr = "Drag: ";
+	std::string rotationStr = "Rotation: ";
+	std::string angularvStr = "Angular Velocity:";
 
 	temp = std::to_string(m_selectedObject->m_rigidbody->m_mass);
 	massStr += temp;
@@ -877,6 +858,17 @@ void Game::DisplayToolTip()
 	temp = "";
 	temp = std::to_string( m_selectedObject->m_rigidbody->m_verletVelocity.x ) + "," + std::to_string( m_selectedObject->m_rigidbody->m_verletVelocity.y );
 	verletStr += temp;
+
+	temp = "";
+	temp = std::to_string( ConvertRadiansToDegrees( m_selectedObject->m_rigidbody->m_rotationInRadians ) );
+	rotationStr += temp;
+	rotationStr += "(R,F->dec/incr)";
+
+	temp = "";
+	temp = std::to_string( ConvertRadiansToDegrees( m_selectedObject->m_rigidbody->m_angularVelocity ) );
+	angularvStr += temp;
+	angularvStr += "(T,Y,U->dec/incr/Reset)";
+
 
 	temp = "";
 	switch ( m_selectedObject->m_rigidbody->m_mode )
@@ -906,6 +898,9 @@ void Game::DisplayToolTip()
 	m_BitmapFont->AddVertsForTextInBox2D( verletVelocityInfo , tooltipBox , 1.f , verletStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.42f ) );
 	m_BitmapFont->AddVertsForTextInBox2D( dragInfo , tooltipBox , 1.f , dragStr , Rgba8( 0 , 0 , 0 , 255 ), 1.f , Vec2( 0.02f , 0.52f ));
 	m_BitmapFont->AddVertsForTextInBox2D( simulationModeInfo , tooltipBox , 1.f , simStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.62f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( roationInfo , tooltipBox , 1.f , rotationStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.72f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( angualrVelocityInfo , tooltipBox , 1.f , angularvStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.82f ) );
+
 	
 
 	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
@@ -934,6 +929,14 @@ void Game::DisplayToolTip()
 
 	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( simulationModeInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( roationInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( angualrVelocityInfo );
 	g_theRenderer->BindTexture( nullptr );
 
 }
