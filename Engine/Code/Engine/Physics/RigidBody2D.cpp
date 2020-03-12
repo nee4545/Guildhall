@@ -3,6 +3,7 @@
 #include "Engine/Physics/Collider2D.hpp"
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 
 void Rigidbody2D::Destroy()
 {
@@ -103,10 +104,18 @@ void Rigidbody2D::ApplyImpulse( Vec2 impulse )
 void Rigidbody2D::ApplyTorque( Vec2 impulse , Vec2 point )
 {
 	Vec2 d;
+	Vec2 c;
 
 	if ( m_collider->m_colliderType == COLLIDER2D_DISC )
 	{
-		d = (point - m_worldPosition).GetRotated90Degrees();
+		c = point - m_worldPosition;
+		d = c.GetRotated90Degrees();
+	}
+
+	if ( m_collider->m_colliderType == COLLIDER2D_POLYGON )
+	{
+		PolygonCollider2D* temp = ( PolygonCollider2D* ) m_collider;
+		d = ( point - temp->m_polygonLocal->GetCentre() ).GetRotated90Degrees();
 	}
 
 	float torque = DotProduct2D( d , impulse );
@@ -134,11 +143,12 @@ void Rigidbody2D::MoveRigidBody( float deltaSeconds )
 		return;
 	}
 	m_worldPosition += m_velocity * deltaSeconds;
+	m_collider->UpdateWorldShape();
 }
 
 void Rigidbody2D::RotateRigidBody( float deltaSeconds )
 {
-	Rotate( ConvertRadiansToDegrees(m_angularVelocity * deltaSeconds) );
+	Rotate( ConvertRadiansToDegrees(m_angularVelocity) * deltaSeconds );
 }
 
 void Rigidbody2D::Move(Vec2 movement)
