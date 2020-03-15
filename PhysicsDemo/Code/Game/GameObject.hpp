@@ -10,8 +10,8 @@ public:
 	GameObject() {};
 	~GameObject();
 
-	Rgba8 m_borderColor = Rgba8( 0 , 0 , 255 , 255 );
-	Rgba8 m_fillColor = Rgba8( 255 , 255 , 255 , 128 );
+	Rgba8 m_borderColor = Rgba8( 0 , 0 , 255 , 100 );
+	Rgba8 m_fillColor = Rgba8( 255 , 255 , 255 , 100 );
 
 	bool isBeingDragged = false;
 	bool isMouseInside = false;

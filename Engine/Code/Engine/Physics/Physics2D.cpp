@@ -1,5 +1,9 @@
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Game.hpp"
+#include "Engine/Renderer/Camera.hpp"
 #include "Engine/Physics/RigidBody2D.hpp"
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Core/Polygon2D.hpp"
@@ -48,6 +52,8 @@ void Physics2D::Update()
 	}
 
 	
+	/*AdvanceSimulation( m_fixedDeltaTime );
+	m_frameCollisions.clear();*/
 	//AdvanceSimulation( m_clock->GetLastDeltaSeconds());
 	
 }
@@ -573,7 +579,7 @@ Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const
 
 	float distance = disc0->m_radius + disc1->m_radius - ( disc1->m_worldPosition - disc0->m_worldPosition ).GetLength();
 	Vec2 normal = ( disc0->m_worldPosition - disc1->m_worldPosition ).GetNormalized();
-	Vec2 centre = ( disc0->m_worldPosition ) - ( normal * distance * 0.5f ) + ( normal * disc0->m_radius );
+	Vec2 centre = ( disc0->m_worldPosition ) - ( normal * distance * 0.5f ) - ( normal * disc0->m_radius );
 
 	collision.centre = centre;
 	collision.normal = normal;
@@ -610,6 +616,7 @@ Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D co
 		collision.penetration = ( discColliderMe->m_worldPosition - closetPoint ).GetLength() + discColliderMe->m_radius;
 	}
 
-	collision.centre = discColliderMe->m_worldPosition + ( collision.normal * ( discColliderMe->m_radius - ( collision.penetration * 0.5f ) ) );
+	collision.centre = discColliderMe->m_worldPosition - ( collision.normal * ( discColliderMe->m_radius - ( collision.penetration * 0.5f ) ) );
+	
 	return collision;
 }

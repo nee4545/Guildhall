@@ -111,11 +111,11 @@ GameObject* Game::CreateDisc()
 	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
 	obj->m_rigidbody = physicsSystem->CreateRigidbody();
-	obj->m_rigidbody->SetPosition( mousePos );
 
 	float discRadius = m_rng.RollRandomFloatInRange( 1.5f , 6.5f );
 	DiscCollider2D* collider = physicsSystem->CreateDiscCollider( Vec2(0.f,0.f) , discRadius );
 	obj->m_rigidbody->TakeCollider( collider );
+	obj->m_rigidbody->SetPosition( mousePos );
 
 	obj->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj );
@@ -990,6 +990,7 @@ void Game::Update( float deltaseconds )
 		return;
 	}
 
+	physicsSystem->Update();
 	HandleClockChanges();
 
 	if ( !isDrawing )
@@ -1002,7 +1003,7 @@ void Game::Update( float deltaseconds )
 
 	UpdateCameraMovement( deltaseconds );
 
-	physicsSystem->Update();
+	
 	if ( !isDrawing )
 	{
 		HandleObjectCreationRequests();
@@ -1056,6 +1057,7 @@ void Game::Render()
 	
 	g_theRenderer->BeginCamera( *m_camera );
 	
+
 	
 	DrawModeRender();
 	for ( int index = 0; index < m_gameObjects.size(); index++ )
@@ -1074,6 +1076,12 @@ void Game::Render()
 	{
 		DisplayToolTip();
 	}
+
+	if ( physicsSystem->m_frameCollisions.size() > 0 )
+	{
+		g_theRenderer->DrawLine( physicsSystem->m_frameCollisions[ 0 ].me->m_rigidbody->m_worldPosition , physicsSystem->m_frameCollisions[ 0 ].manifold.centre , Rgba8( 100 , 0 , 0 , 255 ) , 0.4f );
+		//g_theRenderer->DrawLine( physicsSystem->m_frameCollisions[ 0 ].them->m_rigidbody->m_worldPosition , physicsSystem->m_frameCollisions[ 0 ].manifold.centre , Rgba8( 100 , 0 , 0 , 255 ) , 0.4f );
+	}
 	
 	g_theRenderer->EndCamera( *m_camera );
 
@@ -1081,6 +1089,8 @@ void Game::Render()
 	{
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
+
+
 
 	
 }

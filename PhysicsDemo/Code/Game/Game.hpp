@@ -16,7 +16,7 @@ class Game
 {
 	RandomNumberGenerator m_rng;
 	BitmapFont* m_BitmapFont = nullptr;
-	Camera* m_camera=nullptr;
+	
 	Camera* m_devConsoleCamera = nullptr;
 	
 	std::vector<GameObject*> m_gameObjects;
@@ -45,7 +45,7 @@ class Game
 
 public:
 	
-
+	Camera* m_camera = nullptr;
 	
 	Game();
 	~Game();

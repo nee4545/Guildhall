@@ -10,10 +10,12 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Clock.hpp"
+#include "Game/Game.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
 AudioSystem* g_theAudio = nullptr;
+Game* thegame = nullptr;
 
 
 

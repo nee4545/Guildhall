@@ -19,27 +19,27 @@ void GameObject::UpdateColorsBasedOnStatus()
 {
 	if ( isMouseInside )
 	{
-		m_borderColor = Rgba8( 247 , 202 , 25 , 255 );
+		m_borderColor = Rgba8( 247 , 202 , 25 , 100 );
 	}
 
 	if ( isBeingDragged )
 	{
-		m_borderColor = Rgba8( 0 , 255 , 0 , 255 );
+		m_borderColor = Rgba8( 0 , 255 , 0 , 100 );
 	}
 
 	if ( isColliding )
 	{
-		m_fillColor = Rgba8( 255 , 0 , 0 , 128 );
+		m_fillColor = Rgba8( 255 , 0 , 0 , 100 );
 	}
 
 	if ( !isMouseInside && !isBeingDragged )
 	{
-		m_borderColor = Rgba8( 0 , 0 , 255 , 255 );
+		m_borderColor = Rgba8( 0 , 0 , 255 , 100 );
 	}
 
 	if ( !isColliding )
 	{
-		m_fillColor = Rgba8( 255 , 255 , 255 , 128 );
+		m_fillColor = Rgba8( 255 , 255 , 255 , 100 );
 	}
 
 	float value = RangeMapFloat( 0.f , 1.f , 25.f , 255.f , this->m_rigidbody->m_collider->m_material.bounciness );

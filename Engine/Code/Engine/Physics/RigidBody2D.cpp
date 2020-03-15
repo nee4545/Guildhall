@@ -108,7 +108,7 @@ void Rigidbody2D::ApplyTorque( Vec2 impulse , Vec2 point )
 
 	if ( m_collider->m_colliderType == COLLIDER2D_DISC )
 	{
-		c = point - m_worldPosition;
+		c = point -m_worldPosition ;
 		d = c.GetRotated90Degrees();
 	}
 
@@ -122,6 +122,7 @@ void Rigidbody2D::ApplyTorque( Vec2 impulse , Vec2 point )
 
 	m_angularVelocity += torque / m_moment;
 }
+
 
 void Rigidbody2D::ApplyAngularAccleration( float deltaSeconds )
 {
