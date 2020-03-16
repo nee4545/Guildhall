@@ -364,9 +364,9 @@ void Physics2D::ResolveCollission( Collision2D collision )
 	if ( ( collision.me->m_rigidbody->m_mode == DYNAMIC || collision.me->m_rigidbody->m_mode == KINAMETIC ) && ( collision.them->m_rigidbody->m_mode == DYNAMIC || collision.them->m_rigidbody->m_mode == KINAMETIC ) )
 	{
 		collision.me->m_rigidbody->ApplyImpulse( imp );
-		collision.me->m_rigidbody->ApplyTorque( imp , collision.manifold.centre );
-
 		collision.them->m_rigidbody->ApplyImpulse( -imp );
+
+		collision.me->m_rigidbody->ApplyTorque( imp , collision.manifold.centre );
 		collision.them->m_rigidbody->ApplyTorque( -imp , collision.manifold.centre );
 	}
 
@@ -390,7 +390,7 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 	float theirMass = collision.them->m_rigidbody->m_mass;
 	
 	Vec2 n = collision.manifold.normal;
-	Vec2 t = collision.manifold.normal.GetRotatedMinus90Degrees();
+	Vec2 t = collision.manifold.normal.GetRotated90Degrees();
 
 	Vec2 myVel = collision.me->m_rigidbody->GetImapctVeclocity( collision.manifold.centre );
 	Vec2 themVelDiff = collision.them->m_rigidbody->GetImapctVeclocity( collision.manifold.centre );
@@ -398,8 +398,8 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 	
 	float numerator = -1 * ( 1 + collision.me->GetRestitutionWith( collision.them ) ) * DotProduct2D( ( imapctVelDiff ) , n );
 
-	Vec2 rap = ( collision.manifold.centre - collision.me->m_rigidbody->m_worldPosition ).GetRotatedMinus90Degrees();
-	Vec2 rbp = ( collision.manifold.centre - collision.them->m_rigidbody->m_worldPosition ).GetRotatedMinus90Degrees();
+	Vec2 rap = ( collision.manifold.centre - collision.me->m_rigidbody->m_worldPosition ).GetRotated90Degrees();
+	Vec2 rbp = ( collision.manifold.centre - collision.them->m_rigidbody->m_worldPosition ).GetRotated90Degrees();
 
 	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
 	{
@@ -412,7 +412,7 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 		float denom = massFactor + themInertia;
 
 		float jn = numerator / denom;
-		//jn = ( jn < 0 ) ? 0 : jn;
+		jn = ( jn < 0 ) ? 0 : jn;
 
 		float numeratorT = -1 * (1+ collision.me->GetRestitutionWith( collision.them ) ) * DotProduct2D( ( imapctVelDiff ) , t );
 
@@ -425,7 +425,7 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 		float jt = numeratorT / denomT;
 
 		float friction = collision.me->GetFrictionWith( collision.them );
-		jt = Clamp( jt , -friction * jn , friction * jn );
+		//jt = Clamp( jt , -friction * jn , friction * jn );
 		//jt = abs(jt)
 
 		//jt = 0;
@@ -447,7 +447,7 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 		float denom = massFactor + meInertia;
 
 		float jn = numerator / denom;
-		//jn = ( jn < 0 ) ? 0 : jn;
+		jn = ( jn < 0 ) ? 0 : jn;
 
 		float numeratorT = -1 * (1+ collision.them->GetRestitutionWith( collision.me ) ) * DotProduct2D( ( imapctVelDiff ) , t );
 
@@ -459,8 +459,8 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 		float denomT = massFactorT + themInertiaT;
 		float jt = numeratorT / denomT;
 
-		float friction = collision.me->GetFrictionWith( collision.them );
-		jt = Clamp( jt , -friction * jn , friction * jn );
+		//float friction = collision.me->GetFrictionWith( collision.them );
+		//jt = Clamp( jt , -friction * jn , friction * jn );
 
 		//jt = 0;
 
@@ -482,7 +482,7 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 
 	float jn = numerator / denom;
 
-	//jn = ( jn < 0 ) ? 0 : jn;
+	jn = ( jn < 0 ) ? 0 : jn;
 
 	float numeratorT = -1 * (1+ collision.me->GetRestitutionWith( collision.them ) ) * DotProduct2D( ( imapctVelDiff ) , t );
 
@@ -500,8 +500,8 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 
 	float jt = numeratorT / denomT;
 
-	float friction = collision.me->GetFrictionWith( collision.them );
-	jt = Clamp( jt , -friction * jn , friction * jn );
+	//float friction = collision.me->GetFrictionWith( collision.them );
+	//jt = Clamp( jt , -friction * jn , friction * jn );
 
  	Vec2 J = ( jn * n ) + ( jt * t );
 
@@ -573,7 +573,7 @@ Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const
 
 	float distance = disc0->m_radius + disc1->m_radius - ( disc1->m_worldPosition - disc0->m_worldPosition ).GetLength();
 	Vec2 normal = ( disc0->m_worldPosition - disc1->m_worldPosition ).GetNormalized();
-	Vec2 centre = ( disc0->m_worldPosition ) - ( normal * distance * 0.5f ) + ( normal * disc0->m_radius );
+	Vec2 centre = ( disc1->m_worldPosition ) + ( normal * disc1->m_radius )-( normal * distance * 0.5f );
 
 	collision.centre = centre;
 	collision.normal = normal;
@@ -610,6 +610,6 @@ Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D co
 		collision.penetration = ( discColliderMe->m_worldPosition - closetPoint ).GetLength() + discColliderMe->m_radius;
 	}
 
-	collision.centre = discColliderMe->m_worldPosition + ( collision.normal * ( discColliderMe->m_radius - ( collision.penetration * 0.5f ) ) );
+	collision.centre = discColliderMe->m_worldPosition - ( collision.normal * ( discColliderMe->m_radius - ( collision.penetration * 0.5f ) ) );
 	return collision;
 }
