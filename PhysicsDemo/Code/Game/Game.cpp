@@ -760,7 +760,7 @@ void Game::DisplayX()
 			if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
 			{
 				PolygonCollider2D* temp = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
-				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_polygonLocal->GetCentre() , 1.f , x , Rgba8( 0 , 0 , 255 , 255 ) );
+				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_worldPosition , 1.f , x , Rgba8( 0 , 0 , 255 , 255 ) );
 
 				g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
 				g_theRenderer->DrawVertexArray( textVerts );
@@ -1080,7 +1080,7 @@ void Game::Render()
 	if ( physicsSystem->m_frameCollisions.size() > 0 )
 	{
 		g_theRenderer->DrawLine( physicsSystem->m_frameCollisions[ 0 ].me->m_rigidbody->m_worldPosition , physicsSystem->m_frameCollisions[ 0 ].manifold.centre , Rgba8( 100 , 0 , 0 , 255 ) , 0.4f );
-		//g_theRenderer->DrawLine( physicsSystem->m_frameCollisions[ 0 ].them->m_rigidbody->m_worldPosition , physicsSystem->m_frameCollisions[ 0 ].manifold.centre , Rgba8( 100 , 0 , 0 , 255 ) , 0.4f );
+		g_theRenderer->DrawLine( physicsSystem->m_frameCollisions[ 0 ].them->m_rigidbody->m_worldPosition , physicsSystem->m_frameCollisions[ 0 ].manifold.centre , Rgba8( 100 , 0 , 0 , 255 ) , 0.4f );
 	}
 	
 	g_theRenderer->EndCamera( *m_camera );

@@ -97,11 +97,11 @@ bool DiscVPolygonCollisionCheck( Collider2D const* col0 , Collider2D const* col1
 	PolygonCollider2D const* poly = ( PolygonCollider2D const* ) col1;
 
 	//Mid Phase Check
-	if ( !DoDiscsOverlap( poly->m_polygonLocal->GetCentre() , poly->boundingDiscRadius , disc->m_worldPosition , disc->m_radius ) )
+	/*if ( !DoDiscsOverlap( poly->m_polygonLocal->GetCentre() , poly->boundingDiscRadius , disc->m_worldPosition , disc->m_radius ) )
 	{
 		return false;
 	}
-	else
+	else*/
 	{
 		return DoDiscAndPolygonOverlap( disc->m_worldPosition , disc->m_radius , *poly->m_polygonLocal );
 	}

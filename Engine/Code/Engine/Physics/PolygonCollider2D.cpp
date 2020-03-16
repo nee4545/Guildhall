@@ -14,11 +14,10 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 	m_polygonLocal = polygon;
 	m_polygonLocal->m_localPos = localPosition;
 	m_localPosition = localPosition;
+	//m_polygonLocal->SetPosition( localPosition );
+	//m_worldPosition = m_polygonLocal->GetCentre();
 	boundingDiscRadius = m_polygonLocal->GetBoundingDiscRadius();
-
-	
 	//UpdateWorldShape();
-	
 }
 
 void PolygonCollider2D::UpdateWorldShape()
@@ -77,6 +76,7 @@ void PolygonCollider2D::Rotate( float deltaRotation )
 	{
 		m_polygonLocal->m_points[ index ] = RotateAroundArbitartPoint( c , m_polygonLocal->m_points[ index ] , deltaRotation );
 	}
+	m_polygonLocal->SetPosition( m_worldPosition );
 }
 
 void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
