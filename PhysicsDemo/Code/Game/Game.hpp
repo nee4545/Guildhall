@@ -78,7 +78,6 @@ public:
 	void UpdateFramePositions();
 	void Update(float deltaseconds);
 	void Render();
-
 	void ToggleDevConsole();
 
 };

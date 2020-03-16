@@ -154,8 +154,6 @@ void Game::PopulateInitialObjects()
 	obj1->m_rigidbody->TakeCollider( collider1 );
 	obj1->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj1 );
-
-
 }
 
 
@@ -202,7 +200,6 @@ void Game::HandleMouseInsideObjects()
 		}
 	}
 }
-
 
 void Game::HandleCollissions()
 {
@@ -329,6 +326,22 @@ void Game::HandleDrag()
 			{
 				m_selectedObject->m_rigidbody->m_angularVelocity -= 1.f;
 			}
+
+			if ( g_theInput->WasKeyJustPressed( 'U' ) )
+			{
+				m_selectedObject->m_rigidbody->m_angularVelocity = 0.f;
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'C' ) )
+			{
+				m_selectedObject->m_rigidbody->DecreamnetAngularDrag(0.1f);
+			}
+
+			if ( g_theInput->WasKeyJustPressed( 'V' ) )
+			{
+				m_selectedObject->m_rigidbody->IncreamentAngularDrag(0.1f);
+			}
+
 			
 			
 			if ( !m_offsetSet )
@@ -810,7 +823,7 @@ void Game::DisplayToolTip()
 {
 	Vec2 mousePos = m_camera->ClientToWordPosition2D( g_theInput->GetCurrentMousePosition() );
 
-	AABB2 tooltipBox = AABB2( mousePos , Vec2( mousePos.x + 48.f , mousePos.y + 18.f ) );
+	AABB2 tooltipBox = AABB2( mousePos , Vec2( mousePos.x + 50.f , mousePos.y + 25.f ) );
 
 	g_theRenderer->DrawAABB2D( tooltipBox , Rgba8( 100 , 100 , 100 , 200 ) );
 
@@ -824,6 +837,8 @@ void Game::DisplayToolTip()
 	std::vector<Vertex_PCU> dragInfo;
 	std::vector<Vertex_PCU> roationInfo;
 	std::vector<Vertex_PCU> angualrVelocityInfo;
+	std::vector<Vertex_PCU> momentInfo;
+	std::vector<Vertex_PCU> angularDragInfo;
 
 	std::string temp = "";
 	
@@ -836,6 +851,8 @@ void Game::DisplayToolTip()
 	std::string dragStr = "Drag: ";
 	std::string rotationStr = "Rotation: ";
 	std::string angularvStr = "Angular Velocity:";
+	std::string momentStr = "Moment :";
+	std::string angularDragStr = "Angular Drag: ";
 
 	temp = std::to_string(m_selectedObject->m_rigidbody->m_mass);
 	massStr += temp;
@@ -869,8 +886,19 @@ void Game::DisplayToolTip()
 	angularvStr += temp;
 	angularvStr += "(T,Y,U->dec/incr/Reset)";
 
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_moment );
+	momentStr += temp;
 
 	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_moment );
+	momentStr += temp;
+
+	temp = "";
+	temp = std::to_string( m_selectedObject->m_rigidbody->m_angularDrag );
+	angularDragStr += temp;
+	angularDragStr += "(C,V->dec/incr)";
+
 	switch ( m_selectedObject->m_rigidbody->m_mode )
 	{
 	case STATIC:
@@ -891,17 +919,17 @@ void Game::DisplayToolTip()
 	dragStr += temp;
 	dragStr += "(Z,X->dec/incr)";
 
-	m_BitmapFont->AddVertsForTextInBox2D( massInfo , tooltipBox , 1.f , massStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.02f ));
-	m_BitmapFont->AddVertsForTextInBox2D( frictionInfo , tooltipBox , 1.f , frictionStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.12f ) );
-	m_BitmapFont->AddVertsForTextInBox2D( bounceInfo , tooltipBox , 1.f , bounceStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.22f ) );
-	m_BitmapFont->AddVertsForTextInBox2D( velocityInfo , tooltipBox , 1.f , velocityStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.32f ) );
-	m_BitmapFont->AddVertsForTextInBox2D( verletVelocityInfo , tooltipBox , 1.f , verletStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.42f ) );
-	m_BitmapFont->AddVertsForTextInBox2D( dragInfo , tooltipBox , 1.f , dragStr , Rgba8( 0 , 0 , 0 , 255 ), 1.f , Vec2( 0.02f , 0.52f ));
-	m_BitmapFont->AddVertsForTextInBox2D( simulationModeInfo , tooltipBox , 1.f , simStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.62f ) );
-	m_BitmapFont->AddVertsForTextInBox2D( roationInfo , tooltipBox , 1.f , rotationStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.72f ) );
-	m_BitmapFont->AddVertsForTextInBox2D( angualrVelocityInfo , tooltipBox , 1.f , angularvStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.82f ) );
-
-	
+	m_BitmapFont->AddVertsForTextInBox2D( massInfo , tooltipBox , 1.f , massStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.0f ));
+	m_BitmapFont->AddVertsForTextInBox2D( frictionInfo , tooltipBox , 1.f , frictionStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.1f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( bounceInfo , tooltipBox , 1.f , bounceStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.2f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( velocityInfo , tooltipBox , 1.f , velocityStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.3f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( verletVelocityInfo , tooltipBox , 1.f , verletStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.4f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( dragInfo , tooltipBox , 1.f , dragStr , Rgba8( 0 , 0 , 0 , 255 ), 1.f , Vec2( 0.02f , 0.5f ));
+	m_BitmapFont->AddVertsForTextInBox2D( simulationModeInfo , tooltipBox , 1.f , simStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.6f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( roationInfo , tooltipBox , 1.f , rotationStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.7f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( angualrVelocityInfo , tooltipBox , 1.f , angularvStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.8f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( momentInfo , tooltipBox , 1.f , momentStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.9f ) );
+	m_BitmapFont->AddVertsForTextInBox2D( angularDragInfo , tooltipBox , 1.f , angularDragStr , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , Vec2( 0.02f , 0.99f ) );
 
 	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( massInfo );
@@ -937,6 +965,14 @@ void Game::DisplayToolTip()
 
 	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( angualrVelocityInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( momentInfo );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( angularDragInfo );
 	g_theRenderer->BindTexture( nullptr );
 
 }

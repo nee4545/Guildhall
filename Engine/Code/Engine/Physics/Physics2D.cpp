@@ -167,7 +167,8 @@ void Physics2D::ApplyAffectors( float deltaSeconds )
 			case DYNAMIC:
 			{
 				m_rigidBodies2D[ index ]->ApplyGravity( deltaSeconds , m_gravityMultiplier );
-				//m_rigidBodies2D[ index ]->ApplyDrag( deltaSeconds );
+				m_rigidBodies2D[ index ]->ApplyDrag( deltaSeconds );
+				m_rigidBodies2D[ index ]->ApplyAngularDrag( deltaSeconds );
 				break;
 			}
 			case KINAMETIC:
@@ -425,10 +426,8 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 		float jt = numeratorT / denomT;
 
 		float friction = collision.me->GetFrictionWith( collision.them );
-		//jt = Clamp( jt , -friction * jn , friction * jn );
-		//jt = abs(jt)
-
-		//jt = 0;
+		jt = Clamp( jt , -friction * jn , friction * jn );
+		
 
 		Vec2 J = ( jn * n ) + ( jt * t );
 		return J;
@@ -459,8 +458,8 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 		float denomT = massFactorT + themInertiaT;
 		float jt = numeratorT / denomT;
 
-		//float friction = collision.me->GetFrictionWith( collision.them );
-		//jt = Clamp( jt , -friction * jn , friction * jn );
+		float friction = collision.me->GetFrictionWith( collision.them );
+		jt = Clamp( jt , -friction * jn , friction * jn );
 
 		//jt = 0;
 
@@ -499,9 +498,6 @@ Vec2 Physics2D::GetImpulse( Collision2D& collision )
 	float denomT = massFactorT + meInertiaT + themInertiaT;
 
 	float jt = numeratorT / denomT;
-
-	//float friction = collision.me->GetFrictionWith( collision.them );
-	//jt = Clamp( jt , -friction * jn , friction * jn );
 
  	Vec2 J = ( jn * n ) + ( jt * t );
 
@@ -573,7 +569,7 @@ Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const
 
 	float distance = disc0->m_radius + disc1->m_radius - ( disc1->m_worldPosition - disc0->m_worldPosition ).GetLength();
 	Vec2 normal = ( disc0->m_worldPosition - disc1->m_worldPosition ).GetNormalized();
-	Vec2 centre = ( disc1->m_worldPosition ) + ( normal * disc1->m_radius )-( normal * distance * 0.5f );
+	Vec2 centre = ( disc0->m_worldPosition ) - ( normal * distance * 0.5f ) - ( normal * disc0->m_radius );
 
 	collision.centre = centre;
 	collision.normal = normal;

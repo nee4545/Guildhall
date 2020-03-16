@@ -3,6 +3,7 @@
 #include "Engine/Core/Polygon2D.hpp"
 #include <cmath>
 #include <vector>
+#define UNUSED(x) (void)(x);
 
 
 float ConvertRadiansToDegrees( float radians )
@@ -605,22 +606,20 @@ Vec2 RotateAroundArbitartPoint( Vec2 arbitaryPoint , Vec2 point , float rotation
 	return vec;
 }
 
-float GetMomentOfInertiaOfTriangle( Vec2 point0 , Vec2 point1 , Vec2 point2, float mass )
+float GetMomentOfInertiaOfTriangle( Polygon2D polygon , Vec2 point0 , Vec2 point1 , Vec2 point2, float mass )
 {
+	UNUSED( mass );
 	Vec2 u = point1 - point0;
 	Vec2 v = point2 - point0;
-
-	float projectedDistance = GetProjectedLength2D( v , u );
-
-	Vec2 uNormal = u.GetNormalized();
-	Vec2 point = point0 + uNormal * projectedDistance;
-
-	float height = ( point2 - point ).GetLength();
-	float a = ( point0 - point ).GetLength();
-	float b = u.GetLength();
-
-	return (mass / 18.f)*( ( u.GetLengthSquared() ) - ( a * b ) + ( a * a ) + ( height * height ) );
-	
+	float area = GetAreaOfTriangele( point0 , point1 , point2 );
+	Vec2 center = ( ( point1 + point2 + point0 ) / 3.f ) - polygon.GetCentre();
+	float b = u.GetLengthSquared();																		
+	float a = DotProduct2D( v , u );
+	Vec2 h = ( v - ( ( DotProduct2D( v , u ) / DotProduct2D( u , u ) ) * u ) );
+	float inertia = ( b - a + ( ( a * a ) / b ) + ( DotProduct2D( h , h ) ) );
+	inertia *= area / 18.f;
+	inertia += area * center.GetLengthSquared();
+	return inertia;
 }
 
 float GetAreaOfTriangele( Vec2 point0 , Vec2 point1 , Vec2 point2 )

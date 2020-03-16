@@ -74,6 +74,21 @@ void Rigidbody2D::DecreamentDrag( float decreament )
 	}
 }
 
+void Rigidbody2D::IncreamentAngularDrag( float increament )
+{
+	m_angularDrag += increament;
+}
+
+void Rigidbody2D::DecreamnetAngularDrag( float decreament )
+{
+	m_angularDrag -= decreament;
+
+	if ( m_angularDrag < 0.f )
+	{
+		m_angularDrag = 0.f;
+	}
+}
+
 void Rigidbody2D::MarkForDestroy()
 {
 	m_isGarbage = true;
@@ -94,6 +109,24 @@ void Rigidbody2D::ApplyDrag( float deltaTime )
 {
 	Vec2 dragDirection = 1.f / m_mass * GetVerletVelocity().GetNormalized().GetRotated90Degrees().GetRotated90Degrees();
 	m_velocity += m_drag * dragDirection * deltaTime;
+}
+
+void Rigidbody2D::ApplyAngularDrag( float deltaTime )
+{
+	if ( abs( m_angularVelocity ) <= 0.001f )
+	{
+		return;
+	}
+
+	if ( m_angularVelocity > 0 )
+	{
+		m_angularVelocity -= m_angularDrag * deltaTime;
+	}
+	else
+	{
+		m_angularVelocity += m_angularDrag * deltaTime;
+	}
+
 }
 
 void Rigidbody2D::ApplyImpulse( Vec2 impulse )

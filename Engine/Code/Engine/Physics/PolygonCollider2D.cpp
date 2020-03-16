@@ -60,12 +60,16 @@ void PolygonCollider2D::CalculateMoment()
 		Vec2 nextVert2 = m_polygonLocal->m_points[ j ];
 
 		float areaOfTriangle = GetAreaOfTriangele( commonVert , nextVert1 , nextVert2 );
-		moment += GetMomentOfInertiaOfTriangle( commonVert , nextVert1 , nextVert2 , m_rigidbody->m_mass*( areaOfTriangle / areaOfPolygon ) );
+		moment += GetMomentOfInertiaOfTriangle( *m_polygonLocal, commonVert , nextVert1 , nextVert2 , ( areaOfTriangle / areaOfPolygon ) );
 
 		i++;
 		j++;
 		counter++;
 	}
+
+	moment *= m_rigidbody->m_mass;
+	moment /= areaOfPolygon;
+
 
 	m_rigidbody->m_moment =moment;
 }
