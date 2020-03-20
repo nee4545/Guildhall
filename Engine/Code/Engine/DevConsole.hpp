@@ -37,9 +37,12 @@ public:
 	void ProcessCommand( std::string& command , EventArgs& commandArgs );
 	void InitializeCommands();
 	void HandleTextSelection();
+	void HandleCopyPaste();
+	std::string GetClipBoardData();
 
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const;
+	bool isSelectedTextAfterCursor = false;
 	float m_carrotBlinkTime = 1.f;
 	int m_carrotOffest = 0;
 	int m_commandHistoryIndex = 0;

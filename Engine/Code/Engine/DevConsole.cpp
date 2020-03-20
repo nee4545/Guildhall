@@ -137,6 +137,13 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 
 void DevConsole::ProcessInput()
 {
+
+	if ( g_theInput->IsKeyPressed( 0x11 ) && g_theInput->WasKeyJustPressed( 'V' ) )
+	{
+		HandleCopyPaste();
+		return;
+	}
+
 	if ( g_theInput->m_characters.size()>0 )
 	{
 
@@ -187,7 +194,11 @@ void DevConsole::ProcessInput()
 				m_selectedText = nullptr;
 				if ( m_carrotOffest < 0 )
 				{
-					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
 				}
 				return;
 			}
@@ -211,14 +222,42 @@ void DevConsole::ProcessInput()
 
 		if(m_carrotOffest==0 )
 		{ 
+			if ( m_selectedText != nullptr )
+			{
+				m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
+				m_selectedText = nullptr;
+				if ( m_carrotOffest < 0 )
+				{
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
+				}
+			}
 			m_input += g_theInput->m_characters.front();
 		}
 		else
 		{
+
+			if ( m_selectedText != nullptr )
+			{
+				m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
+				m_selectedText = nullptr;
+				if ( m_carrotOffest < 0 )
+				{
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
+				}
+			}
 			std::string temp = "";
 			temp += g_theInput->m_characters.front();
 			m_input.insert( m_input.size() + m_carrotOffest , temp );
 		}
+
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 0x2E ) )
@@ -231,7 +270,11 @@ void DevConsole::ProcessInput()
 
 				if ( m_carrotOffest < 0 )
 				{
-					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
 				}
 				return;
 			}
@@ -453,6 +496,7 @@ void DevConsole::HandleTextSelection()
 	if ( m_input == "" )
 	{
 		m_selectedText = nullptr;
+		isSelectedTextAfterCursor = false;
 		return;
 	}
 
@@ -489,17 +533,52 @@ void DevConsole::HandleTextSelection()
 		{
 			m_selectedTextStart = textEndIndex;
 			m_selectedTextEnd = m_selectedTextStart + textStartIndex;
+			isSelectedTextAfterCursor = true;
 		}
 		else if(textStartIndex<0 )
 		{
 			m_selectedTextEnd = textEndIndex;
 			m_selectedTextStart = m_selectedTextEnd + textStartIndex;
-
 		}
 		else
 		{
 			m_selectedText = nullptr;
+			isSelectedTextAfterCursor = false;
 		}
+	}
+}
+
+
+
+void DevConsole::HandleCopyPaste()
+{
+	std::string clipBoardData = GetClipBoardData();
+
+	if ( clipBoardData == "" )
+	{
+		return;
+	}
+
+	m_input += clipBoardData;
+}
+
+std::string DevConsole::GetClipBoardData()
+{
+	if ( !OpenClipboard( NULL ) )
+		return "";
+	if ( IsClipboardFormatAvailable( CF_TEXT ) )
+	{
+		HANDLE handleData = GetClipboardData( CF_TEXT );
+		LPCSTR data = ( LPCSTR ) GlobalLock( handleData );
+		std::string clipboardDataString = data;
+		GlobalUnlock( handleData );
+		CloseClipboard();
+		return clipboardDataString;
+	}
+	else
+	{
+		CloseClipboard();
+		return "";
 	}
 }
 
