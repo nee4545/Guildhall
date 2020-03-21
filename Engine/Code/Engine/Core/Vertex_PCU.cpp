@@ -1,6 +1,7 @@
 #include"Vertex_PCU.hpp"
 #include <vector>
 #include "Engine/Core/AABB2.hpp"
+#include "Engine/Core/AABB3.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/Polygon2D.hpp"
 
@@ -64,6 +65,26 @@ m_uvTexCoords=uvTexCoords;
  }
 
  
+ void AppendAABB3( std::vector<Vertex_PCU>& verts , AABB3& aabb , const Rgba8& tint )
+ {
+	 Vertex_PCU vert[ 6 ]
+	 {
+		 Vertex_PCU( Vec3( aabb.mins.x,aabb.mins.y,aabb.mins.z ),tint,Vec2( 0.f,0.f ) ),
+		 Vertex_PCU( Vec3( aabb.maxs.x,aabb.mins.y,aabb.mins.z ),tint,Vec2( 1.f,0.f ) ),
+		 Vertex_PCU( Vec3( aabb.mins.x,aabb.maxs.y,aabb.maxs.z ),tint,Vec2( 0.f,1.f ) ),
+
+		 Vertex_PCU( Vec3( aabb.maxs.x,aabb.mins.y,aabb.mins.z ),tint,Vec2( 1.f,0.f ) ),
+		 Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,aabb.maxs.z ),tint,Vec2( 1.f,1.f ) ),
+		 Vertex_PCU( Vec3( aabb.mins.x,aabb.maxs.y,aabb.maxs.z ),tint,Vec2( 0.f,1.f ) )
+
+	 };
+
+	 for ( int index = 0; index < 6; index++ )
+	 {
+		 verts.push_back( vert[ index ] );
+	 }
+ }
+
  void AppendDisc2( std::vector<Vertex_PCU>& verts , float radius , const Rgba8& color )
  {
 	 Vertex_PCU vertices[ 48 ];

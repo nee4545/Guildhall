@@ -15,7 +15,7 @@ extern AudioSystem* g_theAudio;
 
 DevConsole::DevConsole()
 {
-	
+
 }
 
 void DevConsole::Startup()
@@ -30,15 +30,15 @@ void DevConsole::BeginFrame()
 
 void DevConsole::EndFrame()
 {
-	
+
 }
 
 void DevConsole::Shutdown()
 {
-	
+
 }
 
-void DevConsole::Update(float deltaSeconds)
+void DevConsole::Update( float deltaSeconds )
 {
 	if ( !IsOpen() )
 	{
@@ -61,57 +61,57 @@ void DevConsole::Update(float deltaSeconds)
 
 }
 
-void DevConsole::PrintString( const Rgba8& textColor, const std::string& devConsolePrintString )
+void DevConsole::PrintString( const Rgba8& textColor , const std::string& devConsolePrintString )
 {
 	ColoredLine newLine;
 	newLine.lineColor = textColor;
 	newLine.text = devConsolePrintString;
 
-	m_lines.push_back(newLine);
+	m_lines.push_back( newLine );
 
 }
 
-void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize, float lineHeight ) const
+void DevConsole::Render( RenderContext& renderer , Camera& camera , float textSize , float lineHeight ) const
 {
-	
-	renderer.BeginCamera(camera);
+
+	renderer.BeginCamera( camera );
 	renderer.BindDepthStencil( nullptr );
-	AABB2 consoleBox = AABB2(camera.GetOrthoBottomLeft(),camera.GetOrthoTopRight());
+	AABB2 consoleBox = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
 	float dimensionOfBox = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
 	consoleBox.CarveBoxOffTop( 0.9f );
-	int numberOfLines = RoundDownToInt(dimensionOfBox/lineHeight);
+	int numberOfLines = RoundDownToInt( dimensionOfBox / lineHeight );
 
 	Vec2 startMins = consoleBox.mins;
-	int myStringIndex = (int)m_lines.size()-1;
-	renderer.DrawAABB2D(consoleBox,Rgba8(100,100,100,200));
+	int myStringIndex = ( int ) m_lines.size() - 1;
+	renderer.DrawAABB2D( consoleBox , Rgba8( 100 , 100 , 100 , 200 ) );
 	std::vector<Vertex_PCU> textVerts;
-	for( int index =0; index<numberOfLines; index++ )
+	for ( int index = 0; index < numberOfLines; index++ )
 	{
 		if ( m_lines.size() == 0 )
 		{
 			break;
 		}
-	
-		g_theBitMapFont->AddVertsForText2D( textVerts,startMins,textSize, m_lines[ myStringIndex ].text, m_lines[ myStringIndex ].lineColor );
+
+		g_theBitMapFont->AddVertsForText2D( textVerts , startMins , textSize , m_lines[ myStringIndex ].text , m_lines[ myStringIndex ].lineColor );
 
 		renderer.BindTexture( g_theBitMapFont->GetTexture() );
 		renderer.DrawVertexArray( textVerts );
 		renderer.BindTexture( nullptr );
 
 		myStringIndex--;
-		if( myStringIndex<0 )
+		if ( myStringIndex < 0 )
 		{
 			break;
 		}
-		startMins.y+=lineHeight*textSize;
+		startMins.y += lineHeight * textSize;
 	}
 
 	AABB2 textBox = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
 	textBox.CarveBoxOffBottom( 0.1f );
-	renderer.DrawAABB2D( textBox,Rgba8(100,0,0,100) );
+	renderer.DrawAABB2D( textBox , Rgba8( 100 , 0 , 0 , 100 ) );
 
-	AABB2 carrot = AABB2( Vec2( 0.f , 0.2f ) , Vec2( 0.5f , textSize+0.5f ) );
-	carrot.Translate( Vec2( (m_input.size()+m_carrotOffest)*textSize , 0.f ) );
+	AABB2 carrot = AABB2( Vec2( 0.f , 0.2f ) , Vec2( 0.5f , textSize + 0.5f ) );
+	carrot.Translate( Vec2( ( m_input.size() + m_carrotOffest ) * textSize , 0.f ) );
 
 
 	std::vector<Vertex_PCU> inputTextVerts;
@@ -126,18 +126,25 @@ void DevConsole::Render( RenderContext& renderer,  Camera& camera,float textSize
 
 	if ( m_carrotBlinkTime > 0.5f )
 	{
-		renderer.DrawAABB2D( carrot , Rgba8( 100 , 0 , 0 , 100 ) );	
+		renderer.DrawAABB2D( carrot , Rgba8( 100 , 0 , 0 , 100 ) );
 	}
 
-	if(m_selectedText!=nullptr )
-	renderer.DrawAABB2D( *m_selectedText , Rgba8( 100 , 100 , 100 , 100 ) );
-	
-	renderer.EndCamera(camera);
+	if ( m_selectedText != nullptr )
+		renderer.DrawAABB2D( *m_selectedText , Rgba8( 100 , 100 , 100 , 100 ) );
+
+	renderer.EndCamera( camera );
 }
 
 void DevConsole::ProcessInput()
 {
-	if ( g_theInput->m_characters.size()>0 )
+
+	if ( g_theInput->IsKeyPressed( 0x11 ) && g_theInput->WasKeyJustPressed( 'V' ) )
+	{
+		HandleCopyPaste();
+		return;
+	}
+
+	if ( g_theInput->m_characters.size() > 0 )
 	{
 
 		if ( g_theInput->m_characters.front() == 27 )
@@ -150,10 +157,10 @@ void DevConsole::ProcessInput()
 			}
 			else
 			{
-			m_input = "";
-			SetIsOpen( false );
-			m_carrotOffest = 0;
-			return;
+				m_input = "";
+				SetIsOpen( false );
+				m_carrotOffest = 0;
+				return;
 
 			}
 		}
@@ -183,11 +190,15 @@ void DevConsole::ProcessInput()
 
 			if ( m_selectedText != nullptr )
 			{
-				m_input.erase( m_selectedTextStart ,(m_selectedTextEnd-m_selectedTextStart) );
+				m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
 				m_selectedText = nullptr;
 				if ( m_carrotOffest < 0 )
 				{
-					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
 				}
 				return;
 			}
@@ -209,43 +220,75 @@ void DevConsole::ProcessInput()
 			return;
 		}
 
-		if(m_carrotOffest==0 )
-		{ 
-			m_input += g_theInput->m_characters.front();
-		}
-		else
+		if ( m_carrotOffest == 0 )
 		{
-			std::string temp = "";
-			temp += g_theInput->m_characters.front();
-			m_input.insert( m_input.size() + m_carrotOffest , temp );
-		}
-	}
-
-	if ( g_theInput->WasKeyJustPressed( 0x2E ) )
-	{
-		
 			if ( m_selectedText != nullptr )
 			{
 				m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
 				m_selectedText = nullptr;
-
 				if ( m_carrotOffest < 0 )
 				{
-					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
 				}
-				return;
 			}
+			m_input += g_theInput->m_characters.front();
+		}
+		else
+		{
 
-			if ( m_carrotOffest == 0 )
+			if ( m_selectedText != nullptr )
 			{
-				return;
+				m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
+				m_selectedText = nullptr;
+				if ( m_carrotOffest < 0 )
+				{
+					if ( isSelectedTextAfterCursor )
+					{
+						m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+						isSelectedTextAfterCursor = false;
+					}
+				}
 			}
+			std::string temp = "";
+			temp += g_theInput->m_characters.front();
+			m_input.insert( m_input.size() + m_carrotOffest , temp );
+		}
 
-			if ( m_input.size() + m_carrotOffest >= 0 )
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 0x2E ) )
+	{
+
+		if ( m_selectedText != nullptr )
+		{
+			m_input.erase( m_selectedTextStart , ( m_selectedTextEnd - m_selectedTextStart ) );
+			m_selectedText = nullptr;
+
+			if ( m_carrotOffest < 0 )
 			{
-				m_input.erase( m_input.size() + m_carrotOffest , 1 );
-				m_carrotOffest++;
+				if ( isSelectedTextAfterCursor )
+				{
+					m_carrotOffest += m_selectedTextEnd - m_selectedTextStart;
+					isSelectedTextAfterCursor = false;
+				}
 			}
+			return;
+		}
+
+		if ( m_carrotOffest == 0 )
+		{
+			return;
+		}
+
+		if ( m_input.size() + m_carrotOffest >= 0 )
+		{
+			m_input.erase( m_input.size() + m_carrotOffest , 1 );
+			m_carrotOffest++;
+		}
 
 	}
 
@@ -261,7 +304,7 @@ void DevConsole::ProcessInput()
 	{
 		if ( m_input != "" )
 		{
-			m_carrotOffest =(int)( m_input.size() )*-1;
+			m_carrotOffest = ( int ) ( m_input.size() ) * -1;
 		}
 	}
 }
@@ -297,7 +340,7 @@ void DevConsole::HandleCommandHistoryRequest()
 
 	if ( g_theInput->WasKeyJustPressed( 0x26 ) )
 	{
-		if ( m_commandHistoryIndex+1 <= m_commandHistory.size()-1 )
+		if ( m_commandHistoryIndex + 1 <= m_commandHistory.size() - 1 )
 		{
 			m_commandHistoryIndex++;
 		}
@@ -340,7 +383,7 @@ void DevConsole::SetCarrotUsingMouse()
 	AABB2 textBoc = AABB2( m_devConsoleCamera->GetOrthoBottomLeft() , m_devConsoleCamera->GetOrthoTopRight() );
 	textBoc.CarveBoxOffBottom( 0.1f );
 
-	if(textBoc.IsPointInside(mousePos) )
+	if ( textBoc.IsPointInside( mousePos ) )
 	{
 		AABB2 actualTextBox = AABB2( textBoc.mins , Vec2( m_input.size() * m_textSize , 1.5f ) );
 
@@ -381,9 +424,9 @@ bool DevConsole::IsCommandInHistory( std::string command )
 	return false;
 }
 
-void DevConsole::ProcessCommand(std::string& command)
+void DevConsole::ProcessCommand( std::string& command )
 {
-	Strings cmd=SplitStringOnDelimiter( command , ':' );
+	Strings cmd = SplitStringOnDelimiter( command , ':' );
 	EventArgs currentCommandArgs;
 	std::string currentCommand;
 
@@ -405,7 +448,7 @@ void DevConsole::ProcessCommand(std::string& command)
 		{
 			SoundID s = g_theAudio->CreateOrGetSound( "Data/Sounds/Success.wav" );
 			g_theAudio->PlaySound( s );
-			g_theEventSystem.FireEvent(currentCommand , currentCommandArgs );
+			g_theEventSystem.FireEvent( currentCommand , currentCommandArgs );
 			if ( !IsCommandInHistory( currentCommand ) )
 			{
 				m_commandHistory.push_back( currentCommand );
@@ -430,7 +473,7 @@ void DevConsole::ProcessCommand(std::string& command)
 
 	}
 
-	SoundID s=g_theAudio->CreateOrGetSound( "Data/Sounds/Error.wav" );
+	SoundID s = g_theAudio->CreateOrGetSound( "Data/Sounds/Error.wav" );
 	g_theAudio->PlaySound( s );
 	PrintString( Rgba8( 100 , 0 , 0 , 255 ) , "Invalid command: " + command );
 }
@@ -453,6 +496,7 @@ void DevConsole::HandleTextSelection()
 	if ( m_input == "" )
 	{
 		m_selectedText = nullptr;
+		isSelectedTextAfterCursor = false;
 		return;
 	}
 
@@ -471,7 +515,7 @@ void DevConsole::HandleTextSelection()
 
 	if ( actualTextBox.IsPointInside( mousePos ) )
 	{
-		
+
 		if ( g_theInput->IsLeftMouseButtonPressed() )
 		{
 			AABB2* selectedText = new AABB2( Vec2( mousePos.x , 0.2f ) , Vec2( ( m_input.size() + m_carrotOffest ) * m_textSize , 2.5f ) );
@@ -481,25 +525,60 @@ void DevConsole::HandleTextSelection()
 
 	if ( m_selectedText != nullptr )//Map index of aabb for the text to select
 	{
-		int textEndIndex = (int)m_input.size() + m_carrotOffest;
-		int textStartIndex = RoundToNearestInt( (m_selectedText->mins.x - m_selectedText->maxs.x)/m_textSize );
-		
+		int textEndIndex = ( int ) m_input.size() + m_carrotOffest;
+		int textStartIndex = RoundToNearestInt( ( m_selectedText->mins.x - m_selectedText->maxs.x ) / m_textSize );
+
 
 		if ( textStartIndex > 0 )
 		{
 			m_selectedTextStart = textEndIndex;
 			m_selectedTextEnd = m_selectedTextStart + textStartIndex;
+			isSelectedTextAfterCursor = true;
 		}
-		else if(textStartIndex<0 )
+		else if ( textStartIndex < 0 )
 		{
 			m_selectedTextEnd = textEndIndex;
 			m_selectedTextStart = m_selectedTextEnd + textStartIndex;
-
 		}
 		else
 		{
 			m_selectedText = nullptr;
+			isSelectedTextAfterCursor = false;
 		}
+	}
+}
+
+
+
+void DevConsole::HandleCopyPaste()
+{
+	std::string clipBoardData = GetClipBoardData();
+
+	if ( clipBoardData == "" )
+	{
+		return;
+	}
+
+	m_input += clipBoardData;
+}
+
+std::string DevConsole::GetClipBoardData()
+{
+	if ( !OpenClipboard( NULL ) )
+		return "";
+	if ( IsClipboardFormatAvailable( CF_TEXT ) )
+	{
+		HANDLE handleData = GetClipboardData( CF_TEXT );
+		LPCSTR data = ( LPCSTR ) GlobalLock( handleData );
+		std::string clipboardDataString = data;
+		GlobalUnlock( handleData );
+		CloseClipboard();
+		return clipboardDataString;
+	}
+	else
+	{
+		CloseClipboard();
+		return "";
 	}
 }
 

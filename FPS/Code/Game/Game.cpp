@@ -9,6 +9,7 @@
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Core/Time.hpp"
+#include "Engine/Core/AABB3.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -243,18 +244,28 @@ void Game::Render()
 	
 	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
 
-	Transform quadTransform;
-	quadTransform.m_position.z = -10.f;
-	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
-	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
+	AABB3 temp2 = AABB3( Vec3( 1.f , -1.f , -1.f ) , Vec3( 1.f , 1.f , -2.f ) );
+	std::vector<Vertex_PCU> aabb3Verts;
+	AppendAABB3( aabb3Verts , temp2 , Rgba8( 255 , 255 , 255 , 255 ));
 
 	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
-	g_theRenderer->DrawMesh( mesh );
+	g_theRenderer->BindTexture( tex );
+	g_theRenderer->DrawVertexArray( aabb3Verts );
+	g_theRenderer->BindTexture( nullptr );
+
+	Transform quadTransform;
+	quadTransform.m_position.z = -10.f;
+// 	g_theRenderer->BindShader( nullptr );
+// 	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
+// 	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
+// 
+// 	g_theRenderer->BindShader( nullptr );
+// 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
+// 	g_theRenderer->DrawMesh( mesh );
 
 	g_theRenderer->BindShader( nullptr );
 	//g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
+
 
 	float deltaPhi = 360.f / 10.f;
 	Transform ring;

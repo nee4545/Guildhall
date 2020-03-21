@@ -5,6 +5,7 @@
 #include <vector>
 
 struct AABB2;
+struct AABB3;
 class Polygon2D;
 
 
@@ -44,6 +45,7 @@ struct Vertex_PCU
 };
 
 void AppendAABB2(std::vector<Vertex_PCU>& verts,AABB2& aabb, const Rgba8& tint);
+void AppendAABB3( std::vector<Vertex_PCU>& verts , AABB3& aabb , const Rgba8& tint );
 void AppendAABB2(std::vector<Vertex_PCU>& verts, AABB2& aabb, const Rgba8& tint, Vec2 minUVs, Vec2 maxUVs);
 void AppendDisc2( std::vector<Vertex_PCU>& verts , float radius , const Rgba8& tint );
 void AppendPolygon2(std::vector<Vertex_PCU>& verts,const Polygon2D* poly);

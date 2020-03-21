@@ -57,6 +57,8 @@
     <ClCompile Include="Vec4.cpp" />
     <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
+    <ClCompile Include="Renderer\MeshUtils.cpp" />
+    <ClCompile Include="Core\AABB3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -205,141 +207,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Math\Vec2.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vec3.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Rgba8.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Vertex_PCU.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\MathUtils.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RandomNumberGenerator.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RawNoise.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\InputSystem.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\AnalogJoyStick.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio\AudioSystem.hpp">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\KeyButtonState.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod.hpp">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_codec.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_common.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_dsp.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_errors.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_output.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Mat44.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\IntVec2.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\IntRange.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vec4.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\FloatRange.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\RenderContext.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\Camera.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\BitmapFont.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteDefinition.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteAnimDefinition.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteSheet.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\XboxController.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Image.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\AABB2.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DevConsole.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\EngineCommon.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ErrorWarningAssert.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\EventSystem.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\NamedStrings.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\OBB2.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\SimpleTriangleFont.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\StringUtils.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Time.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\tinyxml2.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\XmlUtils.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteAnimSet.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Core\AABB2.hpp" />
     <ClInclude Include="Core\D3D11Common.hpp" />
@@ -513,9 +380,62 @@
     <ClCompile Include="Renderer\GPUMesh.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\MeshUtils.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
+    <ClInclude Include="Audio\AudioSystem.hpp" />
+    <ClInclude Include="Core\AABB2.hpp" />
+    <ClInclude Include="Core\EngineCommon.hpp" />
+    <ClInclude Include="Core\ErrorWarningAssert.hpp" />
+    <ClInclude Include="Core\EventSystem.hpp" />
+    <ClInclude Include="Core\FloatRange.hpp" />
+    <ClInclude Include="Core\Image.hpp" />
+    <ClInclude Include="Core\IntRange.hpp" />
+    <ClInclude Include="Core\NamedStrings.hpp" />
+    <ClInclude Include="Core\OBB2.hpp" />
+    <ClInclude Include="Core\Rgba8.hpp" />
+    <ClInclude Include="Core\SimpleTriangleFont.hpp" />
+    <ClInclude Include="Core\StringUtils.hpp" />
+    <ClInclude Include="Core\Time.hpp" />
+    <ClInclude Include="Core\Vertex_PCU.hpp" />
+    <ClInclude Include="Core\XmlUtils.hpp" />
+    <ClInclude Include="DevConsole.hpp" />
+    <ClInclude Include="Input\AnalogJoyStick.hpp" />
+    <ClInclude Include="Input\InputSystem.hpp" />
+    <ClInclude Include="Input\KeyButtonState.hpp" />
+    <ClInclude Include="Input\XboxController.hpp" />
+    <ClInclude Include="Math\IntVec2.hpp" />
+    <ClInclude Include="Math\Mat44.hpp" />
+    <ClInclude Include="Math\MathUtils.hpp" />
+    <ClInclude Include="Math\RandomNumberGenerator.hpp" />
+    <ClInclude Include="Math\RawNoise.hpp" />
+    <ClInclude Include="Math\SmoothNoise.hpp" />
+    <ClInclude Include="Math\Vec2.hpp" />
+    <ClInclude Include="Math\Vec3.hpp" />
+    <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Platform\Window.hpp" />
+    <ClInclude Include="Renderer\BitmapFont.hpp" />
+    <ClInclude Include="Renderer\Camera.hpp" />
+    <ClInclude Include="Renderer\GPUMesh.hpp" />
+    <ClInclude Include="Renderer\MeshUtils.hpp" />
+    <ClInclude Include="Renderer\RenderBuffer.hpp" />
+    <ClInclude Include="Renderer\RenderContext.hpp" />
+    <ClInclude Include="Renderer\Sampler.hpp" />
+    <ClInclude Include="Renderer\Shader.hpp" />
+    <ClInclude Include="Renderer\SpriteAnimDefinition.hpp" />
+    <ClInclude Include="Renderer\SpriteAnimSet.hpp" />
+    <ClInclude Include="Renderer\SpriteDefinition.hpp" />
+    <ClInclude Include="Renderer\SpriteSheet.hpp" />
+    <ClInclude Include="Renderer\SwapChain.hpp" />
+    <ClInclude Include="Renderer\TextureView.hpp" />
+    <ClInclude Include="ThirdParty\fmod\fmod.h" />
+    <ClInclude Include="ThirdParty\fmod\fmod.hpp" />
+    <ClInclude Include="ThirdParty\fmod\fmod_codec.h" />
+    <ClInclude Include="ThirdParty\fmod\fmod_common.h" />
+    <ClInclude Include="ThirdParty\fmod\fmod_dsp.h" />
+    <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h" />
+    <ClInclude Include="ThirdParty\fmod\fmod_errors.h" />
+    <ClInclude Include="ThirdParty\fmod\fmod_output.h" />
+    <ClInclude Include="ThirdParty\tinyxml2.h" />
+    <ClInclude Include="Core\AABB3.hpp" />
+    <ClInclude Include="Renderer\DebugRender.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">
@@ -654,41 +574,17 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Math\Poly2D.hpp" />
-    <ClInclude Include="Platform\Window.hpp">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SwapChain.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Texture.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Core\D3D11Common.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\TextureView.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\SmoothNoise.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\Shader.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\RenderBuffer.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\Sampler.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Math\MatrixUtils.hpp">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Core\Transform.hpp">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\GPUMesh.hpp">
-      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Math\RandomNumberGenerator.hpp" />
     <ClInclude Include="Math\RawNoise.hpp" />
@@ -763,9 +659,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\GPUMesh.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\MeshUtils.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
