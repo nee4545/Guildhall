@@ -40,7 +40,7 @@ void* FileReadToNewBuffer( std::string const& filename, size_t *outSize )
 
 Shader::Shader( RenderContext* context ) :m_owner( context )
 {
-	CreateRasterState();
+	//CreateRasterState();
 }
 
 Shader::~Shader()

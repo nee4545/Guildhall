@@ -589,6 +589,19 @@ void Mat44::MatrixInvert( Mat44& mat )
 	mat = ret;
 }
 
+Mat44 Mat44::LookAt( Vec3 pos , Vec3 target , Vec3 worldUp /*= Vec3(0.f,1.f,0.f)*/ )
+{
+	Mat44 toReturn;
+
+	Vec3 fwd = ( target - pos ).GetNormalized();
+	Vec3 r = CrossProduct3D( fwd , worldUp ).GetNormalized();
+	Vec3 u = CrossProduct3D( r , fwd );
+
+	toReturn.SetBasisVectors3D( r , u , -fwd , pos );
+
+	return toReturn;
+}
+
 void Mat44::RotateXDegrees( float degreesAboutX )
 {
 	Mat44 rotationMatrix = CreateXRotationDegrees(degreesAboutX);

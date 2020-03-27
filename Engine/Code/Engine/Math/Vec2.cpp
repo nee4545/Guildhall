@@ -21,6 +21,12 @@ Vec2::Vec2( float initialX, float initialY ): x( 123.f ), y( 456.f )
 }
 
 
+Vec2::Vec2( const IntVec2& copyFrom )
+{
+	x = ( float ) copyFrom.x;
+	y = ( float ) copyFrom.y;
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec2 Vec2::operator + ( const Vec2& vecToAdd ) const
 {

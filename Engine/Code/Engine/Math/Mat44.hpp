@@ -91,6 +91,8 @@ struct Mat44
 	static void MatrixInvertOrthoNormal( Mat44& mat );  // A04
 	static void MatrixInvert( Mat44& mat );
 
+	static Mat44 LookAt(Vec3 pos,Vec3 target, Vec3 worldUp = Vec3(0.f,1.f,0.f));
+
   //Transformation Mutators
 
 	void RotateXDegrees(float degreesAboutX);

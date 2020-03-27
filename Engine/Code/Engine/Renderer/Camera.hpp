@@ -37,7 +37,11 @@ public:
 	unsigned int m_clearMode = 0;
 	Transform m_transform;
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
+	void SetOrthoGraphicProjection( float height , float nearZ = -1.f , float farZ = 1.f );
 	void SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip );
+
+	Mat44 GetProjection();
+	void SetProjection(Mat44 newProjection);
 
 	Vec2 GetOrthoBottomLeft();
 	Vec2 GetOrthoTopRight();

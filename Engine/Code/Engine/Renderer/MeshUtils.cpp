@@ -9,17 +9,32 @@ void AddUVSphereToIndexedVertexArray( std::vector<Vertex_PCU>& verts , std::vect
 	float deltaTheta = 360.f / ( float ) horizintalCuts;
 	float deltaPhi = 180.f / ( float ) verticalCuts;
 
-	for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
+	float x , y , z , xy = 0.f;
+	float u , v = 0.f;
+
+	float hAngle = 0.f;
+	float vAngle = 0.f;
+
+	for ( int i = 0; i <= (int)verticalCuts; i++ )
 	{
-		for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
+		vAngle = 90.f - i * deltaPhi;
+		xy = radius * CosDegrees( vAngle );
+		z = radius * SinDegrees( vAngle );
+
+		for ( int j = 0; j <= (int)horizintalCuts; j++ )
 		{
-			Vec3 currentCoords = GetSphericalCoordinates( theta , phi , radius );
-			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
-			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
-			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoords , color , Vec2( u , v ) );
-			verts.push_back( currentCoordVerts );
+			hAngle = j * deltaTheta;
+
+			x = xy * CosDegrees( hAngle );
+			y = xy * SinDegrees( hAngle );
+
+			u = ( float ) j / horizintalCuts;
+			v = ( float ) i / verticalCuts;
+
+			verts.push_back( Vertex_PCU( Vec3( x , y , z ) + center , color , Vec2( u , v ) ) );
 		}
 	}
+
 	for ( unsigned int hcutIndex = 0; hcutIndex < horizintalCuts; hcutIndex++ )
 	{
 		for ( unsigned int vCutIndex = 0; vCutIndex < verticalCuts; vCutIndex++ )

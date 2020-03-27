@@ -135,6 +135,26 @@ void RenderContext::DrawLine( const Vec2& start, const Vec2& end, const Rgba8& c
 	DrawVertexArray( 3, vert2 );
 }
 
+void RenderContext::DrawArrow2D( Vec2& start , Vec2& end , Rgba8 lineColor , Rgba8 arrowColor , float lineThickness )
+{
+	DrawLine( start , end , lineColor , lineThickness );
+
+	Vec2 dir = ( end - start ).GetNormalized();
+
+	Vec2 pt1 = end + ( dir * 3.f );
+	Vec2 pt2 = end + ( dir.GetRotated90Degrees() * 3.f );
+	Vec2 pt3 = end + ( dir.GetRotatedMinus90Degrees() * 3.f );
+
+	Vertex_PCU verts[ 3 ] =
+	{
+		Vertex_PCU( Vec3( pt1,0.f ),arrowColor,Vec2( 0.f,0.f ) ),
+		Vertex_PCU( Vec3( pt2,0.f ),arrowColor,Vec2( 0.f,0.f ) ),
+		Vertex_PCU( Vec3( pt3,0.f ),arrowColor,Vec2( 0.f,0.f ) )
+	};
+
+	DrawVertexArray( 3 , verts );
+}
+
 void RenderContext::DrawRing( const Vec2 centre, float radius, Rgba8 color, float thickness )
 {
 	constexpr float theta= 360.f/16.f;
@@ -271,8 +291,50 @@ void RenderContext::BindDepthStencil( Texture* dsv )
 	m_context->OMSetRenderTargets( 1 , rtv , tempDsv->m_dsv );
 }
 
-void RenderContext::SetDepthTest()
+void RenderContext::SetDepthTest( eCompareOp comparision , bool writePass  )
 {
+	D3D11_COMPARISON_FUNC cmp;
+	D3D11_DEPTH_WRITE_MASK mask;
+	switch ( comparision )
+	{
+	case COMPARE_NEVER:
+		cmp = D3D11_COMPARISON_NEVER;
+		break;
+	case COMPARE_ALWAYS:
+		cmp = D3D11_COMPARISON_ALWAYS;
+		break;
+	case COMPARE_EQUAL:
+		cmp = D3D11_COMPARISON_EQUAL;
+		break;
+	case COMPARE_NOTEQUAL:
+		cmp = D3D11_COMPARISON_NOT_EQUAL;
+		break;
+	case COMPARE_LESS:
+		cmp = D3D11_COMPARISON_LESS;
+		break;
+	case COMPARE_LEQUAL:
+		cmp = D3D11_COMPARISON_LESS_EQUAL;
+		break;
+	case COMPARE_GREATER:
+		cmp = D3D11_COMPARISON_GREATER;
+		break;
+	case COMPARE_GEQUAL:
+		cmp = D3D11_COMPARISON_GREATER_EQUAL;
+		break;
+	default:
+		cmp = D3D11_COMPARISON_NEVER;
+		break;
+	}
+
+	if ( writePass )
+	{
+		mask= D3D11_DEPTH_WRITE_MASK_ALL;
+	}
+	else
+	{
+	mask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	}
+
 	if ( m_depthStencilState )
 	{
 		DX_SAFE_RELEASE( m_depthStencilState );
@@ -280,8 +342,8 @@ void RenderContext::SetDepthTest()
 	D3D11_DEPTH_STENCIL_DESC dsDesc;
 	// Depth test parameters
 	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	dsDesc.DepthWriteMask = mask;
+	dsDesc.DepthFunc = cmp;
 	// Stencil test parameters
 	dsDesc.StencilEnable = true;
 	dsDesc.StencilReadMask = 0xFF;
@@ -346,8 +408,24 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 }
 
 
+void RenderContext::CreateRasterState( Shader* shader , D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise /*= true */ )
+{
+	D3D11_RASTERIZER_DESC desc;
 
+	desc.FillMode = fillmode;
+	desc.CullMode = cullmode;
+	desc.FrontCounterClockwise = frontCounterClockWise; 
+	desc.DepthBias = 0U;
+	desc.DepthBiasClamp = 0.0f;
+	desc.SlopeScaledDepthBias = 0.0f;
+	desc.DepthClipEnable = TRUE;
+	desc.ScissorEnable = FALSE;
+	desc.MultisampleEnable = FALSE;
+	desc.AntialiasedLineEnable = FALSE;
 
+	ID3D11Device* device = m_device;
+	device->CreateRasterizerState( &desc , &(shader->m_rasterState) );
+}
 
 void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness )
 {
@@ -466,9 +544,9 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 void RenderContext::Startup( Window* window )
 {
 
-	#if defined(RENDER_DEBUG)
+	/*#if defined(RENDER_DEBUG)
 	  CreateDebugModule();
-	#endif
+	#endif*/
 	//Instance - singleton
 	IDXGISwapChain* swapchain = nullptr; 
 
@@ -500,6 +578,7 @@ void RenderContext::Startup( Window* window )
 	m_swapChain = new SwapChain( this , swapchain );
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
+	CreateRasterState( m_defaultShader , D3D11_FILL_SOLID , D3D11_CULL_NONE );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
@@ -509,8 +588,6 @@ void RenderContext::Startup( Window* window )
 
 	CreateBlendStates();
 	g_theBitMapFont = CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
-
-	//CreateDebugModule();
 
 }
 
@@ -657,7 +734,6 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	if ( camera.m_clearMode & CLEAR_COLOR_BIT )
 	{
-		ClaerScreen( camera.GetClearColor() );
 		ClaerScreen(camera.GetClearColor());
 	}
 	BindShader( "" );

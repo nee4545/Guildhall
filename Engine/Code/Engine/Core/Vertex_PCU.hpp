@@ -48,5 +48,7 @@ void AppendAABB2(std::vector<Vertex_PCU>& verts,AABB2& aabb, const Rgba8& tint);
 void AppendAABB3( std::vector<Vertex_PCU>& verts , AABB3& aabb , const Rgba8& tint );
 void AppendAABB2(std::vector<Vertex_PCU>& verts, AABB2& aabb, const Rgba8& tint, Vec2 minUVs, Vec2 maxUVs);
 void AppendDisc2( std::vector<Vertex_PCU>& verts , float radius , const Rgba8& tint );
+void AppendCyinder( std::vector<Vertex_PCU>& cylinderVerts, Vec3 start, Vec3 end, float startRadius, float endRadius, Rgba8 startColor, Rgba8 endColor );
+void AppendArrow( std::vector<Vertex_PCU>& arrowVerts , Vec3 start , Vec3 end ,float coneHeight, float lineRadius , float arrowRadius , Rgba8 lineColor , Rgba8 arrowColor );
 void AppendPolygon2(std::vector<Vertex_PCU>& verts,const Polygon2D* poly);
 void TransformVertexArray( std::vector<Vertex_PCU>& vertices , float scale , float rotationDegrees , const Vec2& translation );

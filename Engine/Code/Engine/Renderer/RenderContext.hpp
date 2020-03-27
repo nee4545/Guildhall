@@ -27,6 +27,20 @@ struct ID3D11BlendState;
 struct ID3D11DepthStencilState;
 class Sampler;
 struct IDXGIDebug;
+enum D3D11_FILL_MODE: int;
+enum D3D11_CULL_MODE: int;
+
+enum eCompareOp            // A04
+{
+	COMPARE_NEVER ,       // false,      "never"
+	COMPARE_ALWAYS ,      // true,       "always"
+	COMPARE_EQUAL ,       // ==,         "equal"
+	COMPARE_NOTEQUAL ,    // !=,         "not"
+	COMPARE_LESS ,        // <           "less"
+	COMPARE_LEQUAL ,      // <=          "lequal"
+	COMPARE_GREATER ,     // >           "greater"
+	COMPARE_GEQUAL ,      // >=          "gequal"
+};
 
 enum class BlendMode
 {
@@ -94,7 +108,7 @@ public:
 	ID3D11BlendState* m_opaqueBlendState;
 	ID3D11DepthStencilState* m_depthStencilState;
 	bool m_isDrawing = false;
-	
+
 
 	
 public:
@@ -114,6 +128,7 @@ public:
 	void DrawAABB2D(const AABB2& aabb,const Rgba8& color );
 	void DrawXFlippedAABB2D( const AABB2& aabb , const Rgba8& color );
 	void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness );
+	void DrawArrow2D( Vec2& start , Vec2& end , Rgba8 lineColor , Rgba8 arrowColor , float lineThickness );
 	void DrawRing( const Vec2 centre, float radius, Rgba8 color, float thickness );
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
 	void DrawPolygonUnfilled(const Polygon2D& polygon, const Rgba8& color, float thickness );
@@ -125,13 +140,14 @@ public:
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
 	void BindDepthStencil( Texture* dsv );
-	void SetDepthTest();
+	void SetDepthTest(eCompareOp comparision = COMPARE_LESS,bool writePass = true);
 	void ClearDepth( Texture* dsTarget , float depth );
 
 	Shader* GetOrCreateShader( char const* filename );
 	void SetModalMatrix( Mat44 mat );
 
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
+	void CreateRasterState( Shader* shader , D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise = true );
 	
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);

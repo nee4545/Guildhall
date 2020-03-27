@@ -763,6 +763,16 @@ float CrossProduct2D( const Vec2& a , const Vec2& b )
 	return ( ( a.x * b.y ) - ( a.y * b.x ) );
 }
 
+Vec3 CrossProduct3D( Vec3& a , Vec3& b )
+{
+	Vec3 c;
+	c.x = ( a.y * b.z ) - ( a.z * b.y );
+	c.y = ( a.z * b.x ) - ( a.x * b.z );
+	c.z = ( a.x * b.y ) - ( a.y * b.x );
+
+	return c;
+}
+
 float DotProduct3D( const Vec3& a , const Vec3& b )
 {
 	return( ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z ) );

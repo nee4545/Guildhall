@@ -1,5 +1,6 @@
 #pragma once
 
+class IntVec2;
 
 //-----------------------------------------------------------------------------------------------
 struct Vec2
@@ -14,7 +15,8 @@ public:
 	~Vec2() {}												// destructor (do nothing)
 	Vec2() {}												// default constructor (do nothing)
 	Vec2( const Vec2& copyFrom );							// copy constructor (from another vec2)
-	explicit Vec2( float initialX, float initialY );		// explicit constructor (from x, y)
+	explicit Vec2( float initialX, float initialY );	// explicit constructor (from x, y)
+	explicit Vec2( const IntVec2& copyFrom );
 
 	//static methods
 	static const Vec2 MakeFromPolarRadians(float directionRadians, float length = 1.f);

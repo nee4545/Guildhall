@@ -18,10 +18,28 @@ void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottomLeft,0.f),Vec3(topRight,1.f));
 }
 
+void Camera::SetOrthoGraphicProjection( float height , float nearZ /*= -1.f */ , float farZ /*= 1.f */ )
+{
+	m_outpitsize.x = height * GetAspectRatio();
+	m_outpitsize.y = height;
+
+	m_projection = Mat44::CreateOrthographicProjection( Vec3( 0.f , 0.f, nearZ ) , Vec3( m_outpitsize  , farZ ) );
+}
+
 void Camera::SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip )
 {
 	m_projection = Mat44::CreatePerspectiveProjection( fovDegrees , aspect , nearZClip , farZClip );
 	
+}
+
+Mat44 Camera::GetProjection()
+{
+	return m_projection;
+}
+
+void Camera::SetProjection( Mat44 newProjection )
+{
+	m_projection = newProjection;
 }
 
 Vec2 Camera::GetOrthoBottomLeft()
@@ -68,8 +86,8 @@ void Camera::SetPosition( Vec2 position )
 
 void Camera::SetOrthoViewForCameraPosition()
 {
-	bottom_Left =  -m_outpitsize / 2.f;
-	top_Right =  m_outpitsize / 2.f;
+	bottom_Left =  -m_outpitsize * 0.5f;
+	top_Right =  m_outpitsize * 0.5f;
 	m_projection = Mat44::CreateOrthographicProjection( Vec3( bottom_Left , 0.f ) , Vec3( top_Right , 1.f ) );
 }
 
@@ -209,7 +227,10 @@ Camera::~Camera()
 	//delete m_texture;
 	m_texture = nullptr;
 
-	delete m_backBuffer;
-	m_backBuffer = nullptr;
+	if ( m_backBuffer != nullptr )
+	{
+		delete m_backBuffer;
+		m_backBuffer = nullptr;
+	}
 }
 

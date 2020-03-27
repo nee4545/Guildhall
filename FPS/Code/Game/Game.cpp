@@ -10,6 +10,7 @@
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/AABB3.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -48,7 +49,7 @@ Game::Game()
 
 	m_camera->SetProjectionPerspective( 60.f ,16.f/9.f, -0.1f , -100.f );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
-	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 127 , 127, 127 , 255 ) , 0.f , 0 );
+	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0, 0 , 255 ) , 0.f , 0 );
 	m_camera->SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , 0 );
 
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
@@ -57,6 +58,8 @@ Game::Game()
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
 	g_theEventSystem.SubscribeToEvent( "close" , Close);
+
+	DebugRenderSystem::sDebugRenderer->TakeWorldCamera( m_camera );
 
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
@@ -147,6 +150,9 @@ Game::Game()
 
 	g_theInput->ClipSystemCursor();
 	g_theInput->SetCursorMode( MODE_RELATIVE );
+	
+	DebugAddScreenPoint( Vec2( 10.f , 10.f ) , Rgba8( 0 , 100 , 0 , 255 ) );
+	DebugAddScreenPoint( Vec2( 20.f , 20.f ) , 20.f , Rgba8( 0 , 0 , 100 , 255 ) , 3.f );
 }
 
 Game::~Game()
@@ -160,6 +166,22 @@ Game::~Game()
 void Game::Update( float deltaseconds )
 {
 	ToggleDevConsole();
+
+	if ( g_theInput->WasKeyJustPressed( 'B' ) )
+	{
+		DebugAddWorldPoint( m_camera->m_transform , 1.f , Rgba8( 255 , 255 , 255 , 255 ) , 50.f, DEBUG_RENDER_XRAY );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'N' ) )
+	{
+		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 0 , 0 , 255 , 255 ) , 2.f , 4.f );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'M' ) )
+	{
+		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 3.f , 2.f );
+	}
+
 	if ( g_theConsole.IsOpen() )
 	{
 		return;
@@ -235,8 +257,6 @@ void Game::Update( float deltaseconds )
 
 void Game::Render()
 {
-	
-
 	g_theRenderer->BeginCamera(*m_camera);
 	m_camera->CreateDepthStencilTarget( g_theRenderer );
 	g_theRenderer->SetDepthTest();
@@ -244,29 +264,28 @@ void Game::Render()
 	
 	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
 
-	AABB3 temp2 = AABB3( Vec3( 1.f , -1.f , -1.f ) , Vec3( 1.f , 1.f , -2.f ) );
-	std::vector<Vertex_PCU> aabb3Verts;
-	AppendAABB3( aabb3Verts , temp2 , Rgba8( 255 , 255 , 255 , 255 ));
-
-	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( tex );
-	g_theRenderer->DrawVertexArray( aabb3Verts );
-	g_theRenderer->BindTexture( nullptr );
-
 	Transform quadTransform;
 	quadTransform.m_position.z = -10.f;
-// 	g_theRenderer->BindShader( nullptr );
-// 	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
-// 	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
-// 
-// 	g_theRenderer->BindShader( nullptr );
-// 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
-// 	g_theRenderer->DrawMesh( mesh );
+ 	g_theRenderer->BindShader( nullptr );
+ 	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
+ 	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
+
+	/*std::vector<Vertex_PCU> cylinder;
+	AppendCyinder( cylinder , Vec3( 0.f , 0.f , 0.f ) , Vec3( 10.f , 5.f , 4.f ) , 4.f , 4.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) );*/
+
+	/*g_theRenderer->BindShader( nullptr );
+	g_theRenderer->DrawVertexArray( cylinder );*/
+
+	std::vector<Vertex_PCU> arrowVerts;
+	AppendArrow( arrowVerts , Vec3( 0.f , 0.f , 0.f ) , Vec3( 10.f , 5.f , 0.f ) , 4.f , 4.f , 6.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->DrawVertexArray( arrowVerts );
+ 
+ 	g_theRenderer->BindShader( nullptr );
+ 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
+ 	g_theRenderer->DrawMesh( mesh );
 
 	g_theRenderer->BindShader( nullptr );
-	//g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
-
-
 	float deltaPhi = 360.f / 10.f;
 	Transform ring;
 
@@ -281,7 +300,6 @@ void Game::Render()
 		g_theRenderer->DrawMesh( sphere );
 	}
 
-	
 	g_theRenderer->EndCamera(*m_camera);
 
 	if ( g_theConsole.IsOpen() )
@@ -289,9 +307,9 @@ void Game::Render()
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
 
+	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
+	//DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
 }
-
-
 
 void Game::UpdateCamera()
 {

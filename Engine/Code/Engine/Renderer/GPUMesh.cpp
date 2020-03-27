@@ -34,15 +34,9 @@ int GPUMesh::GetIndexCount() const
 
 GPUMesh::~GPUMesh()
 {
-	if ( m_vertices != nullptr )
-	{
 		delete m_vertices;
 		m_vertices = nullptr;
-	}
 
-	if ( m_indices != nullptr )
-	{
 		delete m_indices;
 		m_indices = nullptr;
-	}
 }

@@ -4,6 +4,7 @@
 #include "Engine/Core/AABB3.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/Polygon2D.hpp"
+#include "Engine/Math/Mat44.hpp"
 
 Vertex_PCU::Vertex_PCU( const Vec3& position, const Rgba8& tint, const Vec2& uvTexCoords )
 {
@@ -117,6 +118,176 @@ m_uvTexCoords=uvTexCoords;
 	 {
 		 verts.push_back( vertices[ i ] );
 	 }
+ }
+
+ void AppendCyinder( std::vector<Vertex_PCU>& cylinderVerts , Vec3 start , Vec3 end , float startRadius , float endRadius , Rgba8 startColor , Rgba8 endColor )
+ {
+	 Mat44 transformation = Mat44::LookAt( start , end );
+	 Vec3 ibasis = transformation.GetIBasis3D();
+	 Vec3 jbasis = transformation.GetJBasis3D();
+	 const Vec3& i = ibasis;
+	 const Vec3& j = jbasis;
+	 const Vec3& s = start;
+	 const Vec3& e = end;
+
+	 //Start Disc
+
+	 const int  numDiscVerts = 120;
+	 Vertex_PCU startDiscVerts[ numDiscVerts ];
+
+	 float angleDegrees = 0.f;
+	 Vec3 secondVertStartDisc = start + ( i * startRadius ); 
+	 startDiscVerts[ 0 ] = Vertex_PCU( start , startColor , Vec2( 0.f , 0.f ) );
+	 startDiscVerts[ 1 ] = Vertex_PCU( ( secondVertStartDisc ) , startColor , Vec2( 1.f , 0.f ) );
+	 angleDegrees = ( 360.f * 3.f ) / (float)( numDiscVerts );
+
+	 float costheta = CosDegrees( angleDegrees );
+	 Vec3 iComponent = i * costheta * startRadius;
+	 float sintheta = SinDegrees( angleDegrees );
+	 Vec3 jComponent = j * sintheta * startRadius;
+	 startDiscVerts[ 2 ] = Vertex_PCU( ( s + iComponent + jComponent ) , startColor , Vec2(0.f,0.f) );
+	
+	 int discVertIndex = 3;
+	 for ( discVertIndex = 3; discVertIndex < numDiscVerts; discVertIndex += 3 )
+	 {
+		 angleDegrees = angleDegrees + ( ( 360.f * 3.f ) / ( numDiscVerts ) );
+		 startDiscVerts[ discVertIndex ] = startDiscVerts[ discVertIndex - 3 ];
+		 startDiscVerts[ discVertIndex + 1 ] = startDiscVerts[ discVertIndex - 1 ];
+		 costheta = CosDegrees( angleDegrees );
+		 sintheta = SinDegrees( angleDegrees );
+		 iComponent = i * costheta * startRadius;
+		 jComponent = j * sintheta * startRadius;
+		 startDiscVerts[ discVertIndex + 2 ].m_position = s + iComponent + jComponent;
+		 startDiscVerts[ discVertIndex + 2 ].m_color = startColor;
+		 startDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2(0.f,0.f);
+	 }
+	 startDiscVerts[ numDiscVerts - 1 ] = startDiscVerts[ 1 ];
+	 for ( int index = 0; index < numDiscVerts; index++ )
+	 {
+		 cylinderVerts.push_back( startDiscVerts[ index ] );
+	 }
+		
+	 //End Disc
+	 Vertex_PCU endDiscVerts[ numDiscVerts ];
+	 Vec3 secondVertEndDisc = end + ( i * endRadius ); 
+	 angleDegrees = ( 360.f * 3.f ) /  (float)( numDiscVerts );
+	 costheta = CosDegrees( angleDegrees );
+	 iComponent = i * costheta * endRadius;
+	 sintheta = SinDegrees( angleDegrees );
+	 jComponent = j * sintheta * endRadius;
+	 endDiscVerts[ 0 ] = Vertex_PCU( end , endColor , Vec2( 0.f , 0.f ) );
+	 endDiscVerts[ 1 ] = Vertex_PCU( ( secondVertEndDisc ) , endColor , Vec2( 1.f , 0.f ) );
+	 endDiscVerts[ 2 ] = Vertex_PCU( ( end + iComponent + jComponent ) , endColor , Vec2(0.f,0.f) );
+	
+	 discVertIndex = 3;
+	 for ( discVertIndex = 3; discVertIndex < numDiscVerts; discVertIndex += 3 )
+	 {
+		 angleDegrees = angleDegrees + ( ( 360.f * 3.f ) / ( numDiscVerts ) );
+		 endDiscVerts[ discVertIndex ] = endDiscVerts[ discVertIndex - 3 ];
+		 endDiscVerts[ discVertIndex + 1 ] = endDiscVerts[ discVertIndex - 1 ];
+		 costheta = CosDegrees( angleDegrees );
+		 sintheta = SinDegrees( angleDegrees );
+		 iComponent = i * costheta * endRadius;
+		 jComponent = j * sintheta * endRadius;
+		 endDiscVerts[ discVertIndex + 2 ].m_position = e + iComponent + jComponent;
+		 endDiscVerts[ discVertIndex + 2 ].m_color = endColor;
+		 endDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2(0.f,0.f);
+	 }
+	 endDiscVerts[ numDiscVerts - 1 ] = endDiscVerts[ 1 ];
+
+	 for ( int index = 0; index < numDiscVerts; index++ )
+	 {
+		 cylinderVerts.push_back( endDiscVerts[ index ] );
+	 }
+	 
+	// Box
+
+	 std::vector<Vertex_PCU> boxVerts;
+	 for ( int index = 1; index < numDiscVerts-1; index ++ )
+	 {
+		 boxVerts.push_back( startDiscVerts[ index ] );
+		 boxVerts.push_back( startDiscVerts[ index + 1 ] );
+		 boxVerts.push_back( endDiscVerts[ index + 1 ] );
+
+		 boxVerts.push_back( endDiscVerts[ index + 1 ] );
+		 boxVerts.push_back( endDiscVerts[ index ] );
+		 boxVerts.push_back( startDiscVerts[ index ] );
+	 }
+
+	 for ( int index = 0; index < boxVerts.size(); index++ )
+	 {
+		 cylinderVerts.push_back( boxVerts[ index ] );
+	 }
+ }
+
+ void AppendArrow( std::vector<Vertex_PCU>& arrowVerts , Vec3 start , Vec3 end ,float coneHeight, float lineRadius , float arrowRadius , Rgba8 lineColor , Rgba8 arrowColor )
+ {
+	 AppendCyinder( arrowVerts , start , end , lineRadius , lineRadius , lineColor , lineColor );
+
+	 Mat44 transformation = Mat44::LookAt( start , end );
+	 Vec3 ibasis = transformation.GetIBasis3D();
+	 Vec3 jbasis = transformation.GetJBasis3D();
+	 const Vec3& i = ibasis;
+	 const Vec3& j = jbasis;
+	 const Vec3& e = end;
+
+	 const int  numDiscVerts = 120;
+	 Vertex_PCU startDiscVerts[ numDiscVerts ];
+
+	 float angleDegrees = 0.f;
+	 Vec3 secondVertStartDisc = end + ( i * arrowRadius );
+	 startDiscVerts[ 0 ] = Vertex_PCU( end , arrowColor , Vec2( 0.f , 0.f ) );
+	 startDiscVerts[ 1 ] = Vertex_PCU( ( secondVertStartDisc ) , arrowColor , Vec2( 1.f , 0.f ) );
+	 angleDegrees = ( 360.f * 3.f ) / ( float ) ( numDiscVerts );
+
+	 float costheta = CosDegrees( angleDegrees );
+	 Vec3 iComponent = i * costheta * arrowRadius;
+	 float sintheta = SinDegrees( angleDegrees );
+	 Vec3 jComponent = j * sintheta * arrowRadius;
+	 startDiscVerts[ 2 ] = Vertex_PCU( ( e + iComponent + jComponent ) , arrowColor , Vec2( 0.f , 0.f ) );
+
+	 int discVertIndex = 3;
+	 for ( discVertIndex = 3; discVertIndex < numDiscVerts; discVertIndex += 3 )
+	 {
+		 angleDegrees = angleDegrees + ( ( 360.f * 3.f ) / ( numDiscVerts ) );
+		 startDiscVerts[ discVertIndex ] = startDiscVerts[ discVertIndex - 3 ];
+		 startDiscVerts[ discVertIndex + 1 ] = startDiscVerts[ discVertIndex - 1 ];
+		 costheta = CosDegrees( angleDegrees );
+		 sintheta = SinDegrees( angleDegrees );
+		 iComponent = i * costheta * arrowRadius;
+		 jComponent = j * sintheta * arrowRadius;
+		 startDiscVerts[ discVertIndex + 2 ].m_position = e + iComponent + jComponent;
+		 startDiscVerts[ discVertIndex + 2 ].m_color = arrowColor;
+		 startDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2( 0.f , 0.f );
+	 }
+	 startDiscVerts[ numDiscVerts - 1 ] = startDiscVerts[ 1 ];
+	 for ( int index = 0; index < numDiscVerts; index++ )
+	 {
+		 arrowVerts.push_back( startDiscVerts[ index ] );
+	 }
+
+	 Vec3 arrowDir = ( end - start ).GetNormalized();
+	 Vec3 arrowEnd = end + arrowDir * coneHeight;
+
+	 Vertex_PCU arrowEndVertex = Vertex_PCU( arrowEnd , arrowColor , Vec2( 0.f , 0.f ) );
+
+
+	 // Cone
+
+	 std::vector<Vertex_PCU> boxVerts;
+	 for ( int index = 1; index < numDiscVerts - 1; index++ )
+	 {
+		 boxVerts.push_back( startDiscVerts[ index ] );
+		 boxVerts.push_back( startDiscVerts[ index + 1 ] );
+		 boxVerts.push_back( arrowEndVertex );
+	 }
+
+	 for ( int index = 0; index < boxVerts.size(); index++ )
+	 {
+		 arrowVerts.push_back( boxVerts[ index ] );
+	 }
+
+
  }
 
  void AppendPolygon2( std::vector<Vertex_PCU>& verts , const Polygon2D* poly )

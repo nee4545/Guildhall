@@ -8,6 +8,8 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Core/Clock.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
@@ -30,6 +32,10 @@ void App:: Startup()
 		thegame = new Game();
 	}
 	g_theConsole.Startup();
+
+	Clock::SystemStartup();
+
+	DebugRenderSystem::sDebugRenderer->SystemStartUp();
 }
 
 App::~App()
@@ -40,12 +46,13 @@ App::~App()
 
 void App::Shutdown() //Not used right now
 {
-
+	
 	delete thegame;
 	thegame = nullptr; 
-
+	
 	g_theRenderer->Shutdown();
 
+	DebugRenderSystem::sDebugRenderer->SystemShutDown();
 }
 
 
@@ -54,6 +61,7 @@ void App::Update(float deltaSeconds)
 {
 
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
+	DebugRenderSystem::sDebugRenderer->Update();
 
 	if( g_theInput->IsKeyPressed( 'Y' ) )
 	{
@@ -122,6 +130,7 @@ void App::EndFrame() //Not used right now
 	g_theInput->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theConsole.EndFrame();
+	
 }
 
 void App::Render() const
@@ -129,6 +138,7 @@ void App::Render() const
 
 	/*render->ClaerScreen(Rgba8(0,0,0,1));*/
 	thegame->Render();
+	//DebugRenderSystem::sDebugRenderer->Render();
 }
 
 void App::BeginFrame()
@@ -136,6 +146,7 @@ void App::BeginFrame()
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
+	Clock::BeginFrame();
 	
 }
 
