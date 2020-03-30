@@ -55,7 +55,7 @@ void RenderContext::DrawVertexArray(  int numVertexes , VertexBuffer* vertices )
 void RenderContext::DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->RSSetState( m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
 
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
@@ -408,7 +408,7 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 }
 
 
-void RenderContext::CreateRasterState( Shader* shader , D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise /*= true */ )
+void RenderContext::CreateRasterState( D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise /*= true */ )
 {
 	D3D11_RASTERIZER_DESC desc;
 
@@ -424,7 +424,7 @@ void RenderContext::CreateRasterState( Shader* shader , D3D11_FILL_MODE fillmode
 	desc.AntialiasedLineEnable = FALSE;
 
 	ID3D11Device* device = m_device;
-	device->CreateRasterizerState( &desc , &(shader->m_rasterState) );
+	device->CreateRasterizerState( &desc , &m_rasterState );
 }
 
 void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness )
@@ -578,7 +578,7 @@ void RenderContext::Startup( Window* window )
 	m_swapChain = new SwapChain( this , swapchain );
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
-	CreateRasterState( m_defaultShader , D3D11_FILL_SOLID , D3D11_CULL_NONE );
+	CreateRasterState( D3D11_FILL_SOLID , D3D11_CULL_NONE );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
@@ -641,6 +641,7 @@ void RenderContext::Shutdown()
 	m_swapChain = nullptr;
 
 	DX_SAFE_RELEASE( m_depthStencilState );
+	DX_SAFE_RELEASE( m_rasterState );
 
 	DX_SAFE_RELEASE( m_alphaBlendState );
 	DX_SAFE_RELEASE( m_additiveBlendState );
@@ -673,7 +674,7 @@ void RenderContext::EndFrame()
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->RSSetState( m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
 
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );

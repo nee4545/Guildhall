@@ -18,9 +18,9 @@ void Transform::SetRotationFromPitchRollYawDegrees( float pitch , float yaw , fl
 	m_rotationPitchRollYawDegrees.y = yaw;
 	m_rotationPitchRollYawDegrees.z = roll;
 
-	m_rotationPitchRollYawDegrees.x = Clamp( m_rotationPitchRollYawDegrees.x , -90.f , 90.f );
+	/*m_rotationPitchRollYawDegrees.x = Clamp( m_rotationPitchRollYawDegrees.x , -90.f , 90.f );
 	m_rotationPitchRollYawDegrees.y = Clamp( m_rotationPitchRollYawDegrees.y , -180.f , 180.f );
-	m_rotationPitchRollYawDegrees.z = Clamp( m_rotationPitchRollYawDegrees.z , -180.f , 180.f );
+	m_rotationPitchRollYawDegrees.z = Clamp( m_rotationPitchRollYawDegrees.z , -180.f , 180.f );*/
 }
 
 void Transform::Translate( Vec3 translation )

@@ -25,6 +25,7 @@ class RenderBuffer;
 struct Mat44;
 struct ID3D11BlendState;
 struct ID3D11DepthStencilState;
+struct ID3D11RasterizerState;
 class Sampler;
 struct IDXGIDebug;
 enum D3D11_FILL_MODE: int;
@@ -107,6 +108,7 @@ public:
 	ID3D11BlendState* m_additiveBlendState;
 	ID3D11BlendState* m_opaqueBlendState;
 	ID3D11DepthStencilState* m_depthStencilState;
+	ID3D11RasterizerState* m_rasterState = nullptr;
 	bool m_isDrawing = false;
 
 
@@ -147,7 +149,7 @@ public:
 	void SetModalMatrix( Mat44 mat );
 
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
-	void CreateRasterState( Shader* shader , D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise = true );
+	void CreateRasterState( D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise = true );
 	
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);

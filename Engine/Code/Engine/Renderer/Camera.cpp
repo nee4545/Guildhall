@@ -15,8 +15,8 @@ void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 	this->top_Right.x = topRight.x;
 	this->top_Right.y = topRight.y;*/
 
-	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottomLeft,0.f),Vec3(topRight,1.f));
-}
+	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottomLeft,-100.f),Vec3(topRight,100.f));
+}	
 
 void Camera::SetOrthoGraphicProjection( float height , float nearZ /*= -1.f */ , float farZ /*= 1.f */ )
 {

@@ -430,9 +430,6 @@
     <ClCompile Include="Vec4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Poly2D.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Platform\Window.cpp">
       <Filter>Platform</Filter>
     </ClCompile>

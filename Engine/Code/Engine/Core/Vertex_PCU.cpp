@@ -138,7 +138,7 @@ m_uvTexCoords=uvTexCoords;
 	 float angleDegrees = 0.f;
 	 Vec3 secondVertStartDisc = start + ( i * startRadius ); 
 	 startDiscVerts[ 0 ] = Vertex_PCU( start , startColor , Vec2( 0.f , 0.f ) );
-	 startDiscVerts[ 1 ] = Vertex_PCU( ( secondVertStartDisc ) , startColor , Vec2( 1.f , 0.f ) );
+	 startDiscVerts[ 1 ] = Vertex_PCU( ( secondVertStartDisc ) , startColor , Vec2( 0.f , 0.f ) );
 	 angleDegrees = ( 360.f * 3.f ) / (float)( numDiscVerts );
 
 	 float costheta = CosDegrees( angleDegrees );
@@ -203,14 +203,17 @@ m_uvTexCoords=uvTexCoords;
 	// Box
 
 	 std::vector<Vertex_PCU> boxVerts;
-	 for ( int index = 1; index < numDiscVerts-1; index ++ )
+
+
+
+	 for ( int index = 1; index < numDiscVerts; index +=3 )
 	 {
 		 boxVerts.push_back( startDiscVerts[ index ] );
 		 boxVerts.push_back( startDiscVerts[ index + 1 ] );
 		 boxVerts.push_back( endDiscVerts[ index + 1 ] );
 
-		 boxVerts.push_back( endDiscVerts[ index + 1 ] );
-		 boxVerts.push_back( endDiscVerts[ index ] );
+		 boxVerts.push_back( endDiscVerts[ index+1] );
+		 boxVerts.push_back( endDiscVerts[ index] );
 		 boxVerts.push_back( startDiscVerts[ index ] );
 	 }
 
@@ -222,7 +225,7 @@ m_uvTexCoords=uvTexCoords;
 
  void AppendArrow( std::vector<Vertex_PCU>& arrowVerts , Vec3 start , Vec3 end ,float coneHeight, float lineRadius , float arrowRadius , Rgba8 lineColor , Rgba8 arrowColor )
  {
-	 AppendCyinder( arrowVerts , start , end , lineRadius , lineRadius , lineColor , lineColor );
+	 AppendCyinder( arrowVerts , start , end , lineRadius , lineRadius , lineColor , arrowColor );
 
 	 Mat44 transformation = Mat44::LookAt( start , end );
 	 Vec3 ibasis = transformation.GetIBasis3D();

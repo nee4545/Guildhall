@@ -4,6 +4,7 @@
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 extern RenderContext* g_theRenderer;
 DebugRenderSystem* DebugRenderSystem::sDebugRenderer = new DebugRenderSystem();
@@ -42,13 +43,46 @@ DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Transf
 	m_transform.m_scale *= size;
 }
 
+DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_POINT , mode , space , duration , isBillboard )
+{
+	m_startColor = startColor;
+	m_endColor = endColor;
+
+	m_needsColorLerp = true;
+	m_position = pos;
+	m_size = size;
+	
+	m_transform.m_position = pos;
+	m_transform.m_scale *= size;
+
+
+}
+
 DebugLine::DebugLine( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 start , Vec3 end ,Rgba8 color, float lineThickness , float duration , bool isBillboard /*= false */ ) :
 	DebugRenderObject( OBJECT_LINE , mode , space , duration , isBillboard )
 {
 	m_startPos = start;
 	m_endPos = end;
 	m_color = color;
+	m_startColor = color;
+	m_endColor = color;
 	m_lineThickness = lineThickness;
+}
+
+DebugLine::DebugLine( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 start , Vec3 end , Rgba8 p0StartColor , Rgba8 P0endColor , Rgba8 p1StartColor , Rgba8 p1EndColor , float lineThickness , float duration , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_LINE , mode , space , duration , isBillboard )
+{
+	m_startPos = start;
+	m_endPos = end;
+	m_lineThickness = lineThickness;
+
+	m_p0StartColor = p0StartColor;
+	m_p0EndColor = P0endColor;
+	m_p1StartColor = p1StartColor;
+	m_p1EndColor = p1EndColor;
+
+	m_needsColorLerp = true;
 }
 
 DebugArrow::DebugArrow( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 start , Vec3 end ,Rgba8 color, float lineThickness , float tipHeight , float duration/*=-1.f */ , bool isBillboard /*= false */ ):
@@ -59,6 +93,26 @@ DebugArrow::DebugArrow( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 s
 	m_color = color;
 	m_lineThickness = lineThickness;
 	m_tipHeight = tipHeight;
+
+	m_startColor = color;
+	m_endColor = color;
+}
+
+DebugArrow::DebugArrow( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 start , Vec3 end , Rgba8 p0StartColor , Rgba8 p0EndColor , Rgba8 p1StartColor , Rgba8 p1EndColor , float lineThickness , float tipHeight , float duration /*= -1.f */ , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_ARROW , mode , space , duration , isBillboard )
+{
+	m_startPos = start;
+	m_endPos = end;
+
+	m_lineThickness = lineThickness;
+	m_tipHeight = tipHeight;
+
+	m_p0StartColor = p0StartColor;
+	m_p0EndColor = p0EndColor;
+	m_p1StartColor = p1StartColor;
+	m_p1EndColor = p1EndColor;
+
+	m_needsColorLerp = true;
 }
 
 DebugQuad::DebugQuad( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 color , float duration /*= -1.f */ , bool isBillboard /*= false */ ):
@@ -72,13 +126,110 @@ DebugQuad::DebugQuad( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p0 
 	m_color = color;
 }
 
+DebugQuad::DebugQuad( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 color , Texture* tex, AABB2 uvs , float duration /*= -1.f */ , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_QUAD , mode , space , duration , isBillboard )
+{
+	m_p0 = p0;
+	m_p1 = p1;
+	m_p2 = p2;
+	m_p3 = p3;
+
+	m_color = color;
+	m_texture = tex;
+	m_uvs = uvs;
+
+}
+
+DebugQuad::DebugQuad( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 startColor , Rgba8 endColor , float duration /*= -1.f */ , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_QUAD , mode , space , duration , isBillboard )
+{
+	m_p0 = p0;
+	m_p1 = p1;
+	m_p2 = p2;
+	m_p3 = p3;
+
+	m_startColor = startColor;
+	m_endColor = endColor;
+	m_needsColorLerp = true;
+}
+
 void DebugRenderObject::Update()
 {
-	//m_timer->CheckAndDecrement();
 
 	if ( m_timer->m_durationSeconds < 0.f )
 	{
 		return;
+	}
+
+
+	float elapsedTime = ( float ) m_timer->GetElapsedSeconds();
+	unsigned char r = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) m_startColor.r , ( float ) m_endColor.r ,
+		( elapsedTime ) );
+	unsigned char g = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) m_startColor.g , ( float ) m_endColor.g ,
+		( elapsedTime ) );
+	unsigned char b = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) m_startColor.b , ( float ) m_endColor.b ,
+		( elapsedTime ) );
+	unsigned char a = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) m_startColor.a , ( float ) m_endColor.a ,
+		( elapsedTime ) );
+
+	
+
+	if ( m_needsColorLerp )
+	{
+		if ( m_objectType == OBJECT_LINE )
+		{
+			DebugLine* temp = ( DebugLine* ) this;
+
+			unsigned char lineStartR = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.r , ( float ) temp->m_p0EndColor.r ,
+				( elapsedTime ) );
+			unsigned char lineStartG = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.g , ( float ) temp->m_p0EndColor.g ,
+				( elapsedTime ) );
+			unsigned char lineStartB = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.b , ( float ) temp->m_p0EndColor.b ,
+				( elapsedTime ) );
+			unsigned char lineStartA = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.a , ( float ) temp->m_p0EndColor.a ,
+				( elapsedTime ) );
+
+			unsigned char lineEndR = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.r , ( float ) temp->m_p1EndColor.r ,
+				( elapsedTime ) );
+			unsigned char lineEndG = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.g , ( float ) temp->m_p1EndColor.g ,
+				( elapsedTime ) );
+			unsigned char lineEndB = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.b , ( float ) temp->m_p1EndColor.b ,
+				( elapsedTime ) );
+			unsigned char lineEndA = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.a , ( float ) temp->m_p1EndColor.a ,
+				( elapsedTime ) );
+
+			m_startColor = Rgba8( lineStartR , lineStartG , lineStartB , lineStartA );
+			m_endColor = Rgba8( lineEndR , lineEndG , lineEndB , lineEndA );
+
+		}
+
+		if ( m_objectType == OBJECT_ARROW )
+		{
+			DebugArrow* temp = ( DebugArrow* ) this;
+
+			unsigned char lineStartR = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.r , ( float ) temp->m_p0EndColor.r ,
+				( elapsedTime ) );
+			unsigned char lineStartG = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.g , ( float ) temp->m_p0EndColor.g ,
+				( elapsedTime ) );
+			unsigned char lineStartB = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.b , ( float ) temp->m_p0EndColor.b ,
+				( elapsedTime ) );
+			unsigned char lineStartA = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p0StartColor.a , ( float ) temp->m_p0EndColor.a ,
+				( elapsedTime ) );
+
+			unsigned char lineEndR = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.r , ( float ) temp->m_p1EndColor.r ,
+				( elapsedTime ) );
+			unsigned char lineEndG = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.g , ( float ) temp->m_p1EndColor.g ,
+				( elapsedTime ) );
+			unsigned char lineEndB = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.b , ( float ) temp->m_p1EndColor.b ,
+				( elapsedTime ) );
+			unsigned char lineEndA = ( unsigned char ) RangeMapFloat( 0.f , ( float ) m_timer->m_durationSeconds , ( float ) temp->m_p1StartColor.a , ( float ) temp->m_p1EndColor.a ,
+				( elapsedTime ) );
+
+			m_startColor = Rgba8( lineStartR , lineStartG , lineStartB , lineStartA );
+			m_endColor = Rgba8( lineEndR , lineEndG , lineEndB , lineEndA );
+		}
+
+		m_color = Rgba8( r , g , b , a );
 	}
 
 	if ( m_timer->HasElapsed() )
@@ -302,12 +453,13 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						m_camera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
 
 						m_context->BeginCamera( *m_camera );
+						m_context->SetBlendMode( BlendMode::OPAQE );
 						m_context->BindShader( nullptr );
-						
 						std::vector<Vertex_PCU> lineVerts;
-						AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_color , pt->m_color );
+						AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
 
 						m_context->DrawVertexArray( lineVerts );
+						m_context->SetBlendMode( BlendMode::ALPHA );
 						m_context->EndCamera( *m_camera );
 
 						break;
@@ -323,11 +475,12 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						m_context->BindDepthStencil( m_camera->m_backBuffer );
 
 						m_context->BindShader( nullptr );
-
+						m_context->SetBlendMode( BlendMode::OPAQE );
 						std::vector<Vertex_PCU> lineVerts;
-						AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_color , pt->m_color );
+						AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
 
 						m_context->DrawVertexArray( lineVerts );
+						m_context->SetBlendMode( BlendMode::ALPHA );
 						m_context->EndCamera( *m_camera );
 
 						break;
@@ -345,7 +498,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						m_context->BindShader( nullptr );
 
 						std::vector<Vertex_PCU> lineVerts;
-						AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_color , pt->m_color );
+						AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
 
 						m_context->DrawVertexArray( lineVerts );
 						m_context->EndCamera( *m_camera );
@@ -379,7 +532,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						m_context->BindShader( nullptr );
 
 						std::vector<Vertex_PCU> arrowVerts;
-						AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_color , pt->m_color );
+						AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
 
 						m_context->DrawVertexArray( arrowVerts );
 						m_context->EndCamera( *m_camera );
@@ -399,7 +552,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						m_context->BindShader( nullptr );
 
 						std::vector<Vertex_PCU> arrowVerts;
-						AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_color , pt->m_color );
+						AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
 
 						m_context->DrawVertexArray( arrowVerts );
 						m_context->EndCamera( *m_camera );
@@ -419,7 +572,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						m_context->BindShader( nullptr );
 
 						std::vector<Vertex_PCU> arrowVerts;
-						AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_color , pt->m_color );
+						AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
 
 						m_context->DrawVertexArray( arrowVerts );
 						m_context->EndCamera( *m_camera );
@@ -439,6 +592,8 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 					default:
 						break;
 				}
+
+				break;
 			}
 
 			case OBJECT_QUAD:
@@ -457,10 +612,11 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						std::vector<Vertex_PCU> quadVerts;
 						quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , pt->m_uvs.mins ) );
 						quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2(pt->m_uvs.maxs.x,pt->m_uvs.mins.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , pt->m_uvs.maxs ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+
 
 						m_context->BindTexture( pt->m_texture );
 						m_context->DrawVertexArray( quadVerts );
@@ -484,10 +640,10 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						std::vector<Vertex_PCU> quadVerts;
 						quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , pt->m_uvs.mins ) );
 						quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , pt->m_uvs.maxs ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
 
 						m_context->BindTexture( pt->m_texture );
 						m_context->DrawVertexArray( quadVerts );
@@ -511,10 +667,10 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 						std::vector<Vertex_PCU> quadVerts;
 						quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , pt->m_uvs.mins ) );
 						quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , pt->m_uvs.maxs ) );
-						quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.maxs.y ) ) );
+						quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
 
 						m_context->BindTexture( pt->m_texture );
 						m_context->DrawVertexArray( quadVerts );
@@ -536,6 +692,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 					}
 				}
 
+				break;
 			}
 
 			default:
@@ -564,9 +721,9 @@ void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 		camera.SetOrthoView( min , max );
 	}
 
-	camera.SetClearMode(0|CLEAR_DEPTH_BIT|CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+	camera.SetClearMode(0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
 
-	m_context->BeginCamera( camera );
+	
 
 	for ( int index = 0; index < m_screenObjects.size(); index++ )
 	{
@@ -581,14 +738,72 @@ void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 		{
 			DebugPoint* pt = ( DebugPoint* ) m_screenObjects[ index ];
 
+			m_context->BeginCamera( camera );
 			m_context->BindShader( nullptr );
 			m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+
+			/*std::vector<Vertex_PCU> sphereVerts;
+			std::vector<unsigned int> sphereIndices;
+			Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+			AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 1.f , 64 , 32 , pt->m_color );
+			point->UpdateVertices( ( unsigned int ) sphereVerts.size() , &sphereVerts[ 0 ] );
+			point->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
+
+			m_context->DrawMesh( point );*/
 			m_context->DrawDisc( Vec2( 0.f , 0.f ) , 1.f , pt->m_color );
 			break;
 		}
+
+		case  OBJECT_LINE:
+		{
+			DebugLine* pt = ( DebugLine* ) m_screenObjects[ index ];
+
+			m_context->BeginCamera( camera );
+			m_context->BindShader( nullptr );
+			std::vector<Vertex_PCU> lineVerts;
+			AppendCyinder( lineVerts , pt->m_startPos , pt->m_endPos , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
+			m_context->DrawVertexArray( lineVerts );
+			break;
+
+		}
+
+		case OBJECT_ARROW:
+		{
+			DebugArrow* pt = ( DebugArrow* ) m_screenObjects[ index ];
+
+			m_context->BeginCamera( camera );
+			m_context->BindShader( nullptr );
+			std::vector<Vertex_PCU> arrowVerts;
+			AppendArrow( arrowVerts , pt->m_startPos , pt->m_endPos , pt->m_tipHeight , pt->m_lineThickness , pt->m_lineThickness , pt->m_startColor , pt->m_endColor );
+			m_context->DrawVertexArray( arrowVerts );
+			break;
+		}
+
+		case  OBJECT_QUAD:
+		{
+			DebugQuad* pt = ( DebugQuad* ) m_screenObjects[ index ];
+
+			m_context->BeginCamera( camera );
+			m_context->BindShader( nullptr );
+
+			std::vector<Vertex_PCU> quadVerts;
+			quadVerts.push_back( Vertex_PCU( pt->m_p0 , pt->m_color , pt->m_uvs.mins ) );
+			quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
+			quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+			quadVerts.push_back( Vertex_PCU( pt->m_p1 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.mins.y ) ) );
+			quadVerts.push_back( Vertex_PCU( pt->m_p2 , pt->m_color , Vec2( pt->m_uvs.maxs.x , pt->m_uvs.maxs.y ) ) );
+			quadVerts.push_back( Vertex_PCU( pt->m_p3 , pt->m_color , Vec2( pt->m_uvs.mins.x , pt->m_uvs.maxs.y ) ) );
+
+			m_context->BindTexture( pt->m_texture );
+			m_context->DrawVertexArray( quadVerts );
+			m_context->BindTexture( nullptr );
+			break;
+		}
+
 		default:
 			break;
 		}
+
 	}
 
 	m_context->EndCamera( camera );
@@ -611,9 +826,22 @@ void DebugAddWorldPoint( Transform transform , float size , Rgba8 color , float 
 	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
 }
 
+void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
+{
+	DebugPoint* obj = new DebugPoint( mode , DEBUG_RENDER_WORLD , pos , size , startColor , endColor , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
 void DebugAddWorldLine( Vec3 start , Vec3 end , Rgba8 color , float lineThickness , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugLine* obj = new DebugLine( mode , DEBUG_RENDER_WORLD , start , end , color , lineThickness , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+
+void DebugAddWorldLine( Vec3 p0 , Vec3 p1 , Rgba8 p0_start_color , Rgba8 p0_end_color , Rgba8 p1_start_color , Rgba8 p1_end_color ,float lineThickness, float duration , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
+{
+	DebugLine* obj = new DebugLine( mode , DEBUG_RENDER_WORLD , p0 , p1 , p0_start_color , p0_end_color , p1_start_color , p1_end_color , lineThickness , duration );
 	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
 }
 
@@ -624,9 +852,27 @@ void DebugAddWorldArrow( Vec3 start , Vec3 end , Rgba8 color , float duration , 
 }
 
 
+void DebugAddWorldArrow( Vec3 p0 , Vec3 p1 , Rgba8 p0_start_color , Rgba8 p0_end_color , Rgba8 p1_start_color , Rgba8 p1_end_color , float duration , float thickness, eDebugRenderMode mode/*=DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugArrow* obj = new DebugArrow( mode , DEBUG_RENDER_WORLD , p0 , p1 , p0_start_color,p0_end_color,p1_start_color,p1_end_color , thickness , thickness , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
 void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 color , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugQuad* obj = new DebugQuad( mode , DEBUG_RENDER_WORLD , p0 , p1 , p2 , p3 , color , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 color , Texture* tex , float duration ,AABB2 uvs, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugQuad* obj = new DebugQuad( mode , DEBUG_RENDER_WORLD , p0 , p1 , p2 , p3 , color, tex, uvs , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugQuad* obj = new DebugQuad( mode , DEBUG_RENDER_WORLD , p0 , p1 , p2 , p3 , start_color, end_color , duration );
 	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
 }
 
@@ -642,6 +888,51 @@ void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 color , float duration /
 	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
 }
 
+void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 start_color , Rgba8 end_color , float duration )
+{
+	DebugPoint* obj = new DebugPoint( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3( pos , 0.f ) , size , start_color,end_color , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
 
+void DebugAddScreenLine( Vec2 p0 , Vec2 p1 , Rgba8 color ,float lineThickness, float duration /*= 0.0f */ )
+{
+	DebugLine* obj = new DebugLine( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3(p0,0.f) , Vec3(p1,0.f) , color , lineThickness , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
 
+void DebugAddScreenLine( Vec2 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color , Vec2 p1 , Rgba8 p1_start_color , Rgba8 p1_end_color , float lineThickness , float duration )
+{
+	DebugLine* obj = new DebugLine( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3(p0,0.f) , Vec3(p1,0.f) , p0_start_color , p0_end_color , p1_start_color , p1_end_color , lineThickness , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenArrow( Vec2 p0 , Vec2 p1 , Rgba8 color , float lineThickness ,float tipHeight, float duration /*= 0.0f */ )
+{
+	DebugArrow* obj = new DebugArrow( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3(p0,0.f) , Vec3(p1,0.f) , color , lineThickness , tipHeight , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenArrow( Vec2 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color , Vec2 p1 , Rgba8 p1_start_color , Rgba8 p1_end_color , float lineThickness , float tipHeight , float duration )
+{
+	DebugArrow* obj = new DebugArrow( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3(p0,0.f) , Vec3(p1,0.f) , p0_start_color , p0_end_color , p1_start_color , p1_end_color , lineThickness , tipHeight , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenQuad( AABB2 bounds , Rgba8 color , float duration /*= 0.0f */ )
+{
+	DebugQuad* obj = new DebugQuad( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3(bounds.mins,0.f) , Vec3(bounds.maxs.x,bounds.mins.y,0.f) , Vec3(bounds.maxs,0.f) , Vec3( bounds.mins.x , bounds.maxs.y,0.f ) , color , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenQuad( AABB2 bounds , Rgba8 start_color , Rgba8 end_color , float duration )
+{
+	DebugQuad* obj = new DebugQuad( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3( bounds.mins , 0.f ) , Vec3( bounds.maxs.x , bounds.mins.y , 0.f ) , Vec3( bounds.maxs , 0.f ) , Vec3( bounds.mins.x , bounds.maxs.y , 0.f ) , start_color , end_color , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 uvs , Rgba8 tint , float duration /*= 0.0f */ )
+{
+	DebugQuad* obj = new DebugQuad( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_WORLD , Vec3( bounds.mins , 0.f ) , Vec3( bounds.maxs.x , bounds.mins.y , 0.f ) , Vec3( bounds.maxs , 0.f ) , Vec3( bounds.mins.x , bounds.maxs.y , 0.f ) , tint , tex , uvs , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
 

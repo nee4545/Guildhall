@@ -150,9 +150,17 @@ Game::Game()
 
 	g_theInput->ClipSystemCursor();
 	g_theInput->SetCursorMode( MODE_RELATIVE );
+
+	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
 	
-	DebugAddScreenPoint( Vec2( 10.f , 10.f ) , Rgba8( 0 , 100 , 0 , 255 ) );
+	//DebugAddScreenPoint( Vec2( 10.f , 10.f ) , Rgba8( 0 , 100 , 0 , 255 ) );
 	DebugAddScreenPoint( Vec2( 20.f , 20.f ) , 20.f , Rgba8( 0 , 0 , 100 , 255 ) , 3.f );
+	//DebugAddScreenLine( Vec2( 10.f , 10.f ) , Vec2( 300.f , 300.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 5.f , -1.f );
+	//DebugAddScreenLine( Vec2( 10.f , 10.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 300.f , 300.f ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 0 , 100 , 255 ) , 5.f , 4.f );
+	//DebugAddScreenArrow( Vec2( 10.f , 10.f ) , Vec2( 300.f , 300.f ) , Rgba8( 0 , 0 , 100 , 255 ) , 5.f , 20.f , 4.f );
+	//DebugAddScreenArrow( Vec2( 10.f , 10.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 300.f , 300.f ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 0 , 100 , 255 ) , 20.f , 20.f , 5.f  );
+	//DebugAddScreenQuad( AABB2( Vec2( 20.f , 20.f ) , Vec2( 50.f , 50.f ) ) , Rgba8( 0 , 100 , 0 , 255 ),Rgba8(100,0,0,255) , 5.f );
+	DebugAddScreenTexturedQuad( AABB2( Vec2( 20.f , 20.f ) , Vec2( 200.f , 200.f ) ) , tex , AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ) , Rgba8( 255 , 255 , 255 , 100 ) , 6.f );
 }
 
 Game::~Game()
@@ -169,17 +177,29 @@ void Game::Update( float deltaseconds )
 
 	if ( g_theInput->WasKeyJustPressed( 'B' ) )
 	{
-		DebugAddWorldPoint( m_camera->m_transform , 1.f , Rgba8( 255 , 255 , 255 , 255 ) , 50.f, DEBUG_RENDER_XRAY );
+		//DebugAddWorldPoint( m_camera->m_transform , 1.f , Rgba8( 255 , 255 , 255 , 255 ) , 50.f, DEBUG_RENDER_XRAY );
+		DebugAddWorldPoint( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'N' ) )
 	{
-		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 0 , 0 , 255 , 255 ) , 2.f , 4.f );
+		//DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 0 , 0 , 255 , 255 ) , 2.f , 4.f );
+		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 0.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ),Rgba8(0,0,100,255) , 2.f , 5.f,DEBUG_RENDER_USE_DEPTH );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'M' ) )
 	{
-		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 3.f , 2.f );
+		//DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 3.f , 2.f );
+		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 3.f , 2.f );
+
+	}
+
+	
+
+	if ( g_theInput->WasKeyJustPressed( 'L' ) )
+	{
+		DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 4.f ) , Vec3( 3.f , 3.f , 0.f ) , Vec3( 0.f , 4.f , 0.f ) , Rgba8( 0 , 0 , 100 , 255 ),Rgba8(100,0,0,255) , 4.f );
+		//DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 0.f ) , Vec3( 2.f , 2.f , 0.f ) , Vec3( 0.f , 2.f , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ),tex, 4.f );
 	}
 
 	if ( g_theConsole.IsOpen() )
@@ -205,11 +225,6 @@ void Game::Update( float deltaseconds )
 	}
 	
 
-	m_cameraRotation.y += g_theInput->m_relativeMovement.x*0.1f;
-	m_cameraRotation.x += g_theInput->m_relativeMovement.y*0.1f;
-	m_cameraRotation.y = Clamp( m_cameraRotation.y , -90.f , 90.f );
-	m_cameraRotation.x = Clamp( m_cameraRotation.x , -85.f , 85.f );
-
 	cubeTransform.m_rotationPitchRollYawDegrees.x += deltaseconds*10.f;
 
 	if ( cubeTransform.m_rotationPitchRollYawDegrees.x >= 360.f )
@@ -223,34 +238,47 @@ void Game::Update( float deltaseconds )
 
 	m_camera->m_transform.SetRotationFromPitchRollYawDegrees( m_cameraRotation.x , m_cameraRotation.y , m_cameraRotation.z );
 	
+	Mat44 modal = m_camera->m_transform.ToMatrix();
+	Vec3 forwardVec = modal.GetKBasis3D();
+	Vec3 rightVec = modal.GetIBasis3D();
+
+	m_cameraRotation.y += g_theInput->m_relativeMovement.x * 0.1f;
+	m_cameraRotation.x += g_theInput->m_relativeMovement.y * 0.1f;
+	m_cameraRotation.y = Clamp( m_cameraRotation.y , -90.f , 90.f );
+	m_cameraRotation.x = Clamp( m_cameraRotation.x , -85.f , 85.f );
+
 	if ( g_theInput->IsKeyPressed( 'W' ) )
 	{
-		m_camera->m_transform.m_position.z -= 1.f * deltaseconds * 4.f *speedMultiplier;
+		//m_camera->m_transform.m_position.z -= 1.f * deltaseconds * 4.f *speedMultiplier;
+		m_camera->m_transform.m_position -= forwardVec * deltaseconds * 8.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'S' ) )
 	{
-		m_camera->m_transform.m_position.z += 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position += forwardVec * deltaseconds * 8.f * speedMultiplier;
+		//m_camera->m_transform.m_position.z += 1.f * deltaseconds * 4.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'A' ) )
 	{
-		m_camera->m_transform.m_position.x -= 1.f * deltaseconds * 4.f * speedMultiplier;
+		//m_camera->m_transform.m_position.x -= 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position -= rightVec * deltaseconds * 8.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'D' ) )
 	{
-		m_camera->m_transform.m_position.x += 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position += rightVec * deltaseconds * 8.f * speedMultiplier;
+		//m_camera->m_transform.m_position.x += 1.f * deltaseconds * 4.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 'C' ) )
 	{
-		m_camera->m_transform.m_position.y += 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position.y += 1.f * deltaseconds * 8.f * speedMultiplier;
 	}
 
 	if ( g_theInput->IsKeyPressed( 0x20 ) )
 	{
-		m_camera->m_transform.m_position.y -= 1.f * deltaseconds * 4.f * speedMultiplier;
+		m_camera->m_transform.m_position.y -= 1.f * deltaseconds * 8.f * speedMultiplier;
 	}
 
 }
@@ -269,12 +297,6 @@ void Game::Render()
  	g_theRenderer->BindShader( nullptr );
  	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
  	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
-
-	/*std::vector<Vertex_PCU> cylinder;
-	AppendCyinder( cylinder , Vec3( 0.f , 0.f , 0.f ) , Vec3( 10.f , 5.f , 4.f ) , 4.f , 4.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) );*/
-
-	/*g_theRenderer->BindShader( nullptr );
-	g_theRenderer->DrawVertexArray( cylinder );*/
 
 	std::vector<Vertex_PCU> arrowVerts;
 	AppendArrow( arrowVerts , Vec3( 0.f , 0.f , 0.f ) , Vec3( 10.f , 5.f , 0.f ) , 4.f , 4.f , 6.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) );
@@ -308,7 +330,7 @@ void Game::Render()
 	}
 
 	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
-	//DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
+	DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
 }
 
 void Game::UpdateCamera()
