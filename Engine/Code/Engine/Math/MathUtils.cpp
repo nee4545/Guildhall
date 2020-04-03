@@ -3,6 +3,9 @@
 #include "Engine/Core/Polygon2D.hpp"
 #include <cmath>
 #include <vector>
+#include "../Core/Rgba8.hpp"
+#include "../Renderer/DebugRender.hpp"
+#include "Engine/Core/Plane.hpp"
 #define UNUSED(x) (void)(x);
 
 
@@ -663,6 +666,342 @@ float GetAreaOfPolygon( Polygon2D polygon )
 	}
 
 	return area;
+}
+
+Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
+{
+	float maxProduct = DotProduct2D( direction , vertices[ 0 ] );
+	int index = 0;
+
+	for ( int i = 1; i < count; i++ )
+	{
+		float product = DotProduct2D( direction , vertices[ i ] );
+		if ( product > maxProduct )
+		{
+			maxProduct = product;
+			index = i;
+		}
+	}
+	return vertices[index];
+}
+
+bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2, Vec2* outSimplex )
+{
+	Vec2 dir1 = Vec2( 0.f , 1.f );
+	Vec2 dir2 = Vec2( 1.f , 0.f );
+
+	Vec2 sp1 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir1 ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir1 );
+	Vec2 sp2 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir2 ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir2 );
+
+	Vec2 directionTowardsOrigin = -sp1.GetNormalized();
+
+	Vec2 sp3 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , directionTowardsOrigin ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -directionTowardsOrigin );
+
+	bool simplexFound = false;
+
+	Vec2 currentSp1 = sp1;
+	Vec2 currentSp2 = sp2;
+	Vec2 currentSp3 = sp3;
+
+	if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
+	{
+		outSimplex[ 0 ] = sp1;
+		outSimplex[ 1 ] = sp2;
+		outSimplex[ 3 ] = sp3;
+		simplexFound = true;
+		return true;
+	}
+
+	GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
+
+	while ( !IsBothSimplexSame(sp1,sp2,sp3,currentSp1,currentSp2,currentSp3) )
+	{
+		if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
+		{
+			simplexFound = true;
+			outSimplex[ 0 ] = sp1;
+			outSimplex[ 1 ] = sp2;
+			outSimplex[ 3 ] = sp3;
+			return true;
+		}
+
+		currentSp1 = sp1;
+		currentSp2 = sp2;
+		currentSp3 = sp3;
+
+		GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
+	}
+
+	return false;
+}
+
+
+void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3, Polygon2D poly1 , Polygon2D poly2 )
+{
+	Vec2 pointOnEdgeS1S2 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS1 , outS2 );
+	Vec2 pointOnEdgeS1S3 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS1 , outS3 );
+	Vec2 pointOnEdgeS2S3 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS2 , outS3 );
+	Vec2 minPoint;
+	Vec2 s1;
+	Vec2 s2;
+	Vec2 s3;
+
+	float minLength = pointOnEdgeS1S2.GetLength();
+	s1 = outS1;
+	s2 = outS2;
+	minPoint = pointOnEdgeS1S2;
+
+	if ( pointOnEdgeS1S3.GetLength() < minLength )
+	{
+		minLength = pointOnEdgeS1S3.GetLength();
+		minPoint = pointOnEdgeS1S3;
+		s1 = outS1;
+		s2 = outS3;
+	}
+
+	if ( pointOnEdgeS2S3.GetLength() < minLength )
+	{
+		minLength = pointOnEdgeS2S3.GetLength();
+		minPoint = pointOnEdgeS2S3;
+		s1 = outS2;
+		s2 = outS3;
+	}
+
+	Vec2 dir = -minPoint.GetNormalized();
+	s3 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+
+	outS1 = s1;
+	outS2 = s2;
+	outS3 = s3;
+
+}
+
+bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 )
+{
+	Polygon2D temp = Polygon2D();
+
+	if ( CrossProduct2D( p2 - p1 , p3 - p1 ) > 0 )
+	{
+		temp.m_points.push_back( p1 );
+		temp.m_points.push_back( p2 );
+		temp.m_points.push_back( p3 );
+	}
+	else if ( CrossProduct2D( p3 - p1 , p2 - p1 ) > 0 )
+	{
+		temp.m_points.push_back( p1 );
+		temp.m_points.push_back( p3 );
+		temp.m_points.push_back( p2 );
+	}
+	else
+	{
+		temp.m_points.push_back( p2 );
+		temp.m_points.push_back( p3 );
+		temp.m_points.push_back( p1 );
+	}
+
+	return temp.Contains( Vec2( 0.f , 0.f ) );
+}
+
+bool IsBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 )
+{
+	//6 possible combinations
+	float nearZero = 0.000001f;
+
+	if ( ( simplex1P1 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P3 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+
+	if ( ( simplex1P1 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P2 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+
+	if ( ( simplex1P1 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P3 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+
+	if ( ( simplex1P1 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P1 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+
+	if ( ( simplex1P1 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P1 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+
+	if ( ( simplex1P1 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P2 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+
+	return false;
+	
+}
+
+Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
+{
+	Polygon2D toReturn;
+
+	Vec2 simplex[ 3 ];
+
+	DetectPolygonvPolygonIntersections( poly1 , poly2 , simplex );
+
+	std::vector<Vec2> finalListOfPoints;
+	finalListOfPoints.push_back( simplex[ 0 ] );
+	finalListOfPoints.push_back( simplex[ 1 ] );
+	finalListOfPoints.push_back( simplex[ 2 ] );
+
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[0] , 3 );
+
+	int index1;
+	int index2;
+
+	Vec2 nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ),index1,index2 );
+	Vec2 dir = nearestPoint.GetNormalized();
+
+	Plane2 currentPlane = Plane2( dir , nearestPoint );
+
+	const float nearZero = 0.0001f;
+					
+	Vec2 supportPoint =GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+	
+	if (currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	{
+		return toReturn;
+	}
+
+	finalListOfPoints.push_back( supportPoint );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , (int)finalListOfPoints.size() );
+
+	
+	nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ) , index1 , index2 );
+	dir = nearestPoint.GetNormalized();
+
+	Plane2 nextPlane= Plane2(dir,nearestPoint);
+
+	supportPoint = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+
+	if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	{
+		return toReturn;
+	}
+
+	finalListOfPoints.push_back( supportPoint );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , ( int ) finalListOfPoints.size() );
+
+	while ( nextPlane != currentPlane )
+	{
+		currentPlane = nextPlane;
+
+		nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ) , index1 , index2 );
+		dir = nearestPoint.GetNormalized();
+
+		nextPlane = Plane2( dir , nearestPoint );
+
+		supportPoint = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+
+		if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+		{
+			return toReturn;
+		}
+
+		finalListOfPoints.push_back( supportPoint );
+		toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , ( int ) finalListOfPoints.size() );
+	}
+
+	return toReturn;
+}
+
+void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D poly2 , Vec2& cp1 , Vec2& cp2 )
+{
+	Vec2 nearestPoint = minkowskiPoly.GetClosestPointOnTheEdges( Vec2(0.f,0.f) );
+
+	Vec2 normal = -nearestPoint.GetNormalized();
+
+	Vec2 supportPoint = GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , normal );
+
+	Plane2 referencePlane = Plane2( normal , supportPoint );
+
+	const float eps = 0.001f;
+
+	struct Temp
+	{
+		Vec2 point;
+		float distace;
+	};
+	
+	std::vector<Temp> pointsAndDistance;
+
+	for ( int i = 0; i < poly2.m_points.size(); i++ )
+	{
+		float distaceFromPlane = referencePlane.GetSignedDistanceFromPlane( poly2.m_points[ i ] );
+
+		if ( abs( distaceFromPlane ) <= eps )
+		{
+			Temp temp;
+			temp.point = poly2.m_points[ i ];
+			temp.distace = distaceFromPlane;
+
+			pointsAndDistance.push_back( temp );
+		}
+	}
+
+	if ( pointsAndDistance.size() == 1 )
+	{
+		cp1 = pointsAndDistance[ 0 ].point;
+		cp2 = pointsAndDistance[ 0 ].point;
+		return;
+	}
+
+	if ( pointsAndDistance.size() == 2 )
+	{
+		cp1 = pointsAndDistance[ 0 ].point;
+		cp2 = pointsAndDistance[ 1 ].point;
+		return;
+	}
+
+	Vec2 tangent = normal.GetRotatedMinus90Degrees();
+
+	for ( int i = 0; i < pointsAndDistance.size(); i++ )
+	{
+		pointsAndDistance[ i ].distace = DotProduct2D( tangent , pointsAndDistance[ i ].point );
+	}
+
+	//Get min and max in this range
+	Vec2 minPoint = pointsAndDistance[ 0 ].point;
+	Vec2 maxPoint = pointsAndDistance[ 1 ].point;
+	float mindistance = INFINITY;
+	float maxDistance = pointsAndDistance[ 0 ].distace;
+
+	for ( int i = 0; i < pointsAndDistance.size(); i++ )
+	{
+		if ( pointsAndDistance[ i ].distace < mindistance )
+		{
+			mindistance = pointsAndDistance[ i ].distace;
+			minPoint = pointsAndDistance[ i ].point;
+		}
+
+		if ( pointsAndDistance[ i ].distace > maxDistance )
+		{
+			maxDistance = pointsAndDistance[ i ].distace;
+			maxPoint = pointsAndDistance[ i ].point;
+		}
+	}
+	
+
+	cp1 = minPoint;
+	cp2 = maxPoint;
+	
+}
+
+Vec2 GetDirectionForNextPointInMinkowskiSpace( Polygon2D poly )
+{
+	Vec2 nearestPoint =poly.GetClosestPointOnTheEdges( Vec2( 0.f , 0.f ) );
+
+	return -nearestPoint.GetNormalized();
 }
 
 float GetProjectedLength2D( const Vec2& sourceVector, const Vec2& ontoVector )

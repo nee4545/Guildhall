@@ -31,6 +31,7 @@
     <ClCompile Include="Core\IntRange.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\OBB2.cpp" />
+    <ClCompile Include="Core\Plane.cpp" />
     <ClCompile Include="Core\Polygon2D.cpp" />
     <ClCompile Include="Core\SimpleTriangleFont.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="Core\IntRange.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\OBB2.hpp" />
+    <ClInclude Include="Core\Plane.hpp" />
     <ClInclude Include="Core\Polygon2D.hpp" />
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />

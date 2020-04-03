@@ -5,10 +5,10 @@
 #include "Engine/Core/AABB2.hpp"
 #include "Engine/Core/OBB2.hpp"
 #include "Engine/Core/FloatRange.hpp"
-#include "../Core/Polygon2D.hpp"
+#include "Engine/Core/Polygon2D.hpp"
+
 struct Rgba8;
 struct Vec4;
-class Polygon2D;
 
 //Angle Utilities
 float ConvertDegreesToRadians(float degrees);
@@ -106,4 +106,15 @@ Vec2 RotateAroundArbitartPoint( Vec2 arbitaryPoint ,Vec2 point, float rotationDe
 float GetMomentOfInertiaOfTriangle( Polygon2D polygon, Vec2 point0 , Vec2 point1 , Vec2 point2, float mass );
 float GetAreaOfTriangele( Vec2 point0 , Vec2 point1 , Vec2 point2 );
 float GetAreaOfPolygon( Polygon2D polygon );
+
+
+Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction );
+bool DetectPolygonvPolygonIntersections(Polygon2D poly1, Polygon2D poly2, Vec2* outSimplex);
+void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3, Polygon2D poly1, Polygon2D poly2 );
+bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 );
+bool IsBothSimplexSame(Vec2 simplex1P1, Vec2 simplex1P2, Vec2 simplex1P3, Vec2 simplex2P1, Vec2 simplex2P2, Vec2 simplex2P3);
+Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 );
+void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D poly2 , Vec2& cp1 , Vec2 &cp2 );
+Vec2 GetDirectionForNextPointInMinkowskiSpace( Polygon2D poly );
+
 

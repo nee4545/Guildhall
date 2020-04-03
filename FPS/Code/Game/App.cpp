@@ -50,9 +50,10 @@ void App::Shutdown() //Not used right now
 	delete thegame;
 	thegame = nullptr; 
 	
+	DebugRenderSystem::sDebugRenderer->SystemShutDown();
+	
 	g_theRenderer->Shutdown();
 
-	DebugRenderSystem::sDebugRenderer->SystemShutDown();
 }
 
 
@@ -73,7 +74,7 @@ void App::Update(float deltaSeconds)
 		deltaSeconds*=0.1f;
 	}
 
-	if ( g_theInput->WasKeyJustPressed( 'G' ) )
+	/*if ( g_theInput->WasKeyJustPressed( 'G' ) )
 	{
 		HICON icon = LoadIcon( NULL , IDI_WARNING );
 
@@ -97,7 +98,7 @@ void App::Update(float deltaSeconds)
 		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
 			WS_POPUP );
 		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWMAXIMIZED );
-	}
+	}*/
 
 	g_theInput->UpdateMouse();
 

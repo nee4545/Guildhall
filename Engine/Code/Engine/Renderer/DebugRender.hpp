@@ -3,6 +3,9 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/AABB2.hpp"
 #include "Engine/Core/Transform.hpp"
+#include "Engine/Math/Mat44.hpp"
+#include <string>
+#include "../Core/AABB3.hpp"
 
 class RenderContext;
 class Clock;
@@ -10,6 +13,8 @@ class Timer;
 class Camera;
 class Texture;
 class GPUMesh;
+
+struct D3D11_RASTERIZER_DESC;
 
 enum eDebugRenderMode
 {
@@ -25,6 +30,11 @@ enum eObjectTypes
 	OBJECT_LINE,
 	OBJECT_ARROW,
 	OBJECT_QUAD,
+	OBJECT_BASIS,
+	OBJECT_TEXT_WORLD,
+	OBJECT_TEXT_SCREEN,
+	OBJECT_WIRE_SPHERE,
+	OBJECT_WIRE_BOX,
 
 };
 
@@ -69,6 +79,15 @@ public:
 	DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space, Vec3 pos, float size, Rgba8 color, float duration, bool isBillboard = false);
 	DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Transform transform , float size , Rgba8 color , float duration , bool isBillboard = false );
 	DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 startColor, Rgba8 endColor , float duration , bool isBillboard = false );
+	Vec3 m_position;
+	float m_size;
+};
+
+class DebugWireSphere :public DebugRenderObject
+{
+public:
+	DebugWireSphere( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 color , float duration , bool isBillboard = false );
+	DebugWireSphere( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , bool isBillboard = false );
 	Vec3 m_position;
 	float m_size;
 };
@@ -125,6 +144,48 @@ public:
 
 };
 
+class DebugBasis : public DebugRenderObject
+{
+public:
+	DebugBasis( eDebugRenderMode mode , eDebugRenderSpace space , Mat44 basis , Rgba8 color , float duration );
+	DebugBasis( eDebugRenderMode mode , eDebugRenderSpace space , Mat44 basis , Rgba8 startColor, Rgba8 endColor , float duration );
+
+	Mat44 m_basis;
+};
+
+class DebugScreenText : public DebugRenderObject
+{
+public:
+	DebugScreenText( eDebugRenderMode mode , eDebugRenderSpace space ,float size, Rgba8 color ,float duration, Vec2 pivot , Vec4 offset, std::string text );
+	DebugScreenText( eDebugRenderMode mode , eDebugRenderSpace space ,float size, Rgba8 startColor, Rgba8 endColor ,float duration, Vec2 pivot , Vec4 offset, std::string text );
+	Vec4 m_offset;
+	Vec2 m_pivot;
+	std::string m_text;
+	float m_size;
+};
+
+class DebugWorldText : public DebugRenderObject
+{
+public:
+	DebugWorldText( eDebugRenderMode mode , eDebugRenderSpace space , float size , Rgba8 color , Mat44 basis , float duration , Vec2 pivot , std::string text, bool isBillboard = false );
+	DebugWorldText( eDebugRenderMode mode , eDebugRenderSpace space , float size , Rgba8 startColor, Rgba8 endColor , Mat44 basis , float duration , Vec2 pivot , std::string text , bool isBillboard = false );
+
+	Mat44 m_basis;
+	Vec2 m_pivot;
+	std::string m_text;
+	float m_size;
+};
+
+class DebugWorldWireBox : public DebugRenderObject
+{
+public:
+	DebugWorldWireBox( eDebugRenderMode mode , eDebugRenderSpace space , AABB3 box , Rgba8 startColor , Rgba8 endColor , float duration , bool isBillboard = false );
+	DebugWorldWireBox( eDebugRenderMode mode , eDebugRenderSpace space , AABB3 box , Rgba8 color , float duration , bool isBillboard = false );
+	//DebugWorldWireBox( eDebugRenderMode mode , eDebugRenderSpace space , OBB3 box , Rgba8 startColor , Rgba8 endColor , Mat44 basis , float duration , Vec2 pivot , std::string text , bool isBillboard = false );
+	//DebugWorldWireBox( eDebugRenderMode mode , eDebugRenderSpace space , OBB3 box , Rgba8 color , Mat44 basis , float duration , Vec2 pivot , std::string text , bool isBillboard = false );
+
+	AABB3 m_box;
+};
 class DebugRenderSystem
 {
 
@@ -138,6 +199,10 @@ public:
 	void BeginFrame();
 	void Update();
 	void CleanUp();
+
+	void EnableDebugRendering();
+	void DisableDebugRendering();
+	void ClearDebugRendering();
 
 	void DebugRenderWorldToCamera( Camera* cam );
 	void DebugRenderToScreen( Texture* output );
@@ -156,6 +221,7 @@ public:
 
 private:
 	GPUMesh* point = nullptr;
+	bool enableRendring = true;
 };
 
 
@@ -175,6 +241,24 @@ void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 start_colo
 void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 color, Texture* tex, float duration, AABB2 uvs = AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ) , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
+void DebugAddWorldWireBounds( AABB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+
+void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+
+void DebugAddWorldBasis( Mat44 basis , Rgba8 start_tint , Rgba8 end_tint , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldBasis( Mat44 basis ,Rgba8 color, float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+
+void DebugAddWorldText( Mat44 basis , Vec2 pivot ,float size, Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode , char const* text );
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot ,float size, Rgba8 color , float duration , eDebugRenderMode mode , char const* text , ... );
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot ,float size, Rgba8 color , char const* text , ... );
+
+void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot ,float size, Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode , char const* text );
+void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot ,float size, Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... );
+void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , float size, Rgba8 color , char const* format , ... );
+
+
+
 //Screen Renders
 void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 start_color , Rgba8 end_color , float duration );
 void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 color , float duration = 0.0f );
@@ -189,6 +273,12 @@ void DebugAddScreenArrow( Vec2 p0 , Vec2 p1 , Rgba8 color ,float lineThickness,f
 void DebugAddScreenQuad( AABB2 bounds , Rgba8 start_color , Rgba8 end_color , float duration );
 void DebugAddScreenQuad( AABB2 bounds , Rgba8 color , float duration = 0.0f );
 void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 uvs , Rgba8 tint , float duration = 0.0f );
+
+void DebugAddScreenText( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , char const* text );
+void DebugAddScreenText( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 color , float duration , char const* text );
+void DebugAddScreenTextf( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , char const* format , ... );
+void DebugAddScreenTextf( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 color , float duration , char const* format,... );
+
 
 
 

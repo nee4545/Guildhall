@@ -28,6 +28,7 @@ struct ID3D11DepthStencilState;
 struct ID3D11RasterizerState;
 class Sampler;
 struct IDXGIDebug;
+struct D3D11_RASTERIZER_DESC;
 enum D3D11_FILL_MODE: int;
 enum D3D11_CULL_MODE: int;
 
@@ -150,6 +151,7 @@ public:
 
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
 	void CreateRasterState( D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise = true );
+	void CreateRasterState( D3D11_RASTERIZER_DESC desc );
 	
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);

@@ -288,6 +288,11 @@ void Physics2D::DetectCollissions()
 			
 			if ( m_rigidBodies2D[ i ]->m_collider->Intersects( m_rigidBodies2D[ j ]->m_collider ) )
 			{
+				/*if ( m_rigidBodies2D[ i ]->m_collider->m_colliderType == COLLIDER2D_POLYGON && m_rigidBodies2D[ j ]->m_collider->m_colliderType == COLLIDER2D_POLYGON )
+				{
+					continue;
+				}*/
+
 				COLLIDER2D_TYPE myType = m_rigidBodies2D[ i ]->m_collider->m_colliderType;
 				COLLIDER2D_TYPE otherType = m_rigidBodies2D[ j ]->m_collider->m_colliderType;
 				int idx = otherType * NUM_COLLIDER_TYPES + myType;

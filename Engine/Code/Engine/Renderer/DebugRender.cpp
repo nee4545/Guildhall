@@ -1,12 +1,19 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Core/D3D11Common.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Core/D3D11Common.hpp"
+
+constexpr float CLIENT_ASPECT = 16.f / 9.f;
 
 extern RenderContext* g_theRenderer;
+extern BitmapFont* g_theBitMapFont;
+
 DebugRenderSystem* DebugRenderSystem::sDebugRenderer = new DebugRenderSystem();
 
 DebugRenderObject::DebugRenderObject( eObjectTypes type, eDebugRenderMode mode , eDebugRenderSpace space , float duration , bool isBillboard /*= false */ )
@@ -57,6 +64,31 @@ DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p
 	m_transform.m_scale *= size;
 
 
+}
+
+DebugWireSphere::DebugWireSphere( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 color , float duration , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_WIRE_SPHERE , mode , space , duration , isBillboard )
+{
+	m_position = pos;
+	m_size = size;
+	m_color = color;
+
+	m_transform.m_position = pos;
+	m_transform.m_scale *= size;
+}
+
+DebugWireSphere::DebugWireSphere( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_WIRE_SPHERE , mode , space , duration , isBillboard )
+{
+	m_startColor = startColor;
+	m_endColor = endColor;
+
+	m_needsColorLerp = true;
+	m_position = pos;
+	m_size = size;
+
+	m_transform.m_position = pos;
+	m_transform.m_scale *= size;
 }
 
 DebugLine::DebugLine( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 start , Vec3 end ,Rgba8 color, float lineThickness , float duration , bool isBillboard /*= false */ ) :
@@ -151,6 +183,89 @@ DebugQuad::DebugQuad( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p0 
 	m_startColor = startColor;
 	m_endColor = endColor;
 	m_needsColorLerp = true;
+}
+
+DebugScreenText::DebugScreenText( eDebugRenderMode mode , eDebugRenderSpace space ,float size, Rgba8 color ,float duration, Vec2 pivot , Vec4 offset, std::string text ):
+	DebugRenderObject( OBJECT_TEXT_SCREEN , mode , space , duration , false )
+{
+	m_color = color;
+	m_pivot = pivot;
+	m_offset = offset;
+	m_text = text;
+	m_size = size;
+}
+
+DebugScreenText::DebugScreenText( eDebugRenderMode mode , eDebugRenderSpace space ,float size, Rgba8 startColor , Rgba8 endColor , float duration , Vec2 pivot , Vec4 offset , std::string text ):
+	DebugRenderObject( OBJECT_TEXT_SCREEN , mode , space , duration , false )
+{
+	m_startColor = startColor;
+	m_endColor = endColor;
+	m_color = startColor;
+	m_offset = offset;
+	m_text = text;
+	m_pivot = pivot;
+	m_size = size;
+	m_needsColorLerp = true;
+}
+
+DebugWorldText::DebugWorldText( eDebugRenderMode mode , eDebugRenderSpace space , float size , Rgba8 color , Mat44 basis , float duration , Vec2 pivot , std::string text , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_TEXT_WORLD , mode , space , duration , isBillboard )
+{
+	m_size = size;
+	m_pivot = pivot;
+	m_basis = basis;
+	m_color = color;
+	m_text = text;
+}
+
+
+DebugWorldText::DebugWorldText( eDebugRenderMode mode , eDebugRenderSpace space , float size , Rgba8 startColor , Rgba8 endColor , Mat44 basis , float duration , Vec2 pivot , std::string text , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_TEXT_WORLD , mode , space , duration , isBillboard )
+{
+	m_size = size;
+	m_text = text;
+	m_pivot = pivot;
+	m_basis = basis;
+	m_color = startColor;
+	m_startColor = startColor;
+	m_endColor = endColor;
+	m_needsColorLerp = true;
+}
+
+DebugBasis::DebugBasis( eDebugRenderMode mode , eDebugRenderSpace space , Mat44 basis , Rgba8 color , float duration ):
+	DebugRenderObject( OBJECT_BASIS , mode , space , duration , false )
+{
+	m_basis = basis;
+	m_color = color;
+}
+
+
+DebugBasis::DebugBasis( eDebugRenderMode mode , eDebugRenderSpace space , Mat44 basis , Rgba8 startColor , Rgba8 endColor , float duration ):
+	DebugRenderObject( OBJECT_BASIS , mode , space , duration , false )
+{
+	m_basis = basis;
+	m_startColor = startColor;
+	m_endColor = endColor;
+	m_color = startColor;
+	m_needsColorLerp = true;
+}
+
+
+DebugWorldWireBox::DebugWorldWireBox( eDebugRenderMode mode , eDebugRenderSpace space , AABB3 box , Rgba8 startColor , Rgba8 endColor , float duration , bool isBillboard /*= false */ ) :
+	DebugRenderObject( OBJECT_WIRE_BOX , mode , space , duration , isBillboard )
+{
+	m_box = box;
+	m_startColor = startColor;
+	m_endColor = endColor;
+	m_color = startColor;
+	m_needsColorLerp = true;
+}
+
+DebugWorldWireBox::DebugWorldWireBox( eDebugRenderMode mode , eDebugRenderSpace space , AABB3 box , Rgba8 color , float duration , bool isBillboard /*= false */ ):
+	DebugRenderObject( OBJECT_WIRE_BOX , mode , space , duration , isBillboard )
+{
+	m_box = box;
+	m_color = color;
 }
 
 void DebugRenderObject::Update()
@@ -250,7 +365,6 @@ void DebugRenderSystem::SystemStartUp()
 
 	point = new GPUMesh( m_context );
 
-
 }
 
 void DebugRenderSystem::SystemShutDown()
@@ -260,6 +374,7 @@ void DebugRenderSystem::SystemShutDown()
 
 	delete point;
 	point = nullptr;
+
 }
 
 void DebugRenderSystem::TakeWorldCamera( Camera* cam )
@@ -333,8 +448,30 @@ void DebugRenderSystem::CleanUp()
 	}
 }
 
+void DebugRenderSystem::EnableDebugRendering()
+{
+	enableRendring = true;
+}
+
+void DebugRenderSystem::DisableDebugRendering()
+{
+	enableRendring = false;
+}
+
+void DebugRenderSystem::ClearDebugRendering()
+{
+	m_screenObjects.clear();
+	m_worldObjects.clear();
+}
+
 void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 {
+
+	if ( !enableRendring )
+	{
+		return;
+	}
+
 	m_camera->SetProjection( cam->GetProjection() );
 	m_camera->m_transform = cam->m_transform;
 	m_camera->m_backBuffer = cam->m_backBuffer;
@@ -690,8 +827,438 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 
 						break;
 					}
+
 				}
 
+				break;
+			}
+
+			case OBJECT_WIRE_SPHERE:
+			{
+				DebugWireSphere* pt = ( DebugWireSphere* ) m_worldObjects[ index ];
+
+				switch ( m_worldObjects[ index ]->m_renderMode )
+				{
+					case DEBUG_RENDER_ALWAYS:
+					{
+						D3D11_RASTERIZER_DESC currentDesc;
+						m_context->m_rasterState->GetDesc( &currentDesc );
+
+						m_camera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->CreateRasterState( D3D11_FILL_WIREFRAME , D3D11_CULL_NONE );
+						m_context->BindShader( nullptr );
+						m_context->SetBlendMode( BlendMode::OPAQE );
+
+						std::vector<Vertex_PCU> sphereVerts;
+						std::vector<unsigned int> sphereIndices;
+						Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+						AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 1.f , 64 , 32 , pt->m_color );
+						point->UpdateVertices( ( unsigned int ) sphereVerts.size() , &sphereVerts[ 0 ] );
+						point->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
+
+						m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+						m_context->DrawMesh( point );
+						m_context->EndCamera( *m_camera );
+
+						m_context->CreateRasterState( currentDesc );
+						break;
+					}
+
+					case DEBUG_RENDER_USE_DEPTH:
+					{
+						D3D11_RASTERIZER_DESC currentDesc;
+						m_context->m_rasterState->GetDesc( &currentDesc );
+
+						m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->CreateRasterState( D3D11_FILL_WIREFRAME , D3D11_CULL_NONE );
+						m_camera->CreateDepthStencilTarget( g_theRenderer );
+						m_context->SetDepthTest();
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+						std::vector<Vertex_PCU> sphereVerts;
+						std::vector<unsigned int> sphereIndices;
+						Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+						AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 1.f , 64 , 32 , pt->m_color );
+						point->UpdateVertices( ( unsigned int ) sphereVerts.size() , &sphereVerts[ 0 ] );
+						point->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
+
+						m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+						m_context->DrawMesh( point );
+
+						m_context->EndCamera( *m_camera );
+						m_context->CreateRasterState( currentDesc );
+
+						break;
+					}
+
+					case DEBUG_RENDER_XRAY:
+					{
+ 						D3D11_RASTERIZER_DESC currentDesc;
+ 						m_context->m_rasterState->GetDesc( &currentDesc );
+
+						m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->CreateRasterState( D3D11_FILL_WIREFRAME , D3D11_CULL_NONE );
+						m_context->SetBlendMode( BlendMode::OPAQE );
+						pt->m_color.a = 100;
+						m_camera->CreateDepthStencilTarget( g_theRenderer );
+						m_context->SetDepthTest();
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+						std::vector<Vertex_PCU> sphereVerts;
+						std::vector<unsigned int> sphereIndices;
+						Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+						AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 1.f , 64 , 32 , pt->m_color );
+						point->UpdateVertices( ( unsigned int ) sphereVerts.size() , &sphereVerts[ 0 ] );
+						point->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
+						m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+						m_context->DrawMesh( point );
+
+						m_context->EndCamera( *m_camera );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->SetBlendMode( BlendMode::ALPHA );
+						pt->m_color.a = 200;
+						m_context->SetDepthTest( COMPARE_GREATER );
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+						m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+						m_context->DrawMesh( point );
+						m_context->SetDepthTest( COMPARE_LEQUAL );
+						m_context->EndCamera( *m_camera );
+						m_context->CreateRasterState( currentDesc );
+						break;
+					}
+				}
+
+				break;
+			}
+			case OBJECT_WIRE_BOX:
+			{
+				DebugWorldWireBox* pt = ( DebugWorldWireBox* ) m_worldObjects[ index ];
+
+				switch ( m_worldObjects[ index ]->m_renderMode )
+				{
+				case DEBUG_RENDER_ALWAYS:
+				{
+					D3D11_RASTERIZER_DESC currentDesc;
+					m_context->m_rasterState->GetDesc( &currentDesc );
+
+					m_camera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+					m_context->BeginCamera( *m_camera );
+					m_context->CreateRasterState( D3D11_FILL_WIREFRAME , D3D11_CULL_NONE );
+					m_context->BindShader( nullptr );
+					m_context->SetBlendMode( BlendMode::OPAQE );
+
+					std::vector<Vertex_PCU> boxVerts;
+					std::vector<unsigned int> boxIndices;
+					Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+					AppendCuboid( boxVerts , boxIndices , pt->m_box , pt->m_color );
+					point->UpdateVertices( ( unsigned int ) boxVerts.size() , &boxVerts[ 0 ] );
+					point->UpdateIndices( ( unsigned int ) boxIndices.size() , &boxIndices[ 0 ] );
+
+					m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+					m_context->DrawMesh( point );
+					m_context->EndCamera( *m_camera );
+
+					m_context->CreateRasterState( currentDesc );
+					
+					break;
+				}
+
+				case DEBUG_RENDER_USE_DEPTH:
+				{
+					D3D11_RASTERIZER_DESC currentDesc;
+					m_context->m_rasterState->GetDesc( &currentDesc );
+
+					m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+					m_context->BeginCamera( *m_camera );
+					m_context->CreateRasterState( D3D11_FILL_WIREFRAME , D3D11_CULL_NONE );
+					m_camera->CreateDepthStencilTarget( g_theRenderer );
+					m_context->SetDepthTest();
+					m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+					std::vector<Vertex_PCU> boxVerts;
+					std::vector<unsigned int> boxIndices;
+					Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+					AppendCuboid( boxVerts , boxIndices , pt->m_box , pt->m_color );
+					point->UpdateVertices( ( unsigned int ) boxVerts.size() , &boxVerts[ 0 ] );
+					point->UpdateIndices( ( unsigned int ) boxIndices.size() , &boxIndices[ 0 ] );
+
+					m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+					m_context->DrawMesh( point );
+
+					m_context->EndCamera( *m_camera );
+					m_context->CreateRasterState( currentDesc );
+					break;
+				}
+
+				case DEBUG_RENDER_XRAY:
+				{
+					D3D11_RASTERIZER_DESC currentDesc;
+					m_context->m_rasterState->GetDesc( &currentDesc );
+
+					m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+					m_context->BeginCamera( *m_camera );
+					m_context->CreateRasterState( D3D11_FILL_WIREFRAME , D3D11_CULL_NONE );
+					m_context->SetBlendMode( BlendMode::OPAQE );
+					pt->m_color.a = 100;
+					m_camera->CreateDepthStencilTarget( g_theRenderer );
+					m_context->SetDepthTest();
+					m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+					std::vector<Vertex_PCU> boxVerts;
+					std::vector<unsigned int> boxIndices;
+					Vec3 centre = Vec3( 0.f , 0.f , 0.f );
+					AppendCuboid( boxVerts , boxIndices , pt->m_box , pt->m_color );
+					point->UpdateVertices( ( unsigned int ) boxVerts.size() , &boxVerts[ 0 ] );
+					point->UpdateIndices( ( unsigned int ) boxIndices.size() , &boxIndices[ 0 ] );
+					m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+					m_context->DrawMesh( point );
+
+					m_context->EndCamera( *m_camera );
+
+					m_context->BeginCamera( *m_camera );
+					m_context->SetBlendMode( BlendMode::ALPHA );
+					pt->m_color.a = 200;
+					m_context->SetDepthTest( COMPARE_GREATER );
+					m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+					m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+					m_context->DrawMesh( point );
+					m_context->SetDepthTest( COMPARE_LEQUAL );
+					m_context->EndCamera( *m_camera );
+					m_context->CreateRasterState( currentDesc );
+
+					break;
+				 }
+				}
+
+				break;
+			}
+			case OBJECT_BASIS:
+			{
+				DebugBasis* pt = ( DebugBasis* ) m_worldObjects[ index ];
+
+				switch ( m_worldObjects[ index ]->m_renderMode )
+				{
+					case DEBUG_RENDER_ALWAYS:
+					{
+						m_camera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->BindShader( nullptr );
+						m_context->SetBlendMode( BlendMode::OPAQE );
+
+						Vec3 position = pt->m_basis.GetTranslation3D();
+
+						std::vector<Vertex_PCU> arrowVerts1;
+						std::vector<Vertex_PCU> arrowVerts2;
+						std::vector<Vertex_PCU> arrowVerts3;
+						AppendArrow( arrowVerts1 , position , position + pt->m_basis.GetIBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 100 , 0 , 0 , 255 ) );
+						AppendArrow( arrowVerts2 , position , position + pt->m_basis.GetJBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 0 , 100 , 0 , 255 ) );
+						AppendArrow( arrowVerts3 , position , position + pt->m_basis.GetKBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 0 , 0 , 100 , 255 ) );
+
+						m_context->DrawVertexArray( arrowVerts1 );
+						m_context->DrawVertexArray( arrowVerts2 );
+						m_context->DrawVertexArray( arrowVerts3 );
+
+						m_context->EndCamera( *m_camera );
+
+						break;
+					}
+
+					case DEBUG_RENDER_XRAY:
+					{
+						m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+
+						m_context->BindShader( nullptr );
+
+						Vec3 position = pt->m_basis.GetTranslation3D();
+						pt->m_color.a = 100;
+						std::vector<Vertex_PCU> arrowVerts1;
+						std::vector<Vertex_PCU> arrowVerts2;
+						std::vector<Vertex_PCU> arrowVerts3;
+						AppendArrow( arrowVerts1 , position , position + pt->m_basis.GetIBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 100 , 0 , 0 , 255 ) );
+						AppendArrow( arrowVerts2 , position , position + pt->m_basis.GetJBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 0 , 100 , 0 , 255 ) );
+						AppendArrow( arrowVerts3 , position , position + pt->m_basis.GetKBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 0 , 0 , 100 , 255 ) );
+
+						m_context->DrawVertexArray( arrowVerts1 );
+						m_context->DrawVertexArray( arrowVerts2 );
+						m_context->DrawVertexArray( arrowVerts3 );
+
+						m_context->EndCamera( *m_camera );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->SetBlendMode( BlendMode::ALPHA );
+						pt->m_color.a = 200;
+						m_context->SetDepthTest( COMPARE_GREATER );
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+
+						AppendArrow( arrowVerts1 , position , position + pt->m_basis.GetIBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 100 , 0 , 0 , 255 ) );
+						AppendArrow( arrowVerts2 , position , position + pt->m_basis.GetJBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 0 , 100 , 0 , 255 ) );
+						AppendArrow( arrowVerts3 , position , position + pt->m_basis.GetKBasis3D() * 3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8( 0 , 0 , 100 , 255 ) );
+
+						m_context->SetDepthTest( COMPARE_LEQUAL );
+						m_context->EndCamera( *m_camera );
+
+						break;
+					}
+
+					case DEBUG_RENDER_USE_DEPTH:
+					{
+						m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_camera->CreateDepthStencilTarget( g_theRenderer );
+						m_context->SetDepthTest();
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+						m_context->BindShader( nullptr );
+						
+
+						Vec3 position = pt->m_basis.GetTranslation3D();
+
+						std::vector<Vertex_PCU> arrowVerts1;
+						std::vector<Vertex_PCU> arrowVerts2;
+						std::vector<Vertex_PCU> arrowVerts3;
+						AppendArrow( arrowVerts1 , position , position + pt->m_basis.GetIBasis3D()*3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8(100,0,0,255) );
+						AppendArrow( arrowVerts2 , position , position + pt->m_basis.GetJBasis3D()*3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8(0,100,0,255) );
+						AppendArrow( arrowVerts3 , position , position + pt->m_basis.GetKBasis3D()*3.f , 0.5f , 0.5f , 0.8f , pt->m_color , Rgba8(0,0,100,255) );
+
+						m_context->DrawVertexArray( arrowVerts1 );
+						m_context->DrawVertexArray( arrowVerts2 );
+						m_context->DrawVertexArray( arrowVerts3 );
+
+						m_context->EndCamera( *m_camera );
+
+						break;
+					}
+				}
+
+				break;
+			}
+
+			case OBJECT_TEXT_WORLD:
+			{
+				DebugWorldText* pt = ( DebugWorldText* ) m_worldObjects[ index ];
+
+				switch ( m_worldObjects[ index ]->m_renderMode )
+				{
+					case DEBUG_RENDER_ALWAYS:
+					{
+						m_camera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_context->BindShader( nullptr );
+						//m_context->SetBlendMode( BlendMode::OPAQE );
+						std::vector<Vertex_PCU> textVerts;
+						AABB2 textArea=AABB2( Vec2(0.f,0.f) , Vec2( pt->m_text.size()* pt->m_size , pt->m_size ) );
+						g_theBitMapFont->AddVertsForTextInBox2D( textVerts , textArea , pt->m_size , pt->m_text , pt->m_color , 1.f , pt->m_pivot );
+						Mat44 modal = pt->m_basis;
+						Mat44 cameraModal = m_camera->m_transform.ToMatrix();
+						Mat44 mo = Mat44::LookAt( modal.GetTranslation3D() , cameraModal.GetTranslation3D() , -cameraModal.GetJBasis3D() );
+						if ( pt->m_isBillboard )
+						{
+							modal.SetBasisVectors3D( mo.GetIBasis3D() , -mo.GetJBasis3D() , mo.GetKBasis3D() );
+						}
+
+						m_context->SetModalMatrix( modal );
+						m_context->BindTexture( g_theBitMapFont->GetTexture() );
+						m_context->DrawVertexArray( textVerts );
+						m_context->BindTexture( nullptr );
+						m_context->EndCamera( *m_camera );
+						break;
+					}
+
+					case DEBUG_RENDER_USE_DEPTH:
+					{
+						m_camera->SetClearMode( 0  , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+
+						m_context->BeginCamera( *m_camera );
+						m_camera->CreateDepthStencilTarget( g_theRenderer );
+						m_context->SetDepthTest();
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+						m_context->BindShader( nullptr );
+						
+						std::vector<Vertex_PCU> textVerts;
+						AABB2 textArea = AABB2( Vec2( 0.f , 0.f ) , Vec2( pt->m_text.size() * pt->m_size , pt->m_size ) );
+						g_theBitMapFont->AddVertsForTextInBox2D( textVerts , textArea , pt->m_size , pt->m_text , pt->m_color , 1.f , pt->m_pivot );
+
+						Mat44 modal = pt->m_basis;
+						Mat44 cameraModal = m_camera->m_transform.ToMatrix();
+						Mat44 mo = Mat44::LookAt( modal.GetTranslation3D() , cameraModal.GetTranslation3D(), -cameraModal.GetJBasis3D() );
+						if ( pt->m_isBillboard )
+						{
+							modal.SetBasisVectors3D( mo.GetIBasis3D() , -mo.GetJBasis3D() , mo.GetKBasis3D() );
+						}
+
+						m_context->SetModalMatrix( modal );
+						m_context->BindTexture( g_theBitMapFont->GetTexture() );
+						m_context->DrawVertexArray( textVerts );
+						m_context->BindTexture( nullptr );
+						m_context->EndCamera( *m_camera );
+						break;
+					}
+
+					case DEBUG_RENDER_XRAY:
+					{
+						m_camera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
+						m_context->SetBlendMode( BlendMode::ALPHA );
+						m_context->BeginCamera( *m_camera );
+						pt->m_color.a = 100;
+						m_camera->CreateDepthStencilTarget( g_theRenderer );
+						m_context->SetDepthTest();
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+						m_context->BindShader( nullptr );
+
+						std::vector<Vertex_PCU> textVerts;
+						AABB2 textArea = AABB2( Vec2( 0.f , 0.f ) , Vec2( pt->m_text.size() * pt->m_size , pt->m_size ) );
+						g_theBitMapFont->AddVertsForTextInBox2D( textVerts , textArea , pt->m_size , pt->m_text , pt->m_color , 1.f , pt->m_pivot );
+
+						Mat44 modal = pt->m_basis;
+						Mat44 cameraModal = m_camera->m_transform.ToMatrix();
+						Mat44 mo = Mat44::LookAt( modal.GetTranslation3D() , cameraModal.GetTranslation3D() , -cameraModal.GetJBasis3D() );
+						if ( pt->m_isBillboard )
+						{
+							modal.SetBasisVectors3D( mo.GetIBasis3D() , -mo.GetJBasis3D() , mo.GetKBasis3D() );
+						}
+
+						m_context->SetModalMatrix( modal );
+						m_context->BindTexture( g_theBitMapFont->GetTexture() );
+						m_context->DrawVertexArray( textVerts );
+						m_context->BindTexture( nullptr );
+						m_context->EndCamera( *m_camera );
+
+
+						m_context->BeginCamera( *m_camera );
+						pt->m_color.a = 255;
+						m_context->SetDepthTest( COMPARE_GREATER );
+						m_context->BindDepthStencil( m_camera->m_backBuffer );
+						m_context->BindShader( nullptr );
+
+						m_context->SetModalMatrix( modal );
+						m_context->BindTexture( g_theBitMapFont->GetTexture() );
+						m_context->DrawVertexArray( textVerts );
+						m_context->BindTexture( nullptr );
+						m_context->SetDepthTest( COMPARE_LESS );
+						m_context->EndCamera( *m_camera );
+
+						break;
+					}
+
+
+					break;
+				}
 				break;
 			}
 
@@ -706,6 +1273,12 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 
 void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 {
+
+	if ( !enableRendring )
+	{
+		return;
+	}
+
 	Camera camera;	
 	if ( output != nullptr )
 	{
@@ -800,6 +1373,35 @@ void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 			break;
 		}
 
+		case OBJECT_TEXT_SCREEN:
+		{
+			DebugScreenText* pt = ( DebugScreenText* ) m_screenObjects[ index ];
+
+			m_context->BeginCamera( camera );
+			m_context->BindShader( nullptr );
+			
+			AABB2 screenArea = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
+			AABB2 textArea = AABB2( screenArea.mins , Vec2( pt->m_text.size() * pt->m_size * 1.f , pt->m_size ) );
+
+			float ratioX = RangeMapFloat( 0.f , 1.f , screenArea.mins.x , screenArea.maxs.x , pt->m_offset.z );
+			float ratioY = RangeMapFloat( 0.f , 1.f , screenArea.mins.y , screenArea.maxs.y , pt->m_offset.w );
+			textArea.Translate( Vec2( ratioX , ratioY ) );
+			textArea.Translate( Vec2( pt->m_offset.x , pt->m_offset.y ) );
+
+			float pivotX = ( textArea.maxs.x - textArea.mins.x ) * pt->m_pivot.x;
+			float pivotY = ( textArea.maxs.y - textArea.mins.y ) * pt->m_pivot.y;
+			textArea.Translate( Vec2( -pivotX , -pivotY ) );
+			std::vector<Vertex_PCU>textVerts;
+			g_theBitMapFont->AddVertsForTextInBox2D( textVerts , textArea , pt->m_size , pt->m_text , pt->m_color , 1.f , pt->m_pivot );
+			m_context->BindTexture( g_theBitMapFont->GetTexture() );
+			m_context->DrawVertexArray( textVerts );
+			m_context->BindTexture( nullptr );
+			m_context->EndCamera( camera );
+
+			break;
+
+		}
+
 		default:
 			break;
 		}
@@ -812,6 +1414,12 @@ void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 void DebugRenderSystem::DebugRenderSetScreenHeight( float height )
 {
 	m_defaultScreenHeight = height;
+}
+
+AABB2 DebugRenderSystem::DebugGetScreenBounds()
+{
+	AABB2 screenBounds = AABB2( Vec2( 0.f , 0.f ) , Vec2( CLIENT_ASPECT * m_defaultScreenHeight , m_defaultScreenHeight) );
+	return screenBounds;
 }
 
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
@@ -876,6 +1484,99 @@ void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 start_colo
 	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
 }
 
+void DebugAddWorldWireBounds( AABB3 bounds , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugWorldWireBox* obj = new DebugWorldWireBox( mode , DEBUG_RENDER_WORLD , bounds , color , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugWireSphere* obj = new DebugWireSphere( mode , DEBUG_RENDER_WORLD , pos , radius , color , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugWireSphere* obj = new DebugWireSphere( mode , DEBUG_RENDER_WORLD , pos , radius , start_color,end_color , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldBasis( Mat44 basis , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugBasis* obj = new DebugBasis( mode , DEBUG_RENDER_WORLD , basis , color , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldBasis( Mat44 basis , Rgba8 start_tint , Rgba8 end_tint , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugBasis* obj = new DebugBasis( mode , DEBUG_RENDER_WORLD , basis , start_tint,end_tint , duration );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldText( Mat44 basis , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode , char const* text )
+{
+	DebugWorldText* obj = new DebugWorldText( mode , DEBUG_RENDER_WORLD , size , start_color , end_color , basis ,duration, pivot , text );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , float size , Rgba8 color , float duration , eDebugRenderMode mode , char const* text , ... )
+{
+	va_list args;
+	va_start( args , text );
+	std::string tex = Stringv( text , args );
+
+	DebugWorldText* obj = new DebugWorldText( mode , DEBUG_RENDER_WORLD , size ,color, basis , duration , pivot , tex );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , float size , Rgba8 color , char const* text , ... )
+{
+	va_list args;
+	va_start( args , text );
+	std::string tex = Stringv( text , args );
+
+	DebugWorldText* obj = new DebugWorldText( DEBUG_RENDER_USE_DEPTH , DEBUG_RENDER_WORLD , size , color , basis , -1.f , pivot , tex );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+
+void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot ,float size, Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode , char const* text )
+{
+	Mat44 basis = Mat44();
+	basis.SetTranslation3D( origin );
+
+	DebugWorldText* obj = new DebugWorldText( mode , DEBUG_RENDER_WORLD , size , start_color , end_color , basis , duration , pivot , text, true );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , float size , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... )
+{
+
+	va_list args;
+	va_start( args , format );
+	std::string text = Stringv( format , args );
+
+	Mat44 basis = Mat44();
+	basis.SetTranslation3D( origin );
+
+	DebugWorldText* obj = new DebugWorldText( mode , DEBUG_RENDER_WORLD , size , color , basis , duration , pivot , text , true );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
+void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , float size , Rgba8 color , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string text = Stringv( format , args );
+
+	Mat44 basis = Mat44();
+	basis.SetTranslation3D( origin );
+
+	DebugWorldText* obj = new DebugWorldText( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_WORLD , size , color , basis , -1.f , pivot , text , true );
+	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+}
+
 void DebugAddScreenPoint( Vec2 pos , Rgba8 color )
 {
 	DebugPoint* obj = new DebugPoint( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN , Vec3( pos , 0.f ) ,10.f, color , -1.f );
@@ -933,6 +1634,37 @@ void DebugAddScreenQuad( AABB2 bounds , Rgba8 start_color , Rgba8 end_color , fl
 void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 uvs , Rgba8 tint , float duration /*= 0.0f */ )
 {
 	DebugQuad* obj = new DebugQuad( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_WORLD , Vec3( bounds.mins , 0.f ) , Vec3( bounds.maxs.x , bounds.mins.y , 0.f ) , Vec3( bounds.maxs , 0.f ) , Vec3( bounds.mins.x , bounds.maxs.y , 0.f ) , tint , tex , uvs , duration );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenText( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , char const* text )
+{
+	DebugScreenText* obj = new DebugScreenText( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN ,size, start_color , end_color , duration , pivot , ratioOffset , text );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenText( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 color , float duration , char const* text )
+{
+	DebugScreenText* obj = new DebugScreenText( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN ,size, color , duration , pivot , ratioOffset , text );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenTextf( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , char const* format , ... )
+{
+	std::string text = Stringfv2( format );
+
+	DebugScreenText* obj = new DebugScreenText( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN ,size, start_color , end_color , duration , pivot , ratioOffset , text );
+	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
+}
+
+void DebugAddScreenTextf( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 color , float duration , char const* format,... )
+{
+	
+	va_list args;
+	va_start( args , format );
+	std::string text = Stringv( format,args );
+
+	DebugScreenText* obj = new DebugScreenText( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN ,size, color , duration , pivot , ratioOffset , text );
 	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
 }
 

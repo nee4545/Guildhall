@@ -14,6 +14,8 @@
 
 #define UNUSED(x) (void)(x);
 
+eDebugRenderMode currentMode = DEBUG_RENDER_USE_DEPTH;
+
 
 bool Help( EventArgs& args )
 {
@@ -59,7 +61,7 @@ Game::Game()
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
 	g_theEventSystem.SubscribeToEvent( "close" , Close);
 
-	DebugRenderSystem::sDebugRenderer->TakeWorldCamera( m_camera );
+	//DebugRenderSystem::sDebugRenderer->TakeWorldCamera( m_camera );
 
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
@@ -153,14 +155,38 @@ Game::Game()
 
 	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
 	
-	//DebugAddScreenPoint( Vec2( 10.f , 10.f ) , Rgba8( 0 , 100 , 0 , 255 ) );
-	DebugAddScreenPoint( Vec2( 20.f , 20.f ) , 20.f , Rgba8( 0 , 0 , 100 , 255 ) , 3.f );
-	//DebugAddScreenLine( Vec2( 10.f , 10.f ) , Vec2( 300.f , 300.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 5.f , -1.f );
-	//DebugAddScreenLine( Vec2( 10.f , 10.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 300.f , 300.f ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 0 , 100 , 255 ) , 5.f , 4.f );
-	//DebugAddScreenArrow( Vec2( 10.f , 10.f ) , Vec2( 300.f , 300.f ) , Rgba8( 0 , 0 , 100 , 255 ) , 5.f , 20.f , 4.f );
-	//DebugAddScreenArrow( Vec2( 10.f , 10.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 300.f , 300.f ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 0 , 100 , 255 ) , 20.f , 20.f , 5.f  );
-	//DebugAddScreenQuad( AABB2( Vec2( 20.f , 20.f ) , Vec2( 50.f , 50.f ) ) , Rgba8( 0 , 100 , 0 , 255 ),Rgba8(100,0,0,255) , 5.f );
-	DebugAddScreenTexturedQuad( AABB2( Vec2( 20.f , 20.f ) , Vec2( 200.f , 200.f ) ) , tex , AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ) , Rgba8( 255 , 255 , 255 , 100 ) , 6.f );
+	
+
+	std::string text = "Pink Floyd > all music";
+	std::string s1 = "Press B to add a world Point";
+	std::string s2 = "Press N to add a world Line";
+	std::string s3 = "Press M to add a world Arrow";
+	std::string s4 = "Press K to add a wire sphere";
+	std::string s5 = "Press L to add a world Quad";
+	std::string s6 = "press P to add a world Basis ";
+	std::string s7 = "Press O to add text and billboard text";
+	std::string s8 = "Default mode is DEUBUG_RENDER_USE_DEPTH";
+	std::string s9 = "Press 1: RENDER_ALWAYS, 2: RENDER_DEPTH, 3: RENDER_XRAY";
+	std::string s10 = "U can already see some screen renders for 5-7 seconds";
+	std::string s11 = "Press J to add a wire box";
+
+	DebugAddScreenText( Vec4( 10.f , 0.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) ,30.f, Rgba8(100,0,0,255),75.f,s11.c_str());
+	DebugAddScreenText( Vec4( 10.f , 30.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s2.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 60.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s3.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 90.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s1.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 120.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s4.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 150.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s5.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 180.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s6.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 210.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s7.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 870.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , -1.f , s8.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 900.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , -1.f , s9.c_str() );
+	DebugAddScreenText( Vec4( 10.f , 840.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 10.f , s10.c_str() );
+
+	DebugAddScreenPoint( Vec2( 500.f , 500.f ) , 20.f , Rgba8( 0 , 0 , 100 , 255 ) , 3.f );
+	DebugAddScreenLine( Vec2( 600.f , 700.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 800.f , 800.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 12.f , 5.f );
+	DebugAddScreenArrow( Vec2( 200.f , 300.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 600.f , 500.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 12.f , 12.f,5.f );
+	DebugAddScreenTexturedQuad( AABB2( 300.f , 300.f , 400.f , 400.f ) , tex ,AABB2(0.f,0.f,1.f,1.f) ,Rgba8( 255 , 255 , 255 , 255 ) , 6.f );
+	
 }
 
 Game::~Game()
@@ -174,32 +200,64 @@ Game::~Game()
 void Game::Update( float deltaseconds )
 {
 	ToggleDevConsole();
+	ToggleRenderModes();
 
 	if ( g_theInput->WasKeyJustPressed( 'B' ) )
 	{
 		//DebugAddWorldPoint( m_camera->m_transform , 1.f , Rgba8( 255 , 255 , 255 , 255 ) , 50.f, DEBUG_RENDER_XRAY );
-		DebugAddWorldPoint( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f );
+		DebugAddWorldPoint( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f, currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'N' ) )
 	{
 		//DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 0 , 0 , 255 , 255 ) , 2.f , 4.f );
-		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 0.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ),Rgba8(0,0,100,255) , 2.f , 5.f,DEBUG_RENDER_USE_DEPTH );
+		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 0.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ),Rgba8(0,0,100,255) , 2.f , 5.f,currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'M' ) )
 	{
 		//DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 3.f , 2.f );
-		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 3.f , 2.f );
-
+		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 3.f , 2.f ,currentMode);
 	}
 
-	
+	if ( g_theInput->WasKeyJustPressed( 'K' ) )
+	{
+		DebugAddWorldWireSphere( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f ,currentMode);
+	}
 
 	if ( g_theInput->WasKeyJustPressed( 'L' ) )
 	{
-		DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 4.f ) , Vec3( 3.f , 3.f , 0.f ) , Vec3( 0.f , 4.f , 0.f ) , Rgba8( 0 , 0 , 100 , 255 ),Rgba8(100,0,0,255) , 4.f );
+		DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 4.f ) , Vec3( 3.f , 3.f , 0.f ) , Vec3( 0.f , 4.f , 0.f ) , Rgba8( 0 , 0 , 100 , 255 ),Rgba8(100,0,0,255) , 4.f ,currentMode);
 		//DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 0.f ) , Vec3( 2.f , 2.f , 0.f ) , Vec3( 0.f , 2.f , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ),tex, 4.f );
+	}
+
+
+	if ( g_theInput->WasKeyJustPressed( 'J' ) )
+	{
+		DebugAddWorldWireBounds( AABB3( 1.3f , 2.9f , 3.6f , 5.8f , 9.2f , 13.8f ) , Rgba8( 100 , 0 , 0 , 255 ) , 4.f,currentMode );
+		//DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 0.f ) , Vec3( 2.f , 2.f , 0.f ) , Vec3( 0.f , 2.f , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ),tex, 4.f );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'P' ) )
+	{
+		Transform temp = Transform();
+		temp.m_position.z = -9.f;
+		temp.m_position.x = -5.f;
+		Mat44 basis = m_camera->m_transform.ToMatrix();
+		basis.TransformBy( temp.ToMatrix() );
+		DebugAddWorldBasis( basis , Rgba8( 100 , 100 , 100 , 255 ) , 6.f,currentMode );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'O' ) )
+	{
+		Transform temp = Transform();
+		temp.m_position.z = -7.f;
+		temp.m_position.x = -5.f;
+		Mat44 basis = m_camera->m_transform.ToMatrix();
+		basis.TransformBy( temp.ToMatrix() );
+		std::string t = "Coming back to life";
+		DebugAddWorldText( basis , Vec2( 0.f , 0.f ) , 0.5f , Rgba8( 255 , 255 , 255 , 255 ) , Rgba8( 255 , 255 , 255 , 255 ) , 10.f , currentMode , t.c_str() );
+		DebugAddWorldBillboardText( basis.GetTranslation3D()+Vec3(0.f,2.f,0.f) , Vec2( 0.f , 0.f ) , 1.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ),10.f , currentMode ,t.c_str());
 	}
 
 	if ( g_theConsole.IsOpen() )
@@ -298,11 +356,6 @@ void Game::Render()
  	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
  	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
 
-	std::vector<Vertex_PCU> arrowVerts;
-	AppendArrow( arrowVerts , Vec3( 0.f , 0.f , 0.f ) , Vec3( 10.f , 5.f , 0.f ) , 4.f , 4.f , 6.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) );
-	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->DrawVertexArray( arrowVerts );
- 
  	g_theRenderer->BindShader( nullptr );
  	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
  	g_theRenderer->DrawMesh( mesh );
@@ -341,6 +394,27 @@ void Game::UpdateCamera()
 void Game::ToggleDebugCamera()
 {
 	
+}
+
+void Game::ToggleRenderModes()
+{
+	if ( g_theInput->WasKeyJustPressed( '1' ) )
+	{
+		renderMode = 1;
+		currentMode = DEBUG_RENDER_ALWAYS;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '2' ) )
+	{
+		renderMode = 2;
+		currentMode = DEBUG_RENDER_USE_DEPTH;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '3' ) )
+	{
+		renderMode = 3;
+		currentMode = DEBUG_RENDER_XRAY;
+	}
 }
 
 void Game::ToggleDevConsole()

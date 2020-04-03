@@ -97,7 +97,6 @@ void App::BeginFrame()
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
-
 }
 
 bool App::HandleQuitRequested()

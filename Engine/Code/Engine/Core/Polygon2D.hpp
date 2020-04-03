@@ -13,6 +13,7 @@ public:
 	float GetDistance( Vec2 point ) const;
 	Vec2 GetClosestPoint( Vec2 point ) const;
 	Vec2 GetClosestPointOnTheEdges( Vec2 point ) const;
+	Vec2 GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2 point , int &outIndex1 , int &outIndex2 );
 
 	// accessors
 	int GetVertexCount() const;
@@ -34,7 +35,6 @@ public: // static constructors (feel free to just use a constructor - I just lik
 	// create a convex wrapping of a collection of points;  
 	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points , int pointCount );
 	static bool IsPointPartOfPolygon(Vec2 point, Polygon2D &polygon);
-	static Vec2* GetNextPointToAddFromPointClound( Vec2 checkingEdge, Vec2 checkingVertex , std::vector<Vec2> points );
 	void Translate2D( Vec2 translation2D );
 	Vec2 GetCentre();
 	void SetPosition(Vec2 pos);

@@ -65,6 +65,23 @@ const std::string Stringf( const int maxLength, const char* format, ... )
 }
 
 
+std::string Stringv( char const* format , va_list args )
+{
+	char buffer[ 1024 ];
+	vsnprintf_s( buffer , 1024 , format , args );
+	return buffer;
+}
+
+std::string Stringfv2( char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string s = Stringv( format , args );
+	va_end( args );
+	return s;
+}
+
+
 
 
 

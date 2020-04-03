@@ -2,6 +2,10 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
+
+int CheckOrientation( Vec2 pointP , Vec2 pointQ , Vec2 pointR );
+int GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , int pointCount );
+
 bool Polygon2D::IsValid() const
 {
 	if ( m_points.size() < 3 )
@@ -178,6 +182,47 @@ Vec2 Polygon2D::GetClosestPointOnTheEdges( Vec2 point ) const
 	return nearestPoint;
 }
 
+Vec2 Polygon2D::GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2 point , int &outIndex1 , int &outIndex2 )
+{
+	std::vector<Vec2> closestPointsOnEachEdge;
+
+	Vec2 currentEdgeStart = m_points[ 0 ];
+	Vec2 currentEdgeEnd = m_points[ 1 ];
+
+	int counter = 0;
+	size_t start = 0;
+	size_t end = 1;
+	float minDistance = INFINITY;
+	Vec2 nearestPoint;
+
+	while ( counter < m_points.size() )
+	{
+		Vec2 closestPointOnEdge = GetNearestPointOnLineSegment2D( point , currentEdgeStart , currentEdgeEnd );
+		closestPointsOnEachEdge.push_back( closestPointOnEdge );
+
+		float distance = ( point - closestPointOnEdge ).GetLength();
+
+		if ( distance < minDistance )
+		{
+			minDistance = distance;
+			outIndex1 = (int)start;
+			outIndex2 = (int)end;
+			nearestPoint = closestPointOnEdge;
+		}
+
+
+		start = ( start + 1 ) % m_points.size();
+		end = ( end + 1 ) % m_points.size();
+
+		currentEdgeStart = m_points[ start ];
+		currentEdgeEnd = m_points[ end ];
+
+		counter++;
+	}
+
+	return nearestPoint;
+}
+
 int Polygon2D::GetVertexCount() const
 {
 	return (int)m_points.size();
@@ -279,75 +324,7 @@ Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , unsigned int pointCo
 
 }
 
-Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , int pointCount )
-{
-	if ( pointCount < 3 )
-	{
-		ERROR_AND_DIE( "Not enough points to construct" );
-	}
 
-	Polygon2D toReturn;
-
-	Vec2 rightMostVertex = points[ 0 ];
-	Vec2 nextVertex = points[ 1 ];
-
-	for ( int index = 0; index < pointCount; index++ )
-	{
-		if ( points[ index ].x > rightMostVertex.x )
-		{
-			rightMostVertex = points[ index ];
-		}
-	}
-
-	for ( int index = 0; index < pointCount; index++ )
-	{
-		if ( points[ index ].y < nextVertex.y && points[ index ] != rightMostVertex )
-		{
-			nextVertex = points[ index ];
-		}
-	}
-
-	toReturn.m_points.push_back( rightMostVertex );
-	toReturn.m_points.push_back( nextVertex );
-
-	bool constructionDone = false;
-	Vec2 nextPoint;
-	Vec2 checkingVec = rightMostVertex - nextVertex;
-	Vec2 endVertex = nextVertex;
-
-	std::vector<Vec2> edgesToSort;
-
-	while ( !constructionDone )
-	{
-
-		for ( int index = 0; index < pointCount; index++ )
-		{
-			if ( !Polygon2D::IsPointPartOfPolygon( points[ index ] , toReturn ) )
-			{
-				edgesToSort.push_back( points[ index ] );
-			}
-		}
-
-		Vec2* nextVec = Polygon2D::GetNextPointToAddFromPointClound( checkingVec , endVertex , edgesToSort );
-
-		if ( nextVec == nullptr )
-		{
-			constructionDone = true;
-			break;
-		}
-
-		nextPoint = *nextVec;
-		toReturn.m_points.push_back( nextPoint );
-		checkingVec = endVertex - nextPoint;
-		endVertex = nextPoint;
-		edgesToSort.clear();
-
-	}
-
-	return toReturn;
-	
-	
-}
 
 bool Polygon2D::IsPointPartOfPolygon( Vec2 point, Polygon2D &polygon )
 {
@@ -362,44 +339,6 @@ bool Polygon2D::IsPointPartOfPolygon( Vec2 point, Polygon2D &polygon )
 	return false;
 }
 
-Vec2* Polygon2D::GetNextPointToAddFromPointClound( Vec2 checkingEdge, Vec2 checkingVertex , std::vector<Vec2> points )
-{
-	Vec2 normal = checkingEdge.GetRotated90Degrees();
-
-	Vec2* toReturn = nullptr;
-
-	std::vector<Vec2> pointsToConsider;
-
-	for ( int index = 0; index < points.size(); index++ )
-	{
-		if ( DotProduct2D( checkingEdge , points[ index ] )>0 )
-		{
-			pointsToConsider.push_back( points[ index ] );
-		}
-	}
-
-	if ( pointsToConsider.size() == 0 )
-	{
-		return nullptr;
-	}
-
-	toReturn = &(pointsToConsider[ 0 ]);
-
-	for ( int index = 0; index < pointsToConsider.size(); index++ )
-	{
-		if ( *toReturn == pointsToConsider[ index ] )
-		{
-			continue;
-		}
-
-		if ( GetAngleDegreesBetweenVectors2D( normal , ( *toReturn - checkingVertex )) > GetAngleDegreesBetweenVectors2D( normal , ( pointsToConsider[ index ] - checkingVertex ) ))
-		{
-			toReturn = &pointsToConsider[ index ];
-		}
-	}
-
-	return toReturn;
-}
 
 void Polygon2D::Translate2D( Vec2 translation2D )
 {
@@ -463,5 +402,52 @@ float Polygon2D::GetBoundingDiscRadius()
 	}
 
 	return maxDistance;
+}
+
+
+Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , int pointCount )
+{
+	const int start = GetIndexOfLeftMostPointFromPointCloud( points , pointCount );
+	int point = start , nextPoint;
+
+	Polygon2D tempPolygon;
+	do
+	{
+		nextPoint = ( point + 1 ) % pointCount;
+		for ( int index = 0; index < pointCount; index++ )
+		{
+			if ( CheckOrientation( points[ point ] , points[ index ] , points[ nextPoint ] ) == 2 )
+			{
+				nextPoint = index;
+			}
+		}
+		tempPolygon.m_points.push_back( points[ nextPoint ] ); 
+		point = nextPoint; 
+
+	} while ( point != start );
+	
+	return tempPolygon;
+}
+
+int CheckOrientation( Vec2 pointP , Vec2 pointQ , Vec2 pointR )
+{
+	int val = ( int ) ( ( pointQ.y - pointP.y ) * ( pointR.x - pointQ.x ) - ( pointQ.x - pointP.x ) * ( pointR.y - pointQ.y ) );
+	if ( val == 0 )
+	{
+		return 0; // colinear
+	}
+	return ( val > 0 ) ? 1 : 2; // clock or counterclock wise
+}
+
+
+int GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , int pointCount )
+{
+	int indexOfLeftMostPoint = 0;
+	for ( int index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x < points[ indexOfLeftMostPoint ].x )
+			indexOfLeftMostPoint = index;
+	}
+	return indexOfLeftMostPoint;
 }
 

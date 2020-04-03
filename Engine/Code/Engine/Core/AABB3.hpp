@@ -7,8 +7,8 @@ class IntVec2;
 struct AABB3
 {
 public:
-	Vec3 mins;
-	Vec3 maxs;
+	Vec3 m_mins;
+	Vec3 m_maxs;
 
 public:
 	AABB3() = default;

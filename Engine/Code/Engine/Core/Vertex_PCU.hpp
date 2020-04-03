@@ -51,4 +51,5 @@ void AppendDisc2( std::vector<Vertex_PCU>& verts , float radius , const Rgba8& t
 void AppendCyinder( std::vector<Vertex_PCU>& cylinderVerts, Vec3 start, Vec3 end, float startRadius, float endRadius, Rgba8 startColor, Rgba8 endColor );
 void AppendArrow( std::vector<Vertex_PCU>& arrowVerts , Vec3 start , Vec3 end ,float coneHeight, float lineRadius , float arrowRadius , Rgba8 lineColor , Rgba8 arrowColor );
 void AppendPolygon2(std::vector<Vertex_PCU>& verts,const Polygon2D* poly);
+void AppendCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< unsigned int >& cubeIndices , const AABB3 box , const Rgba8& tint );
 void TransformVertexArray( std::vector<Vertex_PCU>& vertices , float scale , float rotationDegrees , const Vec2& translation );

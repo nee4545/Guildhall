@@ -7,17 +7,17 @@ AABB3::AABB3( const AABB3& copyFrom )
 
 AABB3::AABB3( const Vec3& mins , const Vec3& maxs )
 {
-	this->mins = mins;
-	this->maxs = maxs;
+	this->m_mins = mins;
+	this->m_maxs = maxs;
 }
 
 AABB3::AABB3( float minX , float minY , float minZ , float maxX , float maxY , float maxZ )
 {
-	mins.x = minX;
-	mins.y = minY;
-	mins.z = minZ;
+	m_mins.x = minX;
+	m_mins.y = minY;
+	m_mins.z = minZ;
 
-	maxs.x = maxX;
-	maxs.y = maxY;
-	maxs.z = maxZ;
+	m_maxs.x = maxX;
+	m_maxs.y = maxY;
+	m_maxs.z = maxZ;
 }

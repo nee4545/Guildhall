@@ -66,7 +66,7 @@ m_uvTexCoords=uvTexCoords;
  }
 
  
- void AppendAABB3( std::vector<Vertex_PCU>& verts , AABB3& aabb , const Rgba8& tint )
+ /*void AppendAABB3( std::vector<Vertex_PCU>& verts , AABB3& aabb , const Rgba8& tint )
  {
 	 Vertex_PCU vert[ 6 ]
 	 {
@@ -84,7 +84,7 @@ m_uvTexCoords=uvTexCoords;
 	 {
 		 verts.push_back( vert[ index ] );
 	 }
- }
+ }*/
 
  void AppendDisc2( std::vector<Vertex_PCU>& verts , float radius , const Rgba8& color )
  {
@@ -340,4 +340,67 @@ m_uvTexCoords=uvTexCoords;
 	 name = "";
 	 type = BUFFER_FORMAT_VEC2;
 	 offset = 0;
+ }
+
+
+ void AppendCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< unsigned int >& cubeIndices , const AABB3 box , const Rgba8& tint )
+ {
+	 Vertex_PCU CubeVerts[ 24 ] = {
+		 
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 1.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+						 
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y )  , tint, Vec2( 1.f, 1.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+										 
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+														
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+																		 
+	 Vertex_PCU( Vec3( box.m_mins.x, box.m_maxs.z, box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x, box.m_maxs.z, box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z, box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+																						 
+	 Vertex_PCU( Vec3( box.m_mins.x, box.m_mins.z, box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x, box.m_mins.z, box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	 Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+	 Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z, box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	 };
+
+	 for ( int index = 0; index < 24; index++ )
+	 {
+		 cubeMeshVerts.push_back( CubeVerts[ index ] );
+	 }
+
+	 int CubeIndices[ 36 ] = 
+	 {
+		0,1,2,
+		2,3,0,
+		4,5,6,
+		6,7,4,
+		8,9,10,
+		10,11,8,
+		12,13,14,
+		14,15,12,
+		16,17,18,
+		18,19,16,
+		20,21,22,
+		22,23,20,
+	 };
+
+	 for ( int index = 0; index < 36; index++ )
+	 {
+		 cubeIndices.push_back( CubeIndices[ index ] );
+	 }
  }

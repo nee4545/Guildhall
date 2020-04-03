@@ -424,6 +424,24 @@ void RenderContext::CreateRasterState( D3D11_FILL_MODE fillmode , D3D11_CULL_MOD
 	desc.AntialiasedLineEnable = FALSE;
 
 	ID3D11Device* device = m_device;
+
+	if ( m_rasterState != nullptr )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
+	device->CreateRasterizerState( &desc , &m_rasterState );
+}
+
+void RenderContext::CreateRasterState( D3D11_RASTERIZER_DESC desc )
+{
+	ID3D11Device* device = m_device;
+
+	if ( m_rasterState != nullptr )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
 	device->CreateRasterizerState( &desc , &m_rasterState );
 }
 
@@ -652,8 +670,6 @@ void RenderContext::Shutdown()
 
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
-
-	
 
 	ReportLiveObjects();
 	DestroyDebugModule();

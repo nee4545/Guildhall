@@ -9,7 +9,6 @@ class Shader;
 class GPUMesh;
 
 
-
 class Game
 {
 	RandomNumberGenerator rng;
@@ -28,6 +27,7 @@ public:
 
 	Vec3 movement;
 	Vec3 m_cameraRotation;
+	int renderMode = 2;
 	Game();
 	~Game();
 
@@ -41,6 +41,7 @@ public:
 	void UpdateCamera();
 
 	void ToggleDebugCamera();
+	void ToggleRenderModes();
 	void ToggleDevConsole();
 	void ToggleDebugging();
 };

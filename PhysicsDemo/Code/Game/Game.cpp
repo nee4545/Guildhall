@@ -1078,12 +1078,9 @@ void Game::Update( float deltaseconds )
 	}
 
 	HandleGravityModification();
-	//HandleCollissions();
+	HandleCollissions();
 	HandleBounceAndWrapAround();
 
-	
-	
-	
 }
 
 void Game::Render()
@@ -1111,6 +1108,7 @@ void Game::Render()
 		DisplayToolTip();
 	}
 	
+
 	g_theRenderer->EndCamera( *m_camera );
 
 	if ( g_theConsole.IsOpen() )
