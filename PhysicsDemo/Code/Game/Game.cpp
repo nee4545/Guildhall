@@ -10,6 +10,7 @@
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Core/Polygon2D.hpp"
 #include "Engine/Core/Clock.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -774,7 +775,6 @@ void Game::DisplayX()
 			{
 				PolygonCollider2D* temp = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
 				m_BitmapFont->AddVertsForText2D( textVerts , temp->m_polygonLocal->GetCentre() , 1.f , x , Rgba8( 0 , 0 , 255 , 255 ) );
-
 				g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
 				g_theRenderer->DrawVertexArray( textVerts );
 				g_theRenderer->BindTexture( nullptr );
@@ -1116,6 +1116,7 @@ void Game::Render()
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
 
+	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
 	
 }
 

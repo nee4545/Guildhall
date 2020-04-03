@@ -41,7 +41,7 @@ public:
 	void ResolveCollissions();
 	void ResolveCollission( Collision2D collission );
 
-	Vec2 GetImpulse( Collision2D& collision );
+	Vec2 GetImpulse( Collision2D& collision, Vec2& outTangentImpusle );
 
 	void SetSceneGravity( float gravity );
 	void CleanUp();

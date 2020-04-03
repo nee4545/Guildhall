@@ -148,7 +148,9 @@ void Rigidbody2D::ApplyTorque( Vec2 impulse , Vec2 point )
 	if ( m_collider->m_colliderType == COLLIDER2D_POLYGON )
 	{
 		PolygonCollider2D* temp = ( PolygonCollider2D* ) m_collider;
+		
 		d = ( point - temp->m_polygonLocal->GetCentre() ).GetRotated90Degrees();
+		
 	}
 
 	float torque = DotProduct2D( d , impulse );

@@ -8,8 +8,9 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Core/Clock.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
@@ -32,7 +33,10 @@ void App::Startup()
 		thegame = new Game();
 	}
 	g_theConsole.Startup();
+
 	Clock::SystemStartup();
+
+	DebugRenderSystem::sDebugRenderer->SystemStartUp();
 }
 
 App::~App()
@@ -47,6 +51,8 @@ void App::Shutdown() //Not used right now
 	delete thegame;
 	thegame = nullptr;
 
+	DebugRenderSystem::sDebugRenderer->SystemShutDown();
+
 	g_theRenderer->Shutdown();
 
 }
@@ -57,17 +63,59 @@ void App::Update( float deltaSeconds )
 {
 
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
+	DebugRenderSystem::sDebugRenderer->Update();
+
+	if ( g_theInput->IsKeyPressed( 'Y' ) )
+	{
+		deltaSeconds *= 4.f;
+	}
+
+	if ( g_theInput->IsKeyPressed( 'T' ) )
+	{
+		deltaSeconds *= 0.1f;
+	}
+
+	/*if ( g_theInput->WasKeyJustPressed( 'G' ) )
+	{
+		HICON icon = LoadIcon( NULL , IDI_WARNING );
+		SendMessage( ( HWND ) g_theWindow->m_hwnd , WM_SETICON , ICON_BIG , ( LPARAM ) icon );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'H' ) )
+	{
+		SetWindowText( ( HWND ) g_theWindow->m_hwnd , L"New Title" );
+	}
+	if ( g_theInput->WasKeyJustPressed( 'J' ) )
+	{
+		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+			WS_POPUP );
+		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWDEFAULT );
+	}
+	if ( g_theInput->WasKeyJustPressed( 'K' ) )
+	{
+		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+			WS_POPUP );
+		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWMAXIMIZED );
+	}*/
 
 	g_theInput->UpdateMouse();
 
-	thegame->Update( (float)Clock::gMasterClock.GetLastDeltaSeconds() );
+	if ( g_theInput->GetCursorMode() == MODE_RELATIVE )
+	{
+		g_theInput->UpdateRelativeMode();
+	}
+
+	thegame->Update( deltaSeconds );
 
 	g_theConsole.Update( deltaSeconds );
 
+
 	if ( g_theWindow->m_quitRequested == true )
 	{
+
 		HandleQuitRequested();
 	}
+
 
 }
 
@@ -80,8 +128,8 @@ void App::EndFrame() //Not used right now
 {
 	g_theInput->EndFrame();
 	g_theRenderer->EndFrame();
-	thegame->EndFrame();
 	g_theConsole.EndFrame();
+
 }
 
 void App::Render() const
@@ -89,14 +137,16 @@ void App::Render() const
 
 	/*render->ClaerScreen(Rgba8(0,0,0,1));*/
 	thegame->Render();
+	//DebugRenderSystem::sDebugRenderer->Render();
 }
 
 void App::BeginFrame()
 {
-	Clock::BeginFrame();
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
+	Clock::BeginFrame();
+
 }
 
 bool App::HandleQuitRequested()
@@ -109,4 +159,3 @@ void App::ResetGame()
 {
 
 }
-
