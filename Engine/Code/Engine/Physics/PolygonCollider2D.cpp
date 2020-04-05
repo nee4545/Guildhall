@@ -12,13 +12,14 @@ PolygonCollider2D::PolygonCollider2D( Vec2 localPosition , Polygon2D* polygon )
 
 	m_colliderType = COLLIDER2D_POLYGON;
 	m_polygonLocal = polygon;
-	m_polygonLocal->m_localPos = localPosition;
+	
 	m_localPosition = localPosition;
 	boundingDiscRadius = m_polygonLocal->GetBoundingDiscRadius();
 
-	
+	m_polygonLocal->SetCenter( Vec2( 0.f , 0.f ) );
+	//m_worldPosition = localPosition;
+
 	//UpdateWorldShape();
-	
 }
 
 void PolygonCollider2D::UpdateWorldShape()
@@ -28,8 +29,6 @@ void PolygonCollider2D::UpdateWorldShape()
 	m_polygonLocal->SetPosition( m_worldPosition );
 
 }
-
-
 
 Vec2 PolygonCollider2D::GetClosestPoint( Vec2 pos ) const
 {
@@ -87,6 +86,7 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 {
 	ctx->DrawPolygonFilled( *m_polygonLocal , fillColor );
 	ctx->DrawPolygonUnfilled( *m_polygonLocal , borderColor , 0.2f );
+	
 }
 
 void PolygonCollider2D::MarkForDestroy()

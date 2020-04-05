@@ -69,7 +69,7 @@ typedef Manifold2(*manifoldGenerations)( Collider2D const* , Collider2D const* )
 Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 );
 Manifold2 GenerateDiscAndPolygonManifold( Collider2D const* col0 , Collider2D const* col1 );
 Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 );
-
+Manifold2 GeneratePolygonPolygonManifold( Collider2D const* col0 , Collider2D const* col1 );
 
 
 

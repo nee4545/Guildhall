@@ -107,7 +107,6 @@ float GetMomentOfInertiaOfTriangle( Polygon2D polygon, Vec2 point0 , Vec2 point1
 float GetAreaOfTriangele( Vec2 point0 , Vec2 point1 , Vec2 point2 );
 float GetAreaOfPolygon( Polygon2D polygon );
 
-
 Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction );
 bool DetectPolygonvPolygonIntersections(Polygon2D poly1, Polygon2D poly2, Vec2* outSimplex);
 void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3, Polygon2D poly1, Polygon2D poly2 );

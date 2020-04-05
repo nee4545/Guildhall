@@ -23,6 +23,7 @@ public:
 	Vec2 GetRightMostEdge();
 	Vec2 GetLeftMostEdge();
 	void GetPoints( Vec2* outPoints ) const;
+	void InsertNewVertexBetween(Vec2 point, int index1 , int index2 );
 	std::vector<Vec2> m_points;
 	Vec2 m_localPos;
 
@@ -39,6 +40,7 @@ public: // static constructors (feel free to just use a constructor - I just lik
 	Vec2 GetCentre();
 	void SetPosition(Vec2 pos);
 	float GetBoundingDiscRadius();
+	void SetCenter( Vec2 position );
 
 private:
 	Vec2 m_centre;

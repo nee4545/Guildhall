@@ -12,7 +12,7 @@
 manifoldGenerations gManifoldGenerations[ NUM_COLLIDER_TYPES * NUM_COLLIDER_TYPES ] =
 {
 	GenerateDiscAndDiscManifold, GenerateDiscAndPolygonManifold,
-	GeneratePolygonAndDiscManifold, nullptr
+	GeneratePolygonAndDiscManifold, GeneratePolygonPolygonManifold
 };
 
 
@@ -324,8 +324,10 @@ void Physics2D::ResolveCollissions()
 
 void Physics2D::ResolveCollission( Collision2D collision )
 {
+
+	Vec2 contactPoint = (collision.manifold.contactPoint1 + collision.manifold.contactPoint2)*0.5f;
 	
-	if ( collision.me->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
+	if ( collision.me->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON && collision.them->m_rigidbody->m_collider->m_colliderType!=COLLIDER2D_POLYGON )
 	{
 		collision.manifold.normal *= -1;
 	}
@@ -377,27 +379,27 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		collision.me->m_rigidbody->ApplyImpulse( tangentImp );
 		collision.them->m_rigidbody->ApplyImpulse( -tangentImp );
 
-		collision.me->m_rigidbody->ApplyTorque( tangentImp , collision.manifold.centre );
-		collision.them->m_rigidbody->ApplyTorque( -tangentImp , collision.manifold.centre );
+		collision.me->m_rigidbody->ApplyTorque( tangentImp , contactPoint );
+		collision.them->m_rigidbody->ApplyTorque( -tangentImp , contactPoint );
 
-		collision.me->m_rigidbody->ApplyTorque( imp , collision.manifold.centre );
-		collision.them->m_rigidbody->ApplyTorque( -imp , collision.manifold.centre );
+		collision.me->m_rigidbody->ApplyTorque( imp , contactPoint );
+		collision.them->m_rigidbody->ApplyTorque( -imp , contactPoint );
 	}
 
 	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
 	{
 		collision.them->m_rigidbody->ApplyImpulse( -imp );
 		collision.them->m_rigidbody->ApplyImpulse( -tangentImp );
-		collision.them->m_rigidbody->ApplyTorque( -tangentImp , collision.manifold.centre );
-		collision.them->m_rigidbody->ApplyTorque( -imp , collision.manifold.centre );
+		collision.them->m_rigidbody->ApplyTorque( -tangentImp , contactPoint );
+		collision.them->m_rigidbody->ApplyTorque( -imp , contactPoint );
 	}
 
 	if ( collision.them->m_rigidbody->m_mode == STATIC && ( collision.me->m_rigidbody->m_mode == KINAMETIC || collision.me->m_rigidbody->m_mode == DYNAMIC ) )
 	{
 		collision.me->m_rigidbody->ApplyImpulse( imp );
 		collision.me->m_rigidbody->ApplyImpulse( tangentImp );
-		collision.me->m_rigidbody->ApplyTorque( tangentImp , collision.manifold.centre );
-		collision.me->m_rigidbody->ApplyTorque( imp , collision.manifold.centre );
+		collision.me->m_rigidbody->ApplyTorque( tangentImp , contactPoint );
+		collision.me->m_rigidbody->ApplyTorque( imp , contactPoint );
 	}
 
 }
@@ -405,20 +407,22 @@ void Physics2D::ResolveCollission( Collision2D collision )
 Vec2 Physics2D::GetImpulse( Collision2D& collision, Vec2 &outTangentImpusle )
 {
 
+	Vec2 contactPoint = ( collision.manifold.contactPoint1 + collision.manifold.contactPoint2 ) * 0.5f;
+
 	float myMass = collision.me->m_rigidbody->m_mass;
 	float theirMass = collision.them->m_rigidbody->m_mass;
 	
 	Vec2 n = collision.manifold.normal;
 	Vec2 t = collision.manifold.normal.GetRotatedMinus90Degrees();
 
-	Vec2 myVel = collision.me->m_rigidbody->GetImapctVeclocity( collision.manifold.centre );
-	Vec2 themVelDiff = collision.them->m_rigidbody->GetImapctVeclocity( collision.manifold.centre );
+	Vec2 myVel = collision.me->m_rigidbody->GetImapctVeclocity( contactPoint );
+	Vec2 themVelDiff = collision.them->m_rigidbody->GetImapctVeclocity( contactPoint );
 	Vec2 imapctVelDiff = myVel - themVelDiff;
 	
 	float numerator = -1 * ( 1 + collision.me->GetRestitutionWith( collision.them ) ) * DotProduct2D( ( imapctVelDiff ) , n );
 
-	Vec2 rap = ( collision.manifold.centre - collision.me->m_rigidbody->m_worldPosition ).GetRotated90Degrees();
-	Vec2 rbp = ( collision.manifold.centre - collision.them->m_rigidbody->m_worldPosition ).GetRotated90Degrees();
+	Vec2 rap = ( contactPoint - collision.me->m_rigidbody->m_worldPosition ).GetRotated90Degrees();
+	Vec2 rbp = ( contactPoint - collision.them->m_rigidbody->m_worldPosition ).GetRotated90Degrees();
 
 	if ( collision.me->m_rigidbody->m_mode == STATIC && ( collision.them->m_rigidbody->m_mode == KINAMETIC || collision.them->m_rigidbody->m_mode == DYNAMIC ) )
 	{
@@ -592,7 +596,8 @@ Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const
 	Vec2 normal = ( disc0->m_worldPosition - disc1->m_worldPosition ).GetNormalized();
 	Vec2 centre = ( disc0->m_worldPosition ) - ( normal * distance * 0.5f ) - ( normal * disc0->m_radius );
 
-	collision.centre = centre;
+	collision.contactPoint1 = centre;
+	collision.contactPoint2 = centre;
 	collision.normal = normal;
 	collision.penetration = distance;
 
@@ -607,31 +612,54 @@ Manifold2 GenerateDiscAndPolygonManifold( Collider2D const* col0 , Collider2D co
 Manifold2 GeneratePolygonAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 )
 {
 	Manifold2 collision;
-	DiscCollider2D* discColliderMe = ( DiscCollider2D* ) col0;
-	PolygonCollider2D* polyColliderThem = ( PolygonCollider2D* ) col1;
-	Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->m_worldPosition );
-	collision.normal = ( discColliderMe->m_worldPosition - closetPoint ).GetNormalized();
-	collision.penetration = discColliderMe->m_radius - ( discColliderMe->m_worldPosition - closetPoint ).GetLength();
-	
-	if ( discColliderMe->Contains( closetPoint ) )
+	DiscCollider2D* me = ( DiscCollider2D* ) col0;
+	PolygonCollider2D* them = ( PolygonCollider2D* ) col1;
+	Vec2 closetPoint = them->GetClosestPoint( me->m_worldPosition );
+	collision.normal = ( me->m_worldPosition - closetPoint ).GetNormalized();
+	collision.penetration = me->m_radius - ( me->m_worldPosition - closetPoint ).GetLength();
+
+	if ( me->Contains( closetPoint ) )
 	{
-		closetPoint = polyColliderThem->m_polygonLocal->GetClosestPointOnTheEdges( closetPoint );
-		collision.normal = ( closetPoint - discColliderMe->m_worldPosition ).GetNormalized();
-		collision.penetration = -( closetPoint - discColliderMe->m_worldPosition ).GetLength() + discColliderMe->m_radius;
-		collision.normal = collision.normal.GetRotatedDegrees( 180.f );
+		closetPoint = them->m_polygonLocal->GetClosestPointOnTheEdges( closetPoint );
+		collision.normal = ( closetPoint - me->m_worldPosition ).GetNormalized();
+		collision.penetration = -( closetPoint - me->m_worldPosition ).GetLength() + me->m_radius;
+		collision.normal = -collision.normal;
 	}
 
-	if ( polyColliderThem->Contains( discColliderMe->m_worldPosition ) )
+	if ( them->Contains( me->m_worldPosition ) )
 	{
 		collision.normal = -collision.normal;
-		collision.penetration = ( discColliderMe->m_worldPosition - closetPoint ).GetLength() + discColliderMe->m_radius;
+		collision.penetration = ( me->m_worldPosition - closetPoint ).GetLength() + me->m_radius;
 	}
+	Vec2 contactPoint = me->m_worldPosition -
+		( collision.normal * ( me->m_radius - ( collision.penetration * 0.5f ) ) );
 
-	collision.centre = discColliderMe->m_worldPosition - ( collision.normal * ( discColliderMe->m_radius ) );
+	collision.contactPoint1 = contactPoint;
+	collision.contactPoint2 = contactPoint;
 
-	/*DebugAddWorldPoint( Vec3( collision.centre , 1.f ) , 1.f , Rgba8( 100 , 0 , 0 , 255 ) , 0.f );
-	DebugAddWorldArrow( Vec3( discColliderMe->m_worldPosition , 0.f ) , Vec3( discColliderMe->m_worldPosition , 0.f ) + Vec3( collision.normal , 0.f ) * 3.f , Rgba8( 100 , 0 , 0 , 255 ) , 0.f , 1.f , DEBUG_RENDER_ALWAYS );*/
+	return collision;
+}
 
+Manifold2 GeneratePolygonPolygonManifold( Collider2D const* col0 , Collider2D const* col1 )
+{
+	Manifold2 collision;
+	PolygonCollider2D* me = ( PolygonCollider2D* ) col0;
+	PolygonCollider2D* them = ( PolygonCollider2D* ) col1;
+
+	Polygon2D minkowskiPolygon = GetMinkowskiPolygonIfIntersects( *(me->m_polygonLocal) , *(them->m_polygonLocal) );
+
+	Vec2 nearestPoint = minkowskiPolygon.GetClosestPointOnTheEdges( Vec2( 0.f , 0.f ) );
+
+	collision.normal = -nearestPoint.GetNormalized();
+	collision.penetration = nearestPoint.GetLength();
+
+	Vec2 cp1;
+	Vec2 cp2;
+
+	GetContactPoints( minkowskiPolygon , *( me->m_polygonLocal ) , *( them->m_polygonLocal ) , cp1 , cp2 );
+
+	collision.contactPoint1 = cp1;
+	collision.contactPoint2 = cp2;
 	
 	return collision;
 }

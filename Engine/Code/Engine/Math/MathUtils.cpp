@@ -707,7 +707,7 @@ bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2, Vec2
 	{
 		outSimplex[ 0 ] = sp1;
 		outSimplex[ 1 ] = sp2;
-		outSimplex[ 3 ] = sp3;
+		outSimplex[ 2 ] = sp3;
 		simplexFound = true;
 		return true;
 	}
@@ -721,7 +721,7 @@ bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2, Vec2
 			simplexFound = true;
 			outSimplex[ 0 ] = sp1;
 			outSimplex[ 1 ] = sp2;
-			outSimplex[ 3 ] = sp3;
+			outSimplex[ 2 ] = sp3;
 			return true;
 		}
 
@@ -850,11 +850,29 @@ Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
 	DetectPolygonvPolygonIntersections( poly1 , poly2 , simplex );
 
 	std::vector<Vec2> finalListOfPoints;
-	finalListOfPoints.push_back( simplex[ 0 ] );
-	finalListOfPoints.push_back( simplex[ 1 ] );
-	finalListOfPoints.push_back( simplex[ 2 ] );
 
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[0] , 3 );
+	if ( CrossProduct2D( simplex[1] - simplex[0] , simplex[2] - simplex[0] ) > 0 )
+	{
+		finalListOfPoints.push_back( simplex[0] );
+		finalListOfPoints.push_back( simplex[1] );
+		finalListOfPoints.push_back( simplex[2] );
+	}
+	else if ( CrossProduct2D( simplex[2] - simplex[1] , simplex[1] - simplex[0] ) > 0 )
+	{
+		finalListOfPoints.push_back( simplex[0] );
+		finalListOfPoints.push_back( simplex[2] );
+		finalListOfPoints.push_back( simplex[1] );
+	}
+	else
+	{
+		finalListOfPoints.push_back( simplex[1] );
+		finalListOfPoints.push_back( simplex[2] );
+		finalListOfPoints.push_back( simplex[0] );
+	}
+
+	toReturn.m_points.push_back( finalListOfPoints[ 0 ] );
+	toReturn.m_points.push_back( finalListOfPoints[ 1 ] );
+	toReturn.m_points.push_back( finalListOfPoints[ 2 ] );
 
 	int index1;
 	int index2;
@@ -864,38 +882,22 @@ Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
 
 	Plane2 currentPlane = Plane2( dir , nearestPoint );
 
-	const float nearZero = 0.0001f;
+	const float nearZero = 0.001f;
 					
 	Vec2 supportPoint =GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
 	
-	if (currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	if (abs(currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero) )
 	{
 		return toReturn;
 	}
 
 	finalListOfPoints.push_back( supportPoint );
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , (int)finalListOfPoints.size() );
+	toReturn.InsertNewVertexBetween( supportPoint , index1 , index2 );
 
-	
-	nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ) , index1 , index2 );
-	dir = nearestPoint.GetNormalized();
+	Plane2 nextPlane;
 
-	Plane2 nextPlane= Plane2(dir,nearestPoint);
-
-	supportPoint = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
-
-	if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	while ( !(nextPlane == currentPlane) )
 	{
-		return toReturn;
-	}
-
-	finalListOfPoints.push_back( supportPoint );
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , ( int ) finalListOfPoints.size() );
-
-	while ( nextPlane != currentPlane )
-	{
-		currentPlane = nextPlane;
-
 		nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ) , index1 , index2 );
 		dir = nearestPoint.GetNormalized();
 
@@ -903,13 +905,14 @@ Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
 
 		supportPoint = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
 
-		if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+		if ( abs(nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero) )
 		{
 			return toReturn;
 		}
 
 		finalListOfPoints.push_back( supportPoint );
-		toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , ( int ) finalListOfPoints.size() );
+		toReturn.InsertNewVertexBetween( supportPoint , index1 , index2 );
+		currentPlane = nextPlane;
 	}
 
 	return toReturn;
@@ -991,10 +994,8 @@ void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D pol
 		}
 	}
 	
-
 	cp1 = minPoint;
 	cp2 = maxPoint;
-	
 }
 
 Vec2 GetDirectionForNextPointInMinkowskiSpace( Polygon2D poly )
@@ -1086,10 +1087,7 @@ FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const V
 		}
 	}
 
-
-
 	return FloatRange( minLength , maxLength );
-
 }
 
 float DotProduct2D( const Vec2& a, const Vec2& b )

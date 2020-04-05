@@ -294,6 +294,20 @@ void Polygon2D::GetPoints( Vec2* outPoints ) const
 
 
 
+void Polygon2D::InsertNewVertexBetween( Vec2 point, int index1 , int index2 )
+{
+//	UNUSED( index2 );
+	
+	if ( index1 == 0 && index2 == ( m_points.size() - 1 ) )
+	{
+		m_points.push_back( point );
+		return;
+	}
+
+	m_points.insert( m_points.begin() + index1 , point );
+
+}
+
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , unsigned int pointCount )
 {
 	Polygon2D toReturn;
@@ -371,12 +385,15 @@ Vec2 Polygon2D::GetCentre()
 void Polygon2D::SetPosition(Vec2 pos)
 {
 
+	Vec2 centre = GetCentre();
+	Vec2 moveVec = pos - centre;
+
 	for ( int index = 0; index < m_points.size(); index++ )
 	{
-		m_points[ index ] = m_points[index]+ pos - m_localPos;
+		m_points[ index ] = m_points[index]+ moveVec;
 	}
 
-	m_localPos = pos;
+	//m_localPos = pos;
 }
 
 float Polygon2D::GetBoundingDiscRadius()
@@ -404,6 +421,18 @@ float Polygon2D::GetBoundingDiscRadius()
 	return maxDistance;
 }
 
+
+void Polygon2D::SetCenter( Vec2 position )
+{
+	Vec2 centre = GetCentre();
+
+	Vec2 moveVec = position - centre;
+
+	for ( int i = 0; i < m_points.size(); i++ )
+	{
+		m_points[i]+=moveVec;
+	}
+}
 
 Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , int pointCount )
 {
@@ -443,11 +472,13 @@ int CheckOrientation( Vec2 pointP , Vec2 pointQ , Vec2 pointR )
 int GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , int pointCount )
 {
 	int indexOfLeftMostPoint = 0;
+	
 	for ( int index = 1; index < pointCount; index++ )
 	{
 		if ( points[ index ].x < points[ indexOfLeftMostPoint ].x )
 			indexOfLeftMostPoint = index;
 	}
+	
 	return indexOfLeftMostPoint;
 }
 

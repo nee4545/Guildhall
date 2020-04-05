@@ -133,7 +133,7 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 
 	obj->m_rigidbody = physicsSystem->CreateRigidbody();
 
-	PolygonCollider2D* collider = physicsSystem->CreatePolygonCollider( mousePos , &polygon );
+	PolygonCollider2D* collider = physicsSystem->CreatePolygonCollider( polygon.GetCentre() , &polygon );
 
 	obj->m_rigidbody->TakeCollider( collider );
 	obj->m_rigidbody->SetPosition( mousePos );
@@ -141,7 +141,6 @@ GameObject* Game::CreatePolygon(Polygon2D& polygon)
 	obj->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj );
 	
-
 	return obj;
 }
 
@@ -155,6 +154,30 @@ void Game::PopulateInitialObjects()
 	obj1->m_rigidbody->TakeCollider( collider1 );
 	obj1->m_rigidbody->m_collider->CalculateMoment();
 	m_gameObjects.push_back( obj1 );
+
+
+	Polygon2D *polygon= new Polygon2D();
+
+	Vec2 p1 = Vec2( -80.f , -45.f );
+	Vec2 p2 = Vec2(	80.f , -45.f );
+	Vec2 p3 = Vec2( 80.f , -40.f );
+	Vec2 p4 = Vec2( -80.f , -40.f );
+
+	polygon->m_points.push_back( p1 );
+	polygon->m_points.push_back( p2 );
+	polygon->m_points.push_back( p3 );
+	polygon->m_points.push_back( p4 );
+
+	GameObject* obj2 = new GameObject();
+	obj2->m_rigidbody = physicsSystem->CreateRigidbody();
+	obj2->m_rigidbody->m_mode = STATIC;
+	//obj1->m_rigidbody->SetPosition( Vec2( 20.f , 20.f ) );
+	
+	PolygonCollider2D* collider2 = physicsSystem->CreatePolygonCollider( Vec2( 0.f , 0.f ) , polygon );
+	obj2->m_rigidbody->TakeCollider( collider2 );
+	obj2->m_rigidbody->m_collider->CalculateMoment();
+	obj2->m_rigidbody->SetPosition( Vec2( 0.f , -40.f ) );
+	m_gameObjects.push_back( obj2 );
 }
 
 
@@ -606,7 +629,7 @@ void Game::DrawModeRender()
 	
 }
 
-void Game::HandleBounceAndWrapAround()
+void Game::HandleObjectsOutOfBounds()
 {
 	for ( int index = 0; index < m_gameObjects.size(); index++ )
 	{
@@ -619,40 +642,28 @@ void Game::HandleBounceAndWrapAround()
 		{
 			DiscCollider2D* temp = ( DiscCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
 
-			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.y - temp->m_radius < m_camera->GetOrthoBottomLeft().y )
+			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.y - temp->m_radius < m_camera->GetOrthoBottomLeft().y ||
+				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x - temp->m_radius > m_camera->GetOrthoTopRight().x ||
+				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x + temp->m_radius < m_camera->GetOrthoBottomLeft().x )
 			{
-				m_gameObjects[ index ]->m_rigidbody->ReverseVelocityYAxis();
+				delete m_gameObjects[ index ];
+				m_gameObjects[ index ] = nullptr;
+				continue;
 			}
 
-			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x - temp->m_radius > m_camera->GetOrthoTopRight().x )
-			{
-				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoBottomLeft().x - temp->m_radius;
-			}
-
-			if ( m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x + temp->m_radius < m_camera->GetOrthoBottomLeft().x )
-			{
-				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoTopRight().x + temp->m_radius;
-			}
 		}
 
 		if ( m_gameObjects[ index ]->m_rigidbody->m_collider->m_colliderType == COLLIDER2D_POLYGON )
 		{
 			PolygonCollider2D* temp = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->m_collider;
 
-			if ( temp->m_polygonLocal->GetBottomMostEdge().y < m_camera->GetOrthoBottomLeft().y )
+			if ( temp->m_polygonLocal->GetLeftMostEdge().x > m_camera->GetOrthoTopRight().x ||
+				temp->m_polygonLocal->GetRightMostEdge().x < m_camera->GetOrthoBottomLeft().x ) 
 			{
-				m_gameObjects[ index ]->m_rigidbody->ReverseVelocityYAxis();
+				delete m_gameObjects[ index ];
+				m_gameObjects[ index ] = nullptr;
 			}
 
-			if ( temp->m_polygonLocal->GetLeftMostEdge().x > m_camera->GetOrthoTopRight().x )
-			{
-				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoBottomLeft().x - ( temp->m_polygonLocal->GetRightMostEdge().x - temp->m_polygonLocal->m_localPos.x );
-			}
-
-			if ( temp->m_polygonLocal->GetRightMostEdge().x < m_camera->GetOrthoBottomLeft().x )
-			{
-				m_gameObjects[ index ]->m_rigidbody->m_worldPosition.x = m_camera->GetOrthoTopRight().x - ( temp->m_polygonLocal->GetLeftMostEdge().x - temp->m_polygonLocal->m_localPos.x );
-			}
 		}
 
 	}
@@ -1078,8 +1089,8 @@ void Game::Update( float deltaseconds )
 	}
 
 	HandleGravityModification();
-	HandleCollissions();
-	HandleBounceAndWrapAround();
+	//HandleCollissions();
+	HandleObjectsOutOfBounds();
 
 }
 

@@ -119,11 +119,16 @@ bool DiscVsDiscCollisionCheck( Collider2D const* col0 , Collider2D const* col1 )
 
 bool PolygonVPolygonCollisionCheck( Collider2D const* col0 , Collider2D const* col1 )
 {
-	/*PolygonCollider2D const* poly0 = ( PolygonCollider2D* ) col0;
+	PolygonCollider2D const* poly0 = ( PolygonCollider2D* ) col0;
 	PolygonCollider2D const* poly1 = ( PolygonCollider2D* ) col1;
 
-	return DetectPolygonvPolygonIntersections( *poly0->m_polygonLocal , *poly1->m_polygonLocal );*/
-	UNUSED( col0 );
-	UNUSED( col1 );
-	return false;
+
+	if ( !DoDiscsOverlap( poly0->m_worldPosition , poly0->boundingDiscRadius , poly1->m_worldPosition , poly1->boundingDiscRadius ) )
+	{
+		return false;
+	}
+
+	Vec2 unusedPoins[ 3 ] = {};
+	return DetectPolygonvPolygonIntersections( *poly0->m_polygonLocal , *poly1->m_polygonLocal, unusedPoins );
+
 }

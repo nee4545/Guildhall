@@ -2,6 +2,6 @@
 
 struct PhysicsMaterial
 {
-	float bounciness = 1.f;
-	float friction = 0.f;
+	float bounciness = 0.8f;
+	float friction = 0.1f;
 };

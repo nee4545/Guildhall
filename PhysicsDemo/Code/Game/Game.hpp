@@ -1,5 +1,6 @@
 #pragma once
 #include "GameCommon.hpp"
+#include "Engine/Core/AABB2.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include <vector>
 
@@ -14,10 +15,50 @@ static Physics2D* physicsSystem = nullptr;
 
 class Game
 {
+
+public:
+
+	Game();
+	~Game();
+
+	void StartUp();
+	void Update( float deltaseconds );
+	void Render();
+	void BeginFrame();
+	void EndFrame();
+
+	GameObject* CreateDisc();
+	GameObject* CreatePolygon( Polygon2D& polygon );
+	void PopulateInitialObjects();
+	void UpdateCameraMovement( float deltaSeconds );
+	void HandleMouseInsideObjects();
+	void HandleCollissions();
+	void HandleDrag();
+	void HandleObjectCreationRequests();
+	void HandleThrow();
+	void ResetCamera();
+	void GetCurrentSelectedObject();
+	void ZoomInCamera( float deltaSeconds );
+	void ZoomOutCamera( float deltaSeconds );
+	void PolygonDrawMode();
+	bool IsPolygonPotentiallyConvex( Vec2 newAddedPoint );
+	void HandlePolygonDrawMode();
+	void DrawModeRender();
+	void HandleObjectsOutOfBounds();
+	void HandleClockChanges();
+	void DisplayMiscInfo();
+	void DisplayX();
+	void HandleGravityModification();
+	void DisplayToolTip();
+	void UpdateFramePositions();
+	void ToggleDevConsole();
+
+private:
 	RandomNumberGenerator m_rng;
 	BitmapFont* m_BitmapFont = nullptr;
 	Camera* m_camera=nullptr;
 	Camera* m_devConsoleCamera = nullptr;
+	AABB2 m_screenBounds=AABB2( Vec2( -80.f , -45.f ) , Vec2( 80.f , 45.f ) );
 	
 	std::vector<GameObject*> m_gameObjects;
 	GameObject* m_selectedObject = nullptr;
@@ -43,41 +84,6 @@ class Game
 	bool finalPointSet = false;
 	bool devConsoleOpen = false;
 
-public:
-	
 
-	
-	Game();
-	~Game();
-	void StartUp();
-	void BeginFrame();
-	void EndFrame();
-	GameObject* CreateDisc();
-	GameObject* CreatePolygon(Polygon2D& polygon);
-	void PopulateInitialObjects();
-	void UpdateCameraMovement( float deltaSeconds );
-	void HandleMouseInsideObjects();
-	void HandleCollissions();
-	void HandleDrag();
-	void HandleObjectCreationRequests();
-	void HandleThrow();
-	void ResetCamera();
-	void GetCurrentSelectedObject();
-	void ZoomInCamera( float deltaSeconds );
-	void ZoomOutCamera( float deltaSeconds );
-	void PolygonDrawMode();
-	bool IsPolygonPotentiallyConvex(Vec2 newAddedPoint);
-	void HandlePolygonDrawMode();
-	void DrawModeRender();
-	void HandleBounceAndWrapAround();
-	void HandleClockChanges();
-	void DisplayMiscInfo();
-	void DisplayX();
-	void HandleGravityModification();
-	void DisplayToolTip();
-	void UpdateFramePositions();
-	void Update(float deltaseconds);
-	void Render();
-	void ToggleDevConsole();
 
 };
