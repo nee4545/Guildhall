@@ -8,11 +8,105 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Core/D3D11Common.hpp"
+#include "Engine/Core/EventSystem.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 constexpr float CLIENT_ASPECT = 16.f / 9.f;
 
 extern RenderContext* g_theRenderer;
 extern BitmapFont* g_theBitMapFont;
+
+bool DebugRenderEnabled( EventArgs& args )
+{
+	bool value = args.GetValue( "render" , true );
+	if ( value )
+	{
+		DebugRenderSystem::sDebugRenderer->EnableDebugRendering();
+	}
+	else
+	{
+		DebugRenderSystem::sDebugRenderer->DisableDebugRendering();
+	}
+
+	return true;
+}
+
+bool DebugAddWorldPoint( EventArgs& args )
+{
+	Vec3	position = args.GetValue( "position" , Vec3( 0.f , 0.f , 0.f ) );
+	float	duration = args.GetValue( "duration" , 5.f );
+	float   size = args.GetValue( "size" , 0.2f );
+	DebugAddWorldPoint( position , size , Rgba8( 255 , 255 , 255 , 255 ) , duration , DEBUG_RENDER_ALWAYS );
+	return true;
+}
+
+bool DebugAddWorldWireSphere( EventArgs& args )
+{
+	Vec3	position = args.GetValue( "position" , Vec3( 0.f , 0.f , 0.f ) );
+	float	duration = args.GetValue( "duration" , 5.f );
+	float	radius = args.GetValue( "radius" , 0.5f );
+
+	DebugAddWorldWireSphere( position , radius , Rgba8( 255 , 255 , 255 , 255 ) , duration , DEBUG_RENDER_ALWAYS );
+	return true;
+}
+
+bool DebugAddWorldWireBounds( EventArgs& args )
+{
+	Vec3	mins = args.GetValue( "mins" , Vec3( 0.f , 0.f , 0.f ) );
+	Vec3	maxs = args.GetValue( "maxs" , Vec3( 1.f , 1.f , 1.f ) );
+	float	duration = args.GetValue( "duration" , 5.f );
+
+	DebugAddWorldWireBounds( AABB3( mins , maxs ) , Rgba8( 255 , 0 , 0 , 255 ) , duration , DEBUG_RENDER_ALWAYS );
+	return true;
+}
+
+
+bool DebugAddWorldBillboardText( EventArgs& args )
+{
+	std::string displayText = args.GetValue( "text" , "TEXT NOT READ CORRECTLY" );
+	Vec3		position = args.GetValue( "position" , Vec3( 0.f , 0.f , 0.f ) );
+	Vec2		pivot = args.GetValue( "pivot" , Vec2( 0.f , 0.f ) );
+	float       size = args.GetValue( "size" , 1.f );
+	float		duration = args.GetValue( "duration" , 10.f );
+
+	DebugAddWorldBillboardText( position , pivot , size , Rgba8( 255 , 255 , 255 , 255 ) , Rgba8( 255 , 255 , 255 , 255 ) , duration , DEBUG_RENDER_ALWAYS , displayText.c_str() );
+	return true;
+}
+
+
+bool DebugAddScreenPoint( EventArgs& args )
+{
+	Vec2	position = args.GetValue( "position" , Vec2( 0.f , 0.f ) );
+	float	duration = args.GetValue( "duration" , 5.f );
+	float	size = args.GetValue( "size" , 10.f );
+
+	DebugAddScreenPoint( position , size , Rgba8( 255 , 255 , 255 , 255 ) , duration );
+	return true;
+}
+
+bool DebugAddScreenQuad( EventArgs& args )
+{
+	Vec2	mins = args.GetValue( "mins" , Vec2( 0.f , 0.f ) );
+	Vec2	maxs = args.GetValue( "maxs" , Vec2( 100.f , 100.f ) );
+	float	duration = args.GetValue( "duration" , 5.f );
+
+	DebugAddScreenQuad( AABB2( mins , maxs ) , Rgba8( 0 , 0 , 100 , 255 ) , duration );
+	return true;
+}
+
+bool DebugAddScreenText( EventArgs& args )
+{
+	std::string displayText = args.GetValue( "text" , "TEXT NOT READ CORRECTLY" );
+	Vec2		position = args.GetValue( "position" , Vec2( 0.f , 0.f ) );
+	Vec2		alignment = args.GetValue( "align" , Vec2( 0.f , 0.f ) );
+	Vec2		pivot = args.GetValue( "pivot" , Vec2( 0.f , 0.f ) );
+	float		duration = args.GetValue( "duration" , 5.f );
+	float		size = args.GetValue( "size" , 20.f );
+
+	DebugAddScreenText( Vec4( position.x , position.y , alignment.x , alignment.y ) , pivot , size ,
+		Rgba8( 255 , 255 , 255 , 255 ) , Rgba8( 255 , 255 , 255 , 255 ) , duration , displayText.c_str() );
+	return true;
+}
 
 DebugRenderSystem* DebugRenderSystem::sDebugRenderer = new DebugRenderSystem();
 
@@ -364,6 +458,15 @@ void DebugRenderSystem::SystemStartUp()
 	m_camera = new Camera();
 
 	point = new GPUMesh( m_context );
+
+	g_theEventSystem.SubscribeToEvent( "debug_render_enabled" , DebugRenderEnabled );
+	g_theEventSystem.SubscribeToEvent( "debug_add_world_point" , DebugAddWorldPoint );
+	g_theEventSystem.SubscribeToEvent( "debug_add_screen_point" , DebugAddScreenPoint );
+	g_theEventSystem.SubscribeToEvent( "debug_add_screen_quad" , DebugAddScreenQuad );
+	g_theEventSystem.SubscribeToEvent( "debug_add_world_wiresphere" , DebugAddWorldWireSphere );
+	g_theEventSystem.SubscribeToEvent( "debug_add_world_wirequad" , DebugAddWorldWireBounds );
+	g_theEventSystem.SubscribeToEvent( "debug_add_world_billboardtext" , DebugAddWorldBillboardText );
+	g_theEventSystem.SubscribeToEvent( "debug_add_screen_text" , DebugAddScreenText );
 
 }
 
@@ -1667,4 +1770,7 @@ void DebugAddScreenTextf( Vec4 ratioOffset , Vec2 pivot , float size , Rgba8 col
 	DebugScreenText* obj = new DebugScreenText( DEBUG_RENDER_ALWAYS , DEBUG_RENDER_SCREEN ,size, color , duration , pivot , ratioOffset , text );
 	DebugRenderSystem::sDebugRenderer->m_screenObjects.push_back( obj );
 }
+
+
+
 

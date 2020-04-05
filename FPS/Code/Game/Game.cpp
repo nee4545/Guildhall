@@ -199,7 +199,15 @@ Game::~Game()
 
 void Game::Update( float deltaseconds )
 {
+	
+
 	ToggleDevConsole();
+
+	if ( g_theConsole.IsOpen() )
+	{
+		return;
+	}
+
 	ToggleRenderModes();
 
 	if ( g_theInput->WasKeyJustPressed( 'B' ) )
@@ -377,13 +385,19 @@ void Game::Render()
 
 	g_theRenderer->EndCamera(*m_camera);
 
+
+	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
+
+	if ( !g_theConsole.IsOpen() )
+	{
+		DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
+	}
+
 	if ( g_theConsole.IsOpen() )
 	{
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
 
-	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
-	DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
 }
 
 void Game::UpdateCamera()
