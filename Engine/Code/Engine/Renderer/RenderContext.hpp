@@ -152,6 +152,9 @@ public:
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
 	void CreateRasterState( D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise = true );
 	void CreateRasterState( D3D11_RASTERIZER_DESC desc );
+	void SetCullMode( D3D11_CULL_MODE cullmode );
+	void SetFrontFaceWindOrder( bool frontCounterClockWise );
+	void SetFillMode( D3D11_FILL_MODE fillmode );
 	
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);

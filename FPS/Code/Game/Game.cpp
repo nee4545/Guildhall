@@ -21,9 +21,30 @@ bool Help( EventArgs& args )
 {
 	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Currently Supported Commands" );
-	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "help");
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "help" );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "quit" );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "close" );
+
+	g_theConsole.PrintString( Rgba8( 255 , 255 , 255 , 255 ) , "Debug Render Commands" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_render_enabled" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: render=(bool)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_world_point" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: position=(Vec3), duration=(float), size=(float)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_screen_quad" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: mins=(Vec2), maxs=(Vec2), duration=(float)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_world_wiresphere" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: position=(Vec3), duration=(float), radius=(float)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_screen_point" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: position=(Vec2), duration=(float), size=(float)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_world_wirequad" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: mins=(Vec3), maxs=(Vec3), duration=(float)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_world_billboardtext" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: text=(string), duration=(float), size=(float), pivot=(Vec2)" );
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 255 , 255 ) , "debug_add_screen_text" );
+	g_theConsole.PrintString( Rgba8( 100 , 0 , 100 , 255 ) , "Parameters: text=(string), duration=(float), size=(float), pivot=(Vec2), alignment=(Vec2)" );
+	g_theConsole.PrintString( Rgba8( 255 , 0 , 255 , 255 ) , "Example Usage:" );
+	g_theConsole.PrintString( Rgba8( 255 , 0 , 255 , 255 ) , "debug_add_world_point:position=10,10,10|duration=10" );
+
 	return false;
 }
 
@@ -45,13 +66,13 @@ bool Close( EventArgs& args )
 
 Game::Game()
 {
-	rng= RandomNumberGenerator();
-	m_camera=new Camera();
+	rng = RandomNumberGenerator();
+	m_camera = new Camera();
 	m_devConsoleCamera = new Camera();
 
-	m_camera->SetProjectionPerspective( 60.f ,16.f/9.f, -0.1f , -100.f );
+	m_camera->SetProjectionPerspective( 60.f , 16.f / 9.f , -0.1f , -100.f );
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
-	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0, 0 , 255 ) , 0.f , 0 );
+	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
 	m_camera->SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , 0 );
 
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
@@ -59,7 +80,7 @@ Game::Game()
 
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
-	g_theEventSystem.SubscribeToEvent( "close" , Close);
+	g_theEventSystem.SubscribeToEvent( "close" , Close );
 
 	//DebugRenderSystem::sDebugRenderer->TakeWorldCamera( m_camera );
 
@@ -82,8 +103,8 @@ Game::Game()
 
 	AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 3.f , 64 , 32 , WHITE );
 
-	sphere->UpdateVertices((unsigned int) sphereVerts.size() , &sphereVerts[0] );
-	sphere->UpdateIndices((unsigned int) sphereIndices.size() , &sphereIndices[0] );
+	sphere->UpdateVertices( ( unsigned int ) sphereVerts.size() , &sphereVerts[ 0 ] );
+	sphere->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
 
 
 	std::vector<Vertex_PCU> verices;
@@ -122,7 +143,7 @@ Game::Game()
 
 	};
 
-	
+
 
 	for ( int index = 0; index < 24; index++ )
 	{
@@ -147,15 +168,15 @@ Game::Game()
 	};
 
 
-	mesh->UpdateVertices( (unsigned int)verices.size() , &verices[ 0 ] );
+	mesh->UpdateVertices( ( unsigned int ) verices.size() , &verices[ 0 ] );
 	mesh->UpdateIndices( 36 , cubeInd );
 
 	g_theInput->ClipSystemCursor();
 	g_theInput->SetCursorMode( MODE_RELATIVE );
 
 	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
-	
-	
+
+
 
 	std::string text = "Pink Floyd > all music";
 	std::string s1 = "Press B to add a world Point";
@@ -170,7 +191,7 @@ Game::Game()
 	std::string s10 = "U can already see some screen renders for 5-7 seconds";
 	std::string s11 = "Press J to add a wire box";
 
-	DebugAddScreenText( Vec4( 10.f , 0.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) ,30.f, Rgba8(100,0,0,255),75.f,s11.c_str());
+	DebugAddScreenText( Vec4( 10.f , 0.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s11.c_str() );
 	DebugAddScreenText( Vec4( 10.f , 30.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s2.c_str() );
 	DebugAddScreenText( Vec4( 10.f , 60.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s3.c_str() );
 	DebugAddScreenText( Vec4( 10.f , 90.f , 0.f , 0.f ) , Vec2( 0.f , 0.f ) , 30.f , Rgba8( 100 , 0 , 0 , 255 ) , 75.f , s1.c_str() );
@@ -184,9 +205,9 @@ Game::Game()
 
 	DebugAddScreenPoint( Vec2( 500.f , 500.f ) , 20.f , Rgba8( 0 , 0 , 100 , 255 ) , 3.f );
 	DebugAddScreenLine( Vec2( 600.f , 700.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 800.f , 800.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 12.f , 5.f );
-	DebugAddScreenArrow( Vec2( 200.f , 300.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 600.f , 500.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 12.f , 12.f,5.f );
-	DebugAddScreenTexturedQuad( AABB2( 300.f , 300.f , 400.f , 400.f ) , tex ,AABB2(0.f,0.f,1.f,1.f) ,Rgba8( 255 , 255 , 255 , 255 ) , 6.f );
-	
+	DebugAddScreenArrow( Vec2( 200.f , 300.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , Vec2( 600.f , 500.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 12.f , 12.f , 5.f );
+	DebugAddScreenTexturedQuad( AABB2( 300.f , 300.f , 400.f , 400.f ) , tex , AABB2( 0.f , 0.f , 1.f , 1.f ) , Rgba8( 255 , 255 , 255 , 255 ) , 6.f );
+
 }
 
 Game::~Game()
@@ -199,42 +220,50 @@ Game::~Game()
 
 void Game::Update( float deltaseconds )
 {
+
+
 	ToggleDevConsole();
+
+	if ( g_theConsole.IsOpen() )
+	{
+		return;
+	}
+
 	ToggleRenderModes();
 
 	if ( g_theInput->WasKeyJustPressed( 'B' ) )
 	{
 		//DebugAddWorldPoint( m_camera->m_transform , 1.f , Rgba8( 255 , 255 , 255 , 255 ) , 50.f, DEBUG_RENDER_XRAY );
-		DebugAddWorldPoint( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f, currentMode );
+		DebugAddWorldPoint( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f , currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'N' ) )
 	{
 		//DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 0 , 0 , 255 , 255 ) , 2.f , 4.f );
-		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 0.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ),Rgba8(0,0,100,255) , 2.f , 5.f,currentMode );
+		DebugAddWorldLine( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 0.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 2.f , 5.f , currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'M' ) )
 	{
 		//DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , 3.f , 2.f );
-		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 3.f , 2.f ,currentMode);
+		DebugAddWorldArrow( Vec3( 0.f , 0.f , 0.f ) , Vec3( 4.f , 3.f , 1.f ) , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 100 , 0 , 255 ) , Rgba8( 100 , 100 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 3.f , 2.f , currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'K' ) )
 	{
-		DebugAddWorldWireSphere( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f ,currentMode);
+		DebugAddWorldWireSphere( Vec3( 0.f , 0.f , 0.f ) , 2.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 4.f , currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'L' ) )
 	{
-		DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 4.f ) , Vec3( 3.f , 3.f , 0.f ) , Vec3( 0.f , 4.f , 0.f ) , Rgba8( 0 , 0 , 100 , 255 ),Rgba8(100,0,0,255) , 4.f ,currentMode);
+		DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 4.f ) , Vec3( 3.f , 3.f , 0.f ) , Vec3( 0.f , 4.f , 0.f ) , Rgba8( 0 , 0 , 100 , 255 ) , Rgba8( 100 , 0 , 0 , 255 ) , 4.f , currentMode );
 		//DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 0.f ) , Vec3( 2.f , 2.f , 0.f ) , Vec3( 0.f , 2.f , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ),tex, 4.f );
 	}
 
 
 	if ( g_theInput->WasKeyJustPressed( 'J' ) )
 	{
-		DebugAddWorldWireBounds( AABB3( 1.3f , 2.9f , 3.6f , 5.8f , 9.2f , 13.8f ) , Rgba8( 100 , 0 , 0 , 255 ) , 4.f,currentMode );
+		DebugAddWorldWireBounds( AABB3( 1.3f , 2.9f , 3.6f , 5.8f , 9.2f , 13.8f ) , Rgba8( 100 , 0 , 0 , 255 ) , 4.f , currentMode );
 		//DebugAddWorldQuad( Vec3( 0.f , 0.f , 0.f ) , Vec3( 2.f , 0.f , 0.f ) , Vec3( 2.f , 2.f , 0.f ) , Vec3( 0.f , 2.f , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ),tex, 4.f );
 	}
 
@@ -245,7 +274,7 @@ void Game::Update( float deltaseconds )
 		temp.m_position.x = -5.f;
 		Mat44 basis = m_camera->m_transform.ToMatrix();
 		basis.TransformBy( temp.ToMatrix() );
-		DebugAddWorldBasis( basis , Rgba8( 100 , 100 , 100 , 255 ) , 6.f,currentMode );
+		DebugAddWorldBasis( basis , Rgba8( 100 , 100 , 100 , 255 ) , 6.f , currentMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
@@ -257,7 +286,7 @@ void Game::Update( float deltaseconds )
 		basis.TransformBy( temp.ToMatrix() );
 		std::string t = "Coming back to life";
 		DebugAddWorldText( basis , Vec2( 0.f , 0.f ) , 0.5f , Rgba8( 255 , 255 , 255 , 255 ) , Rgba8( 255 , 255 , 255 , 255 ) , 10.f , currentMode , t.c_str() );
-		DebugAddWorldBillboardText( basis.GetTranslation3D()+Vec3(0.f,2.f,0.f) , Vec2( 0.f , 0.f ) , 1.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ),10.f , currentMode ,t.c_str());
+		DebugAddWorldBillboardText( basis.GetTranslation3D() + Vec3( 0.f , 2.f , 0.f ) , Vec2( 0.f , 0.f ) , 1.f , Rgba8( 100 , 0 , 0 , 255 ) , Rgba8( 0 , 0 , 100 , 255 ) , 10.f , currentMode , t.c_str() );
 	}
 
 	if ( g_theConsole.IsOpen() )
@@ -281,9 +310,9 @@ void Game::Update( float deltaseconds )
 	{
 		speedMultiplier = 1.f;
 	}
-	
 
-	cubeTransform.m_rotationPitchRollYawDegrees.x += deltaseconds*10.f;
+
+	cubeTransform.m_rotationPitchRollYawDegrees.x += deltaseconds * 10.f;
 
 	if ( cubeTransform.m_rotationPitchRollYawDegrees.x >= 360.f )
 	{
@@ -291,11 +320,11 @@ void Game::Update( float deltaseconds )
 	}
 
 	cubeTransform.m_position = Vec3( 1.f , 0.5f , -12.f );
-	
+
 	sphereTransform.SetRotationFromPitchRollYawDegrees( 0.f , 10.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 
 	m_camera->m_transform.SetRotationFromPitchRollYawDegrees( m_cameraRotation.x , m_cameraRotation.y , m_cameraRotation.z );
-	
+
 	Mat44 modal = m_camera->m_transform.ToMatrix();
 	Vec3 forwardVec = modal.GetKBasis3D();
 	Vec3 rightVec = modal.GetIBasis3D();
@@ -343,57 +372,63 @@ void Game::Update( float deltaseconds )
 
 void Game::Render()
 {
-	g_theRenderer->BeginCamera(*m_camera);
+	g_theRenderer->BeginCamera( *m_camera );
 	m_camera->CreateDepthStencilTarget( g_theRenderer );
 	g_theRenderer->SetDepthTest();
 	g_theRenderer->BindDepthStencil( m_camera->m_backBuffer );
-	
+
 	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
 
 	Transform quadTransform;
 	quadTransform.m_position.z = -10.f;
- 	g_theRenderer->BindShader( nullptr );
- 	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
- 	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ),Rgba8(100,100,100,255) );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
+	g_theRenderer->DrawAABB2D( AABB2( Vec2( 0.f , 0.f ) , Vec2( 1.f , 1.f ) ) , Rgba8( 100 , 100 , 100 , 255 ) );
 
- 	g_theRenderer->BindShader( nullptr );
- 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
- 	g_theRenderer->DrawMesh( mesh );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
+	g_theRenderer->DrawMesh( mesh );
 
 	g_theRenderer->BindShader( nullptr );
 	float deltaPhi = 360.f / 10.f;
 	Transform ring;
 
-	for ( float index = 0; index <= 360.f ; index += deltaPhi )
+	for ( float index = 0; index <= 360.f; index += deltaPhi )
 	{
-		Vec3 position = GetSphericalCoordinates( 0.f , 20.f * (float)GetCurrentTimeSeconds() +  index , 15.f );
+		Vec3 position = GetSphericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + index , 15.f );
 		position.z -= 30.f;
 		ring.SetPosition( position );
-		ring.SetRotationFromPitchRollYawDegrees( 0.f , 20.f * (float)GetCurrentTimeSeconds() + index , 0.f );
+		ring.SetRotationFromPitchRollYawDegrees( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + index , 0.f );
 		g_theRenderer->SetModalMatrix( ring.ToMatrix() );
 		g_theRenderer->BindTexture( tex );
 		g_theRenderer->DrawMesh( sphere );
 	}
 
-	g_theRenderer->EndCamera(*m_camera);
+	g_theRenderer->EndCamera( *m_camera );
+
+
+	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
+
+	if ( !g_theConsole.IsOpen() )
+	{
+		DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
+	}
 
 	if ( g_theConsole.IsOpen() )
 	{
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
 
-	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
-	DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
 }
 
 void Game::UpdateCamera()
 {
-	
+
 }
 
 void Game::ToggleDebugCamera()
 {
-	
+
 }
 
 void Game::ToggleRenderModes()
@@ -422,7 +457,7 @@ void Game::ToggleDevConsole()
 	if ( g_theInput->WasKeyJustPressed( 0xC0 ) )
 	{
 		devConsoleOpen = !devConsoleOpen;
-		g_theConsole.SetIsOpen(devConsoleOpen);
+		g_theConsole.SetIsOpen( devConsoleOpen );
 	}
 
 	if ( g_theConsole.IsOpen() )
@@ -441,38 +476,5 @@ void Game::ToggleDevConsole()
 
 void Game::ToggleDebugging()
 {
-	
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

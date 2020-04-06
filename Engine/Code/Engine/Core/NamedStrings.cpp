@@ -131,3 +131,16 @@ std::string NamedStrings::GetValue( const std::string& keyName, const char* defa
 	else
 		return defaultValue;
 }
+
+Vec3 NamedStrings::GetValue( const std::string keyName , const Vec3& defaultValue ) const
+{
+	if ( dictionary.find( keyName ) != dictionary.end() )
+	{
+		std::string toReturn = dictionary.at( keyName );
+		Vec3 temp;
+		temp.SetFromText( toReturn.c_str() );
+		return temp;
+	}
+	else
+		return defaultValue;
+}

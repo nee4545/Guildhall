@@ -435,6 +435,19 @@ void DevConsole::ProcessCommand( std::string& command )
 		currentCommand = cmd[ 0 ];
 		std::string parameter = cmd[ 1 ];
 		currentCommandArgs.SetValue( currentCommand , parameter );
+
+		Strings parameters = SplitStringOnDelimiter( cmd[ 1 ] , '|' );
+
+		for ( int i = 0; i < parameters.size(); i++ )
+		{
+			std::string s = parameters[ i ];
+			Strings split = SplitStringOnDelimiter( s , '=' );
+
+			if ( split.size() == 2 )
+			{
+				currentCommandArgs.SetValue( split[ 0 ] , split[ 1 ] );
+			}
+		}
 	}
 
 	for ( int i = 0; i < m_commands.size(); i++ )
@@ -489,6 +502,15 @@ void DevConsole::InitializeCommands()
 	m_commands.push_back( "help" );
 	m_commands.push_back( "close" );
 	m_commands.push_back( "set_physics_update_freq" );
+	m_commands.push_back( "debug_render_enabled" );
+	m_commands.push_back( "debug_add_world_point" );
+	m_commands.push_back( "debug_add_screen_point" );
+	m_commands.push_back( "debug_add_screen_quad" );
+	m_commands.push_back( "debug_add_world_wiresphere" );
+	m_commands.push_back( "debug_add_world_wirequad" );
+	m_commands.push_back( "debug_add_world_billboardtext" );
+	m_commands.push_back( "debug_add_screen_text" );
+
 }
 
 void DevConsole::HandleTextSelection()

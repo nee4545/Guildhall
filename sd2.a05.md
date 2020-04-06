@@ -19,9 +19,9 @@ Some example code for how the system will be used in this assignment;
     - [x]`RenderContext::SetCullMode`
     - [x]  `RenderContext::SetFillMode`
     - [x] `RenderContext::SetFrontFaceWindOrder`
-    	(I have encapsulated all these to a single CreateRasterState Call)
     - [x] Create a default raster state to set when `BeginCamera` is called.
-    - [x] Have a transient raster state to create/set when above calls are used.
+    - [-] Have a transient raster state to create/set when above calls are used.
+    		(I don't feel i really need a transient raster state, I overload my current rasterstate)
 
 - [x] World Rendering
     - [x] Points
@@ -48,15 +48,15 @@ Some example code for how the system will be used in this assignment;
     - [x] Add a `DebugRenderWorldTo` call to your game after you render your scene
     - [x] Add a `DebugRenderScreenTo` call to your App before your present to render 2D objects
 
-- [ ] Controls
-    - [ ] Console command: `debug_render enabled=bool` 
-    - [ ] Console command: `debug_add_world_point position=vec3 duration=float`
-    - [ ] Console command: `debug_add_world_wire_sphere position=vec3 radius=float duration=float`
-    - [ ] Console command: `debug_add_world_wire_bounds min=vec3 max=vec3 duration=float`
-    - [ ] Console command: `debug_add_world_billboard_text position=vec3 pivot=vec2 text=string`
-    - [ ] Console command: `debug_add_screen_point position=vec2 duration=float`
-    - [ ] Console command: `debug_add_screen_quad min=vec2 max=vec2 duration=float`
-    - [ ] Console command: `debug_add_screen_text position=vec2 pivot=vec2 text=string`
+- [x] Controls (Type help in devConsle for exact usages)
+    - [x] Console command: `debug_render enabled=bool` 
+    - [x] Console command: `debug_add_world_point position=vec3 duration=float`
+    - [x] Console command: `debug_add_world_wire_sphere position=vec3 radius=float duration=float`
+    - [x] Console command: `debug_add_world_wire_bounds min=vec3 max=vec3 duration=float`
+    - [x] Console command: `debug_add_world_billboard_text position=vec3 pivot=vec2 text=string`
+    - [x] Console command: `debug_add_screen_point position=vec2 duration=float`
+    - [x] Console command: `debug_add_screen_quad min=vec2 max=vec2 duration=float`
+    - [x] Console command: `debug_add_screen_text position=vec2 pivot=vec2 text=string`
 
 
 ## Extras

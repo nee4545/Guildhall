@@ -445,6 +445,63 @@ void RenderContext::CreateRasterState( D3D11_RASTERIZER_DESC desc )
 	device->CreateRasterizerState( &desc , &m_rasterState );
 }
 
+void RenderContext::SetCullMode( D3D11_CULL_MODE cullmode )
+{
+	D3D11_RASTERIZER_DESC desc;
+	
+	if ( m_rasterState != nullptr )
+	{
+		m_rasterState->GetDesc( &desc );
+	}
+
+	desc.CullMode = cullmode;
+
+	if ( m_rasterState != nullptr )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
+	m_device->CreateRasterizerState( &desc , &m_rasterState );
+}
+
+void RenderContext::SetFrontFaceWindOrder( bool frontCounterClockWise )
+{
+	D3D11_RASTERIZER_DESC desc;
+
+	if ( m_rasterState != nullptr )
+	{
+		m_rasterState->GetDesc( &desc );
+	}
+
+	desc.FrontCounterClockwise = frontCounterClockWise;
+
+	if ( m_rasterState != nullptr )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
+	m_device->CreateRasterizerState( &desc , &m_rasterState );
+}
+
+void RenderContext::SetFillMode( D3D11_FILL_MODE fillmode )
+{
+	D3D11_RASTERIZER_DESC desc;
+
+	if ( m_rasterState != nullptr )
+	{
+		m_rasterState->GetDesc( &desc );
+	}
+
+	desc.FillMode = fillmode;
+
+	if ( m_rasterState != nullptr )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
+	m_device->CreateRasterizerState( &desc , &m_rasterState );
+}
+
 void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness )
 {
 	int numPoints = polygon.GetVertexCount();
