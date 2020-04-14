@@ -33,7 +33,8 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	size_t bufferByteSize = numVertexes * sizeof( Vertex_PCU );
 	size_t elementSize = sizeof( Vertex_PCU );
 	m_immediateVBO->Update( vertexes , bufferByteSize , elementSize );
-	
+	m_immediateVBO->m_attribute = Vertex_PCU::LAYOUT;
+	m_immediateVBO->m_stride = sizeof( Vertex_PCU );
 	//Bind 
 	BindVertexBuffer( m_immediateVBO );
 	Draw( numVertexes , 0 );
@@ -52,13 +53,13 @@ void RenderContext::DrawVertexArray(  int numVertexes , VertexBuffer* vertices )
 	Draw( numVertexes , 0 );
 }
 
-void RenderContext::DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride )
+void RenderContext::DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride , buffer_attribute_t* layout  )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
 	m_context->RSSetState( m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs , nullptr , 0 );
 
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( layout );
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
@@ -212,11 +213,11 @@ void RenderContext::DrawMesh( GPUMesh* mesh )
 	if ( hasIndices )
 	{
 		BindIndexBuffer( mesh->m_indices );
-		DrawIndexed( mesh->GetIndexCount() , 0 , 0 );
+		DrawIndexed( mesh->GetIndexCount() , 0 , 0 ,mesh->m_vertices->m_attribute);
 	}
 	else
 	{
-		Draw( mesh->m_vertexCount , 0 );
+		Draw( mesh->m_vertexCount , 0, mesh->m_vertices->m_attribute );
 	}
 }
 
@@ -249,7 +250,7 @@ void RenderContext::BindShader( std::string filename )
 void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
-	unsigned int stride = sizeof( Vertex_PCU );
+	unsigned int stride = vbo->m_stride;/*sizeof( Vertex_PCU );*/
 	unsigned int offset = 0;
 	
 	if ( m_lastBoundVBO != vboHandle )
@@ -507,7 +508,7 @@ Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 	unsigned char* imageData = stbi_load( imageFilePath, &imageTexelSizeX, &imageTexelSizeY, &numComponents, numComponentsRequested );
 	// Check if the load was successful
 	GUARANTEE_OR_DIE( imageData, Stringf( "Failed to load image \"%s\"", imageFilePath ) );
-	GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
+	//GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
 	
 
 	//DirectX Creation
@@ -595,7 +596,7 @@ void RenderContext::Startup( Window* window )
 
 	m_swapChain = new SwapChain( this , swapchain );
 
-	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
+	m_defaultShader = GetOrCreateShader( "Data/Shaders/DefaultVertexPCU.hlsl" );
 	CreateRasterState( D3D11_FILL_SOLID , D3D11_CULL_NONE );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
@@ -655,6 +656,12 @@ void RenderContext::Shutdown()
 		m_modelUBO = nullptr;
 	}
 
+	if ( m_lightUBO != nullptr )
+	{
+		delete m_lightUBO;
+		m_lightUBO = nullptr;
+	}
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
@@ -687,7 +694,7 @@ void RenderContext::EndFrame()
 	m_swapChain->Present();
 }
 
-void RenderContext::Draw( int numVertexes , int vertexOffset )
+void RenderContext::Draw( int numVertexes , int vertexOffset, buffer_attribute_t* layout /*= Vertex_PCU::LAYOUT */ )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs , nullptr , 0 );
 	m_context->RSSetState( m_rasterState );
@@ -696,7 +703,7 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	//Describe vertex format to shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*Vertex_PCU::LAYOUT*/ );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( layout );
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes , vertexOffset );
@@ -768,8 +775,6 @@ void RenderContext::BeginCamera( Camera &camera)
 	BindSampler( m_defaultSampler );
 
 	SetBlendMode( BlendMode::ALPHA );
-	//SetDepthTest();
-	//BindDepthStencil( camera.m_backBuffer );
 
 }
 
@@ -839,6 +844,88 @@ BitmapFont* RenderContext::GetOrCreateBitMapFontFromFile( std::string filePath )
 	return temp;
 }
 
+void RenderContext::SetAmbientColor( Rgba8 color )
+{
+	Vec4 c = color.GetAsNormalizedVec4();
+
+	m_lights.ambientLight.x = c.x;
+	m_lights.ambientLight.y = c.y;
+	m_lights.ambientLight.z = c.z;
+}
+
+void RenderContext::SetAmbientIntensity( float intensity )
+{
+	m_lights.ambientLight.w = intensity;
+}
+
+void RenderContext::SetAmbientLight( Rgba8 color , float intensity )
+{
+	SetAmbientColor( color );
+	m_lights.ambientLight.w = intensity;
+}
+
+void RenderContext::SetSpecularConstants( float specularPower , float specularFactor )
+{
+	m_lights.specularFactor = specularFactor;
+	m_lights.specularPower = specularPower;
+}
+
+void RenderContext::EnableLight( unsigned int idx , light_t const& lightInfo )
+{
+	if ( m_lightUBO == nullptr )
+	{
+		m_lightUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	m_lights.light[ idx ] = lightInfo;
+
+	m_lightUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+
+	BindUniformBuffer( 3 , m_lightUBO );
+
+}
+
+void RenderContext::SetAttenuationFactors( eAttenuations factor, unsigned int lightId )
+{
+	Vec3 att;
+	switch ( factor )
+	{
+	case ATTENUATION_LINEAR:
+		att = Vec3( 0.f , 1.f , 0.f );
+		break;
+	case ATTENUATION_QUADRATIC:
+		att = Vec3( 0.f , 0.f , 1.f );
+		break;
+	case ATTENUATION_CONSTANT:
+		att = Vec3( 1.f , 0.f , 0.f );
+		break;
+	default:
+		break;
+	}
+
+	m_lights.light[lightId].attenuation = att;
+}
+
+void RenderContext::SetSpecularFactor( float factor )
+{
+	m_lights.specularFactor = factor;
+}
+
+void RenderContext::SetSpecularPower( float power )
+{
+	m_lights.specularPower = power;
+}
+
+void RenderContext::SetSpecularAttenuation( Vec3 attenuation , unsigned int lightId )
+{
+	m_lights.light[ lightId ].specularAttunation = attenuation;
+}
+
+void RenderContext::SetDiffuseAttenuation( Vec3 attenuation , unsigned int lightId )
+{
+	m_lights.light[ lightId ].attenuation = attenuation;
+}
+
 void RenderContext::CreateBlendStates()
 {
 	D3D11_BLEND_DESC alphaDesc;
@@ -902,7 +989,7 @@ void RenderContext::ClaerScreen( const Rgba8 clearColor )
 }
 
 
-void RenderContext::BindTexture(const Texture* texture )
+void RenderContext::BindTexture(const Texture* texture , eTextureSlot textureType )
 {
 	Texture* tex;
 	
@@ -915,10 +1002,9 @@ void RenderContext::BindTexture(const Texture* texture )
 		tex = m_defaultColor;
 	}
 
-
 	TextureView* shaderResourceView= tex->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetSRV();
-	m_context->PSSetShaderResources( 0 , 1 , &srvHandle );
+	m_context->PSSetShaderResources( ( UINT ) textureType , 1 , &srvHandle );
 }
 
 void RenderContext::BindSampler( const Sampler* sampler )
@@ -926,8 +1012,6 @@ void RenderContext::BindSampler( const Sampler* sampler )
 	ID3D11SamplerState* samplerHandle = sampler->m_handle;
 	m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
 }
-
-
 
 void RenderContext::CreateDebugModule()
 {

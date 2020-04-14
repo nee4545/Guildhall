@@ -161,6 +161,8 @@ RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
 	Mat44 mat = m_transform.ToMatrix();
 	cameraData.view = GetViewMatrix();
 
+	cameraData.cameraPosition = m_transform.m_position;
+
 
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ));
 	return m_cameraUBO;

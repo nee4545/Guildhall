@@ -4,6 +4,7 @@ class RenderContext;
 class VertexBuffer;
 class IndexBuffer;
 struct buffer_attribute_t;
+#include "Engine/Renderer/RenderBuffer.hpp"
 
 class GPUMesh // A04
 {
@@ -11,7 +12,7 @@ public:
 	GPUMesh( RenderContext* owner );
 	~GPUMesh();
 
-	void UpdateVertices( unsigned int vcount , void const* vertexData , unsigned int vertexStride , buffer_attribute_t const* layout );
+	void UpdateVertices( unsigned int vcount , void const* vertexData , unsigned int vertexStride , buffer_attribute_t* layout );
 	void UpdateIndices( unsigned int icount , unsigned int const* indices );
 	void UpdateIndices( unsigned int icount,void const* vertexData );
 
@@ -20,6 +21,8 @@ public:
 	template <typename VERTEX_TYPE>
 	void UpdateVertices( unsigned int vcount , VERTEX_TYPE const* vertices )
 	{
+		m_vertices->m_attribute = VERTEX_TYPE::LAYOUT;
+		m_vertices->m_stride = sizeof( VERTEX_TYPE );
 		UpdateVertices( vcount , vertices , sizeof( VERTEX_TYPE ) , VERTEX_TYPE::LAYOUT );
 	}
 

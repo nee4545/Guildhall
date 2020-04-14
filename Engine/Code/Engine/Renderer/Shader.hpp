@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Math/Vec2.hpp"
 #include "string"
+
 
 class RenderContext;
 struct ID3D11Resource;

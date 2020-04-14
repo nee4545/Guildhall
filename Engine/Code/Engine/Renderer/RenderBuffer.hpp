@@ -1,6 +1,7 @@
 #pragma once
 
 //A GPU allocator
+#include "Engine/Core/VertexCommon.hpp"
 #include <vector>
 
 struct ID3D11Buffer;
@@ -60,6 +61,8 @@ class VertexBuffer :public RenderBuffer
 {
 public:
 	VertexBuffer( RenderContext* ctx , eRenderMemoryHint hint ) :RenderBuffer( ctx,VERTEX_BUFFER_BIT , hint ) {};
+	buffer_attribute_t* m_attribute;
+	unsigned int m_stride;
 };
 
 

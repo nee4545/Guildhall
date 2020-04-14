@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+constexpr int MAX_LIGHTS= 1;
 
 
 class BitmapFont;
@@ -57,6 +58,19 @@ enum eBufferSlot
 	UBO_CAMERA_SLOT=1,
 };
 
+enum eTextureSlot
+{
+	TEXTURE_SLOT_DIFFUSE = 0,
+	TEXTURE_SLOT_NORMAL = 1
+};
+
+enum eAttenuations
+{
+	ATTENUATION_LINEAR,
+	ATTENUATION_QUADRATIC,
+	ATTENUATION_CONSTANT,
+};
+
 struct modelData_t
 {
 	Mat44 modal;
@@ -68,13 +82,44 @@ struct  frameData_t
 	float systemTime;
 	float systemDeltaTime;
 
-	float padding[ 2 ];
+	float padding;
+	float INVERSE_GAMMA		= 1.f/2.2f;
+};
+
+struct light_t
+{
+	Vec3 position;
+	float pad00;
+
+	Vec3 color;
+	float intensity;
+
+	Vec3 attenuation = Vec3(0.f,0.f,1.f);
+	float dotInnerAngle;
+
+	Vec3 specularAttunation = Vec3(1.f,0.f,0.f);
+	float dotOuterAngle;
+};
+
+struct lights_data
+{
+	Vec4 ambientLight;
+	light_t light[MAX_LIGHTS];
+
+	// all 0 to 1 and help influence the lighting equation
+   float diffuseFactor=1.f;   // default: 1  - scales diffuse lighting in equation (lower values make an object absorb light
+   float specularFactor=1.f;  // default: 1  - scales specular lighting in the equation (higher values create a "shinier" surface)
+   float specularPower=32.f;   // default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
+   float emmissiveFactor=1.f;  // default: 1  - controls how much the emissive texture is added into the final equation
 };
 
 struct cameraData_t
 {
 	Mat44 projection;
 	Mat44 view;
+
+	Vec3 cameraPosition;
+	float padding;
 };
 
 class RenderContext
@@ -103,6 +148,7 @@ public:
 	//ID3D11Buffer* m_lastBoundIBO = nullptr;
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;
+	RenderBuffer* m_lightUBO = nullptr;
 
 	Texture* m_texture;
 	ID3D11BlendState* m_alphaBlendState;
@@ -111,9 +157,8 @@ public:
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11RasterizerState* m_rasterState = nullptr;
 	bool m_isDrawing = false;
+	lights_data m_lights;
 
-
-	
 public:
 	
 
@@ -122,11 +167,11 @@ public:
 	void BeginFrame();
 	void EndFrame();
 
-	void Draw( int numVertexes , int vertexOffset );
+	void Draw( int numVertexes , int vertexOffset, buffer_attribute_t* layout = Vertex_PCU::LAYOUT );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray(const std::vector<Vertex_PCU> &verts);
 	void DrawVertexArray(int numVertexes, VertexBuffer* vertices );
-	void DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride );
+	void DrawIndexed( unsigned int indexCount , unsigned int startIndex , unsigned int indexStride , buffer_attribute_t* layout = Vertex_PCU::LAYOUT);
 
 	void DrawAABB2D(const AABB2& aabb,const Rgba8& color );
 	void DrawXFlippedAABB2D( const AABB2& aabb , const Rgba8& color );
@@ -159,7 +204,7 @@ public:
 
 	Texture* CreateTextureFromColor( Rgba8 color );
 
-	void BindTexture(  const Texture* texture);
+	void BindTexture(  const Texture* texture , eTextureSlot textureType = eTextureSlot::TEXTURE_SLOT_DIFFUSE );
 	void BindSampler( const Sampler* sampler );
 
 	void ClaerScreen(const Rgba8 clearColor);
@@ -174,14 +219,21 @@ public:
 	BitmapFont* CreateBitMapFontFromFile(std::string filePath);
 	BitmapFont* GetOrCreateBitMapFontFromFile(std::string filePath);
 
-private:
+	void SetAmbientColor( Rgba8 color );
+	void SetAmbientIntensity( float intensity );
+	void SetAmbientLight( Rgba8 color , float intensity );
+	void SetSpecularConstants( float specularPower , float specularFactor );
+	void EnableLight( unsigned int idx , light_t const& lightInfo );
+	void SetAttenuationFactors( eAttenuations factor, unsigned int lightId );
+	void SetSpecularFactor( float factor );
+	void SetSpecularPower( float power );
+	void SetSpecularAttenuation( Vec3 attenuation , unsigned int lightId );
+	void SetDiffuseAttenuation( Vec3 attenuation , unsigned int lightId );
 
+private:
 
 	void CreateDebugModule();
 	void DestroyDebugModule();
 	void ReportLiveObjects();
 	void CreateBlendStates();
-
-
-
 };

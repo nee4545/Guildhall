@@ -93,13 +93,20 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t* attribute
 		return m_inputLayout;
 	}
 
+	buffer_attribute_t const* attribsCopy = attribute;
+	int count = 0;
+	while ( attribsCopy->type != BUFFER_FORMAT_INVALID )
+	{
+		count++;
+		attribsCopy++;
+	}
+
 	//int numAttributes = sizeof(attribute)/sizeof(buffer_attribute_t);
-	D3D11_INPUT_ELEMENT_DESC vertexDescription[3];
-	
+	D3D11_INPUT_ELEMENT_DESC* vertexDescription= new D3D11_INPUT_ELEMENT_DESC[ count ];
 
 	buffer_attribute_t *current_ele = &attribute[ 0 ];
 	int i = 0;
-	while (current_ele->name!="")
+	while ( i < count )
 	{
 		vertexDescription[ i ].SemanticName = ( LPSTR ) current_ele->name.c_str();
 		vertexDescription[ i ].SemanticIndex = 0;
@@ -115,9 +122,10 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t* attribute
 
 
 	ID3D11Device* device = m_owner->m_device;
-	device->CreateInputLayout( vertexDescription , 3 , m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() , &m_inputLayout );
+	device->CreateInputLayout( vertexDescription , count , m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() , &m_inputLayout );
 
 	return m_inputLayout;
+
 }
 
 

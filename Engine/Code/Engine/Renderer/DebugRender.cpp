@@ -130,7 +130,7 @@ DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p
 	m_color = color;
 
 	m_transform.m_position = pos;
-	m_transform.m_scale *= size;
+	m_transform.m_scale *= m_size;
 
 }
 
@@ -141,7 +141,7 @@ DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Transf
 	m_size = size;
 	m_color = color;
 
-	m_transform.m_scale *= size;
+	m_transform.m_scale *= m_size;
 }
 
 DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , bool isBillboard /*= false */ ):
@@ -156,8 +156,6 @@ DebugPoint::DebugPoint( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 p
 	
 	m_transform.m_position = pos;
 	m_transform.m_scale *= size;
-
-
 }
 
 DebugWireSphere::DebugWireSphere( eDebugRenderMode mode , eDebugRenderSpace space , Vec3 pos , float size , Rgba8 color , float duration , bool isBillboard /*= false */ ):
@@ -605,7 +603,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 					std::vector<Vertex_PCU> sphereVerts;
 					std::vector<unsigned int> sphereIndices;
 					Vec3 centre = Vec3( 0.f , 0.f , 0.f );
-					AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , 1.f , 64 , 32 , pt->m_color );
+					AddUVSphereToIndexedVertexArray( sphereVerts , sphereIndices , centre , pt->m_size , 64 , 32 , pt->m_color );
 					point->UpdateVertices( ( unsigned int ) sphereVerts.size() , &sphereVerts[ 0 ] );
 					point->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
 					
@@ -634,6 +632,7 @@ void DebugRenderSystem::DebugRenderWorldToCamera( Camera* cam )
 					point->UpdateIndices( ( unsigned int ) sphereIndices.size() , &sphereIndices[ 0 ] );
 
 					m_context->SetModalMatrix( pt->m_transform.ToMatrix() );
+					m_context->BindShader( nullptr );
 					m_context->DrawMesh( point );
 
 					m_context->EndCamera( *m_camera );

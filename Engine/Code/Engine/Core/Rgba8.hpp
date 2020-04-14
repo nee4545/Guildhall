@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
-
+struct Vec4;
 
 struct Rgba8
 {
@@ -43,6 +43,8 @@ struct Rgba8
 			GUARANTEE_OR_DIE( true, Stringf( "Vec2 can't construct from improper string \"%s\"", asText ) );
 		}
 	}
+
+	Vec4 GetAsNormalizedVec4();
 
 
 };

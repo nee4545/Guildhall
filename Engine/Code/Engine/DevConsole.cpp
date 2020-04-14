@@ -510,6 +510,7 @@ void DevConsole::InitializeCommands()
 	m_commands.push_back( "debug_add_world_wirequad" );
 	m_commands.push_back( "debug_add_world_billboardtext" );
 	m_commands.push_back( "debug_add_screen_text" );
+	m_commands.push_back( "light_set_ambient_color" );
 
 }
 

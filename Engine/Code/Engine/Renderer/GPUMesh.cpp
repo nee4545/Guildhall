@@ -8,10 +8,12 @@ GPUMesh::GPUMesh( RenderContext* owner )
 	m_indices = new IndexBuffer( owner , MEMORY_HINT_DYNAMIC );
 }
 
-void GPUMesh::UpdateVertices( unsigned int vcount , void const* vertexData , unsigned int vertexStride , buffer_attribute_t const* layout )
+void GPUMesh::UpdateVertices( unsigned int vcount , void const* vertexData , unsigned int vertexStride , buffer_attribute_t* layout )
 {
 	m_vertexCount = vcount;
 	size_t bufferByteSize = vcount * vertexStride;
+	m_vertices->m_attribute = layout;
+	m_vertices->m_stride = vertexStride;
 	m_vertices->Update( vertexData , bufferByteSize, sizeof(layout) );
 }
 

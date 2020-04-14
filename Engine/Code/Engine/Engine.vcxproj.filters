@@ -90,9 +90,6 @@
     <ClCompile Include="Vec4.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Vertex_PCU.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Transform.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -172,6 +169,11 @@
       <Filter>DebugRender</Filter>
     </ClCompile>
     <ClCompile Include="Core\Plane.cpp" />
+    <ClCompile Include="Core\Vertex_PCU.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VertexLit.cpp" />
+    <ClCompile Include="Core\Rgba8.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -475,7 +477,6 @@
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Time.hpp" />
-    <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="DevConsole.hpp" />
     <ClInclude Include="Input\AnalogJoyStick.hpp" />
@@ -686,10 +687,19 @@
     <ClInclude Include="Core\StringUtils.hpp">
       <Filter>ThirdParty</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Plane.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Plane.hpp" />
+    <ClInclude Include="Core\VertexLit.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Vertex_PCU.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VertexCommon.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">

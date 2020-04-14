@@ -64,16 +64,6 @@ void App::Update(float deltaSeconds)
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
 	DebugRenderSystem::sDebugRenderer->Update();
 
-	if( g_theInput->IsKeyPressed( 'Y' ) )
-	{
-		deltaSeconds*=4.f;
-	}
-
-	if( g_theInput->IsKeyPressed( 'T' ) )
-	{
-		deltaSeconds*=0.1f;
-	}
-
 	/*if ( g_theInput->WasKeyJustPressed( 'G' ) )
 	{
 		HICON icon = LoadIcon( NULL , IDI_WARNING );

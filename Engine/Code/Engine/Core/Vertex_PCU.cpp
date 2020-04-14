@@ -338,7 +338,7 @@ m_uvTexCoords=uvTexCoords;
  buffer_attribute_t::buffer_attribute_t()
  {
 	 name = "";
-	 type = BUFFER_FORMAT_VEC2;
+	 type = BUFFER_FORMAT_INVALID;
 	 offset = 0;
  }
 

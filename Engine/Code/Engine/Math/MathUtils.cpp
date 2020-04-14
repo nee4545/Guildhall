@@ -1102,7 +1102,7 @@ float CrossProduct2D( const Vec2& a , const Vec2& b )
 	return ( ( a.x * b.y ) - ( a.y * b.x ) );
 }
 
-Vec3 CrossProduct3D( Vec3& a , Vec3& b )
+Vec3 CrossProduct3D( Vec3 a , Vec3 b )
 {
 	Vec3 c;
 	c.x = ( a.y * b.z ) - ( a.z * b.y );

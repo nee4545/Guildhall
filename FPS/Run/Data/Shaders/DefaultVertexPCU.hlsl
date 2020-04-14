@@ -13,36 +13,41 @@
 // The semantic and internal names can be whatever you want, 
 // but know that semantics starting with SV_* usually denote special 
 // inputs/outputs, so probably best to avoid that naming.
-struct vs_input_t 
+struct vs_input_t
 {
    // we are not defining our own input data; 
-   float3 position      : POSITION; 
-   float4 color         : COLOR; 
-   float2 uv            : TEXCOORD; 
-}; 
-
-
-cbuffer time_constants:register( b0 )
-{
-	float SYSTEM_TIME_SECONDS;
-	float SYSTEM_TIME_DELTASECONDS;
+    float3 position : POSITION;
+    float4 color : COLOR;
+    float2 uv : TEXCOORD;
 };
 
-cbuffer camera_constants: register( b1 )
+
+cbuffer time_constants : register(b0)
 {
-	float4x4 PROJECTION; //CAMERA_TO_CLIP_TRANSFORM
-	float4x4 VIEW;
+    float SYSTEM_TIME_SECONDS;
+    float SYSTEM_TIME_DELTASECONDS;
 };
 
-Texture2D <float4> tDiffuse : register( t0 );
-SamplerState sSampler : register( s0 );
-
-
-float RangeMap( float val , float inMin , float inMax , float outMin , float outMax )
+cbuffer camera_constants : register(b1)
 {
-	float domain = inMax - inMin;
-	float range = outMax - outMin;
-	return( ( val - inMin ) / domain ) * range + outMin;
+    float4x4 PROJECTION; //CAMERA_TO_CLIP_TRANSFORM
+    float4x4 VIEW;
+};
+
+cbuffer model_constants : register(b2)
+{
+    float4x4 MODEL;
+}
+
+Texture2D<float4> tDiffuse : register(t0);
+SamplerState sSampler : register(s0);
+
+
+float RangeMap(float val, float inMin, float inMax, float outMin, float outMax)
+{
+    float domain = inMax - inMin;
+    float range = outMax - outMin;
+    return ((val - inMin) / domain) * range + outMin;
 }
 
 //--------------------------------------------------------------------------------------
@@ -51,33 +56,34 @@ float RangeMap( float val , float inMin , float inMax , float outMin , float out
 
 //--------------------------------------------------------------------------------------
 // for passing data from vertex to fragment (v-2-f)
-struct v2f_t 
+struct v2f_t
 {
-   float4 position : SV_POSITION; 
-   float4 color : COLOR; 
-   float2 uv : UV; 
-}; 
+    float4 position : SV_POSITION;
+    float4 color : COLOR;
+    float2 uv : UV;
+};
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
-v2f_t VertexFunction( vs_input_t input )
+v2f_t VertexFunction(vs_input_t input)
 {
-   v2f_t v2f = (v2f_t)0;
+    v2f_t v2f = (v2f_t) 0;
 
    // forward vertex input onto the next stage
-   v2f.position = float4( input.position, 1.0f ); 
-   v2f.color = input.color; 
-   v2f.uv = input.uv; 
+    v2f.position = float4(input.position, 1.0f);
+    v2f.color = input.color;
+    v2f.uv = input.uv;
 
-   float4 worldPos = float4( input.position , 1 );
-   float4 cameraPos = mul( VIEW , worldPos );
+    float4 worldPos = float4(input.position, 1);
+    worldPos = mul(MODEL, worldPos);
+    float4 cameraPos = mul(VIEW, worldPos);
 
-   float4 clipPos;
-   clipPos = mul( PROJECTION , cameraPos );
+    float4 clipPos;
+    clipPos = mul(PROJECTION, cameraPos);
 
-   v2f.position = clipPos;
+    v2f.position = clipPos;
     
-   return v2f;
+    return v2f;
 }
 
 //--------------------------------------------------------------------------------------
@@ -85,9 +91,11 @@ v2f_t VertexFunction( vs_input_t input )
 // 
 // SV_Target0 at the end means the float4 being returned
 // is being drawn to the first bound color target.
-float4 FragmentFunction( v2f_t input ) : SV_Target0
+float4 FragmentFunction(v2f_t input) : SV_Target0
 {
-	float4 color= tDiffuse.Sample( sSampler,input.uv );
-	
-	return float4( 1 - color.xyz , color.a );
+    float4 color = tDiffuse.Sample(sSampler, input.uv);
+    return color * input.color;
+
+	//return (1-color.xyz,color.a);
+
 }

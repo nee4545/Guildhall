@@ -65,14 +65,21 @@ v2f_t VertexFunction(vs_input_t input)
 }
 
 //--------------------------------------------------------------------------------------
-// Fragment Shader
-// 
+
+//--------------------------------------------------------------------------------------
+//                  FRAGMENT SHADER
+//--------------------------------------------------------------------------------------
 // SV_Target0 at the end means the float4 being returned
 // is being drawn to the first bound color target.
-float4 FragmentFunction( v2f_t input ) : SV_Target0
-{
-    float4 color = tDiffuse.Sample( sSampler,input.uv );
-    return color * input.color;
+//--------------------------------------------------------------------------------------
 
-   // return float4(1-color.xyz,color.a);
+float4 FragmentFunction(v2f_t input) : SV_Target0
+{
+
+	float3 normal = normalize(input.world_normal);
+	float4 color = ConvertNormalizedVector3ToColor(normal);
+	return color;
+    
 }
+
+//--------------------------------------------------------------------------------------
