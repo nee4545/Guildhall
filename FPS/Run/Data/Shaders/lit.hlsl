@@ -104,8 +104,8 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
 
 	float3 specularFactor = float3(0.0f.xxx);
 	
-	float3 lightColor = LIGHT.color.xyz;
-	float2 lightFactor = ComputeLightFactor(LIGHT, input.world_position, worldNormal, dir_to_eye);
+	float3 lightColor = LIGHT[0].color.xyz;
+	float2 lightFactor = ComputeLightFactor(LIGHT[0], input.world_position, worldNormal, dir_to_eye);
 	
 	diffuse += lightFactor.x * lightColor;
 	specularFactor += lightFactor.y * lightColor;

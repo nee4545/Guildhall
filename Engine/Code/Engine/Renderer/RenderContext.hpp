@@ -82,14 +82,17 @@ struct  frameData_t
 	float systemTime;
 	float systemDeltaTime;
 
-	float padding;
-	float INVERSE_GAMMA		= 1.f/2.2f;
+	float GAMMA = 2.f;
+	float INVERSE_GAMMA		= 0.5f;
 };
 
 struct light_t
 {
 	Vec3 position;
 	float pad00;
+
+	Vec3 direction = Vec3(0.f,0.f,1.f);
+	float directionFactor = 0.f;
 
 	Vec3 color;
 	float intensity;

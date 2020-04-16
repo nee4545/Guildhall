@@ -1,8 +1,13 @@
 
+static const uint MAX_LIGHTS = 1;
+
 struct light_t
 {
 	float3 world_position;
 	float pad00; // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+	
+    float3 direction;
+    float directionFactor;
 
 	float3 color;
 	float intensity; // rgb and an intensity
@@ -40,7 +45,7 @@ cbuffer model_constants: register( b2 )
 cbuffer light_constants : register( b3 )         // constant buffer slot 3
 {
 	float4 AMBIENT;
-	light_t LIGHT;
+	light_t LIGHT[MAX_LIGHTS];
 	
 	// all 0 to 1 and help influence the lighting equation
 	float DIFFUSE_FACTOR; // default: 1  - scales diffuse lighting in equation (lower values make an object absorb light
