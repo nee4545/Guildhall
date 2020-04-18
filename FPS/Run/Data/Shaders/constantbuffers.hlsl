@@ -1,5 +1,5 @@
 
-static const uint MAX_LIGHTS = 1;
+static const uint MAX_LIGHTS = 8;
 
 struct light_t
 {
@@ -53,6 +53,21 @@ cbuffer light_constants : register( b3 )         // constant buffer slot 3
 	float SPECULAR_POWER; // default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
 	float EMISSIVE_FACTOR; // default: 1  - controls how much the emissive texture is added into the final equation
 };
+
+cbuffer fog_constants : register(b4) // constant buffer slot 5
+{
+    float nearFog;
+    float3 fogNearColor;
+    float farFog;
+    float3 fogFarColor;
+};
+
+float3 ApplyLinearFog(float3 worldPosition, float3 color)
+{
+    float distance = length(worldPosition - CAMERA_POSITION);
+    float alpha = smoothstep(nearFog, farFog, distance);
+    return lerp(color, fogFarColor, alpha.xxx);
+}
 
 Texture2D <float4> tDiffuse : register( t0 );
 Texture2D <float4> tNormal : register( t1 );

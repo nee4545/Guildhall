@@ -16,9 +16,20 @@
 
 #define UNUSED(x) (void)(x);
 
+struct Light
+{
+	light_t light;
+	eLightTypes type;
+	bool shouldFollwCamera = false;
+	bool shouldAnimate = false;
+};
+
 eDebugRenderMode currentMode = DEBUG_RENDER_USE_DEPTH;
-light_t tempLight;
+Light tempLight[8];
 Rgba8 lightColor = Rgba8( 255 , 255 , 255 , 255 );
+int currentLightIndex = 0;
+fog_t fog;
+
 
 
 bool Help( EventArgs& args )
@@ -98,6 +109,7 @@ Game::Game()
 
 	tileDiffuse = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	tileNormal = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
+	noise = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/noise.png" );
 
 
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
@@ -146,9 +158,17 @@ Game::Game()
 	g_theInput->SetCursorMode( MODE_RELATIVE );
 
 	tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/gg.png" );
-	tempLight.position = Vec3( 0.f , 0.f , 0.f );
-	tempLight.intensity = 0.5f;
-	tempLight.color = Vec3( 1.f , 1.f , 1.f );
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		tempLight[i].light.position = Vec3( 0.f , 0.f , 0.f );
+		tempLight[i].light.intensity = 0.f;
+		tempLight[i].light.color = Vec3( 1.f , 1.f , 1.f );
+		tempLight[ i ].type = POINT_LIGHT;
+	}
+
+	tempLight[ 0 ].light.intensity = 0.5f;
+
 
 	std::vector<VertexLit> cubeVertices;
 	std::vector<unsigned int> cubeIndices;
@@ -169,7 +189,7 @@ Game::Game()
 	dissolveData.burnAmount = 0.f;
 	dissolveData.burnStartColor = Vec3( 0.f , 0.f , 1.f );
 	dissolveData.burnEndColor = Vec3( 1.f , 0.f , 1.f );
-	dissolveData.burnEdgeWidth = 0.f;
+	dissolveData.burnEdgeWidth = 1.f;
 
 	//g_theRenderer->CreateRasterState( D3D11_FILL_SOLID , D3D11_CULL_BACK );
 
@@ -201,6 +221,9 @@ void Game::Update( float deltaseconds )
 	ToggleSpecularAttenuation();
 	ToggleLightIntensity();
 	ToggleRenderModes();
+	UpdateDissolveDetails();
+	ToggleLights();
+	ToggleLightTypes();
 
 	if ( g_theConsole.IsOpen() )
 	{
@@ -303,16 +326,22 @@ void Game::Render()
 	switch ( currentShaderNumber )
 	{
 	case 0: g_theRenderer->BindShader( "Data/Shaders/lit.hlsl" );
+		g_theRenderer->EnableFog( fog );
 		break;
 	case 1: g_theRenderer->BindShader( "Data/Shaders/Default.hlsl" );
+		g_theRenderer->DisableFog();
 		break;
 	case 2: g_theRenderer->BindShader( "Data/Shaders/Normals.hlsl" );
+		g_theRenderer->DisableFog();
 		break;
 	case 3: g_theRenderer->BindShader( "Data/Shaders/tangents.hlsl" );
+		g_theRenderer->DisableFog();
 		break;
 	case 4: g_theRenderer->BindShader( "Data/Shaders/bitangents.hlsl" );
+		g_theRenderer->DisableFog();
 		break;
 	case 5: g_theRenderer->BindShader( "Data/Shaders/surfaceNormals.hlsl" );
+		g_theRenderer->DisableFog();
 		break;
 	default:
 		break;
@@ -321,53 +350,69 @@ void Game::Render()
 	g_theRenderer->SetAmbientLight( lightColor , ambientLightIntensity );
 	g_theRenderer->SetSpecularPower( specularPower );
 	g_theRenderer->SetSpecularFactor( specularFactor );
-	tempLight.specularAttunation = specularAttenuation;
+	tempLight[currentLightIndex].light.specularAttunation = specularAttenuation;
 	//tempLight.attenuation = specularAttenuation;
 	
-	if ( lightShouldAnimate )
+	for ( int i = 0; i < 8; i++ )
 	{
-		float zOffset = -7.f ;
-		tempLight.position = Vec3( CosDegrees( roataionAngleForAnimation )*9.f , 0.5f , (SinDegrees( roataionAngleForAnimation )*5.f)+zOffset );
-		roataionAngleForAnimation += 1.f;
-
-		if ( roataionAngleForAnimation >= 360.f )
+		if ( tempLight[i].shouldAnimate )
 		{
-			roataionAngleForAnimation = 0.f;
+			float zOffset = -7.f;
+			tempLight[ i ].light.position = Vec3( CosDegrees( roataionAngleForAnimation ) * 9.f , 0.5f , ( SinDegrees( roataionAngleForAnimation ) * 5.f ) + zOffset );
+			roataionAngleForAnimation += 1.f;
+
+			if ( roataionAngleForAnimation >= 360.f )
+			{
+				roataionAngleForAnimation = 0.f;
+			}
 		}
 	}
-	else
+	
+	for ( int i = 0; i < 8; i++ )
 	{
-		roataionAngleForAnimation = 0.f;
+		if ( tempLight[ i ].shouldFollwCamera )
+		{
+			tempLight[ i ].light.position = m_camera->m_transform.m_position;
+		}
 	}
 
-	if ( lightFollowCamera )
+	for ( int i = 0; i < 8; i++ )
 	{
-		tempLight.position = m_camera->m_transform.m_position;
+		g_theRenderer->EnableLight( i , tempLight[i].light );
 	}
 
-	g_theRenderer->EnableLight( 0 , tempLight );
-
-	DebugAddWorldPoint( tempLight.position , 0.1f , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , DEBUG_RENDER_USE_DEPTH );
-
+	
 	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( quad );
 
-	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
-	g_theRenderer->DrawMesh( mesh );
+	/*g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
+	g_theRenderer->DrawMesh( mesh );*/
 
 	g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( sphere );
 
-	/*g_theRenderer->SetDepthTest( COMPARE_LEQUAL );
+	g_theRenderer->SetDepthTest( COMPARE_LEQUAL );
 	g_theRenderer->BindShader( "Data/Shaders/fresnal.hlsl" );
 	g_theRenderer->BindMaterialData( ( void* ) &fresnalData , sizeof( fresnalData ) );
 	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
 	g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
-	g_theRenderer->DrawMesh( sphere );*/
+	g_theRenderer->DrawMesh( sphere );
+
+	g_theRenderer->BindShader( "Data/Shaders/dissolve.hlsl" );
+	g_theRenderer->BindTexture( noise , TEXTURE_SLOT_USER );
+	g_theRenderer->SetBlendMode( BlendMode::OPAQE );
+	g_theRenderer->BindMaterialData( &dissolveData , sizeof( dissolveData ) );
+	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
+	g_theRenderer->DrawMesh( mesh );
 
 	g_theRenderer->EndCamera(*m_camera);
 
 	DisplayUIText();
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		DebugAddWorldPoint( tempLight[ i ].light.position , 0.1f , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , DEBUG_RENDER_USE_DEPTH );
+	}
 
 
 	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
@@ -383,6 +428,9 @@ void Game::Render()
 	}
 
 	//DebuggerPrintf( "%f,%f,%f \n" , tempLight.specularAttunation.x , tempLight.specularAttunation.y , tempLight.specularAttunation.z );
+
+	
+
 }
 
 void Game::UpdateCamera()
@@ -476,37 +524,35 @@ void Game::ToggleLightPositions()
 {
 	if ( g_theInput->WasKeyJustPressed( F5 ) )
 	{
-		tempLight.position = Vec3( 0.f , 0.f , 0.f );
-		lightFollowCamera = false;
-		lightShouldAnimate = false;
+		tempLight[currentLightIndex].light.position = Vec3( 0.f , 0.f , 0.f );
+		tempLight[ currentLightIndex ].shouldFollwCamera = false;
+		tempLight[ currentLightIndex ].shouldAnimate = false;
+
 	}
 
 	if ( g_theInput->WasKeyJustPressed( F6 ) )
 	{
-		tempLight.position = m_camera->m_transform.m_position;
+		tempLight[currentLightIndex].light.position = m_camera->m_transform.m_position;
+		tempLight[ currentLightIndex ].shouldFollwCamera = false;
+		tempLight[ currentLightIndex ].shouldAnimate = false;
 
-		tempLight.directionFactor = 0.f;
 		Mat44 modal = m_camera->m_transform.ToMatrix();
 		Vec3 forwardVec = modal.GetKBasis3D();
-		tempLight.direction = -forwardVec.GetNormalized();
-	//tempLight.specularAttunation = Vec3( 0.f , 0.f , 1.f );
-		tempLight.dotInnerAngle = CosDegrees( 30.f );
-		tempLight.dotOuterAngle = CosDegrees( 30.f );
-		
-		lightFollowCamera = false;
-		lightShouldAnimate = false;
+		forwardVec = -forwardVec.GetNormalized();
+
+		tempLight[ currentLightIndex ].light.direction = forwardVec;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( F7 ) )
 	{
-		lightFollowCamera = true;
-		lightShouldAnimate = false;
+		tempLight[ currentLightIndex ].shouldFollwCamera = true;
+		tempLight[ currentLightIndex ].shouldAnimate = false;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( F8 ) )
 	{
-		lightFollowCamera = false;
-		lightShouldAnimate = true;
+		tempLight[ currentLightIndex ].shouldFollwCamera = false;
+		tempLight[ currentLightIndex ].shouldAnimate = true;
 	}
 	
 }
@@ -610,7 +656,14 @@ void Game::DisplayUIText()
 	std::string s8 = "[{,}] - Specular Power: ";
 	std::string s9 = "[<,>] - Shaders: ";
 	std::string s10 = "[U,I] - Light Intensity :";
+	std::string s11 = "[N,M] - Current Light: ";
+	std::string s12 = "[F] - Current Light Type:";
 	std::string temp = "";
+
+	std::string x1 = "Fresnal is applied on Sphere";
+	std::string x2 = "Fog is applied on Sphere and Quad";
+	std::string x3 = "Dissolve is applied on Cube";
+	std::string x4 = "[Z,X] - CurrentDissolve Factor";
 
 	std::vector<Vertex_PCU> v1;
 	m_font->AddVertsForTextInBox2D( v1 , box , 2.f , s1 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.98f ) );
@@ -649,10 +702,34 @@ void Game::DisplayUIText()
 	m_font->AddVertsForTextInBox2D( v8 , box , 2.f , s8 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.77f ) );
 
 	std::vector<Vertex_PCU> v10;
-	temp = std::to_string( tempLight.intensity );
+	temp = std::to_string( tempLight[currentLightIndex].light.intensity );
 	s10 += temp;
 
 	m_font->AddVertsForTextInBox2D( v10 , box , 2.f , s10 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.71f ) );
+
+	std::vector<Vertex_PCU> v11;
+	temp = std::to_string( currentLightIndex );
+	s11 += temp;
+
+	m_font->AddVertsForTextInBox2D( v11 , box , 2.f , s11 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.68f ) );
+
+	std::vector<Vertex_PCU> v12;
+	
+	switch ( tempLight[ currentLightIndex ].type )
+	{
+	case DIRECTIONAL_LIGHT:
+		temp = "Directional Light";
+		break;
+	case  SPOT_LIGHT:
+		temp = "Spot Light";
+		break;
+	case POINT_LIGHT:
+		temp = "Point Light";
+		break;
+	}
+
+	s12 += temp;
+	m_font->AddVertsForTextInBox2D( v12 , box , 2.f , s12 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.65f ) );
 
 	std::vector<Vertex_PCU> v9;
 	if ( currentShaderNumber == 0 )
@@ -683,6 +760,22 @@ void Game::DisplayUIText()
 
 	m_font->AddVertsForTextInBox2D( v9 , box , 2.f , s9 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.74f ) );
 
+	std::vector<Vertex_PCU> k1;
+	m_font->AddVertsForTextInBox2D( k1 , box , 2.f , x1 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.12f ) );
+
+	std::vector<Vertex_PCU> k2;
+	m_font->AddVertsForTextInBox2D( k2 , box , 2.f , x2 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.09f ) );
+
+	std::vector<Vertex_PCU> k3;
+	m_font->AddVertsForTextInBox2D( k3 , box , 2.f , x3 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.06f ) );
+
+	std::vector<Vertex_PCU> k4;
+	temp = std::to_string( currentBurnAmt );
+	x4 += temp;
+	m_font->AddVertsForTextInBox2D( k4 , box , 2.f , x4 , Rgba8( 100 , 100 , 100 , 255 ) , 1.f , Vec2( 0.02f , 0.03f ) );
+
+
+
 	g_theRenderer->BeginCamera( *m_UICamera );
 	g_theRenderer->BindShader( "Data/Shaders/DefaultVertexPCU.hlsl" );
 	g_theRenderer->BindTexture( m_font->GetTexture() );
@@ -696,6 +789,12 @@ void Game::DisplayUIText()
 	g_theRenderer->DrawVertexArray( v8 );
 	g_theRenderer->DrawVertexArray( v9 );
 	g_theRenderer->DrawVertexArray( v10 );
+	g_theRenderer->DrawVertexArray( v11 );
+	g_theRenderer->DrawVertexArray( v12 );
+	g_theRenderer->DrawVertexArray( k1 );
+	g_theRenderer->DrawVertexArray( k2 );
+	g_theRenderer->DrawVertexArray( k3 );
+	g_theRenderer->DrawVertexArray( k4 );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera( *m_UICamera );
 
@@ -705,20 +804,104 @@ void Game::ToggleLightIntensity()
 {
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
-		tempLight.intensity += 0.1f;
+		tempLight[currentLightIndex].light.intensity += 0.1f;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'U' ) )
 	{
-		tempLight.intensity -= 0.1f;
+		tempLight[currentLightIndex].light.intensity -= 0.1f;
 	}
 
-	tempLight.intensity = Clamp( tempLight.intensity , 0.f , 1.f );
+	tempLight[currentLightIndex].light.intensity = Clamp( tempLight[currentLightIndex].light.intensity , 0.f , 1.f );
 
 }
 
+void Game::UpdateDissolveDetails()
+{
+	if ( g_theInput->WasKeyJustPressed( 'Z' ) )
+	{
+		currentBurnAmt += 0.1f;
+		currentBurnAmt = Clamp( currentBurnAmt , 0.f , 1.f );
+
+		dissolveData.burnAmount = currentBurnAmt;
+		dissolveData.burnEdgeWidth = 1 + ( 2 * currentBurnAmt );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'X' ) )
+	{
+		currentBurnAmt -= 0.1f;
+		currentBurnAmt = Clamp( currentBurnAmt , 0.f , 1.f );
+
+		dissolveData.burnAmount = currentBurnAmt;
+		dissolveData.burnEdgeWidth = 1 + ( 2 * currentBurnAmt );
+	}
+
+}
+
+void Game::ToggleLights()
+{
+	if ( g_theInput->WasKeyJustPressed( 'M' ) )
+	{
+		currentLightIndex += 1;
+
+		if ( currentLightIndex > 7 )
+		{
+			currentLightIndex = 7;
+		}
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'N' ) )
+	{
+		currentLightIndex -= 1;
+
+		if ( currentLightIndex < 0 )
+		{
+			currentLightIndex = 0;
+		}
+	}
+}
+
+void Game::ToggleLightTypes()
+{
+	if ( g_theInput->WasKeyJustPressed( 'F' ) )
+	{
+		if ( tempLight[ currentLightIndex ].type == POINT_LIGHT )
+		{
+			tempLight[ currentLightIndex ].type = SPOT_LIGHT;
+		}
+		else if ( tempLight[ currentLightIndex ].type == SPOT_LIGHT )
+		{
+			tempLight[ currentLightIndex ].type = DIRECTIONAL_LIGHT;
+		}
+		else
+		{
+			tempLight[ currentLightIndex ].type = POINT_LIGHT;
+		}
+	}
 
 
+	if ( tempLight[ currentLightIndex ].type == POINT_LIGHT )
+	{
+		tempLight[ currentLightIndex ].light.directionFactor = 0.f;
+		tempLight[ currentLightIndex ].light.dotInnerAngle = -1.f;
+		tempLight[ currentLightIndex ].light.dotOuterAngle = -1.f;
+	}
+
+	if ( tempLight[ currentLightIndex ].type == SPOT_LIGHT )
+	{
+		tempLight[ currentLightIndex ].light.directionFactor = 0.f;
+		tempLight[ currentLightIndex ].light.dotInnerAngle = CosDegrees( 15.f );
+		tempLight[ currentLightIndex ].light.dotOuterAngle = CosDegrees( 30.f );
+	}
+
+	if ( tempLight[ currentLightIndex ].type == DIRECTIONAL_LIGHT )
+	{
+		tempLight[ currentLightIndex ].light.directionFactor = 1.f;
+		tempLight[ currentLightIndex ].light.dotInnerAngle = -1.f;
+		tempLight[ currentLightIndex ].light.dotOuterAngle = -1.f;
+	}
+
+}
 
 
 

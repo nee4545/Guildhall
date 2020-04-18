@@ -50,6 +50,7 @@ class Game
 	Texture* tex = nullptr;
 	Texture* tileDiffuse = nullptr;
 	Texture* tileNormal = nullptr;
+	Texture* noise = nullptr;
 
 	GPUMesh* mesh = nullptr;
 	GPUMesh* sphere = nullptr;
@@ -72,6 +73,7 @@ class Game
 	Fresnal fresnalData;
 	Dissolve dissolveData;
 	float currentBurnAmt = 0.f;
+	
 
 public:
 
@@ -100,7 +102,9 @@ public:
 	void ToggleSpecularPower();
 	void ToggleSpecularFactor();
 	void ToggleSpecularAttenuation();
-	void ToggleAttenuation();
 	void DisplayUIText();
 	void ToggleLightIntensity();
+	void UpdateDissolveDetails();
+	void ToggleLights();
+	void ToggleLightTypes();
 };

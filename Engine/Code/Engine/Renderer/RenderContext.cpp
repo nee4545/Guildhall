@@ -668,6 +668,12 @@ void RenderContext::Shutdown()
 		m_materialUBO = nullptr;
 	}
 
+	if ( m_fogUBO != nullptr )
+	{
+		delete m_fogUBO;
+		m_fogUBO = nullptr;
+	}
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
@@ -961,6 +967,34 @@ void RenderContext::BindMaterialData( void* data , unsigned int dataSize )
 	m_materialUBO->Update( data , dataSize , dataSize );
 
 	BindUniformBuffer( 5 , m_materialUBO );
+}
+
+void RenderContext::EnableFog( fog_t fogData )
+{
+	if ( m_fogUBO == nullptr )
+	{
+		m_fogUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	m_fogUBO->Update( &fogData , sizeof( fogData ) , sizeof( fogData ) );
+
+	BindUniformBuffer( 4 , m_fogUBO );
+}
+
+void RenderContext::DisableFog()
+{
+	if ( m_fogUBO == nullptr )
+	{
+		m_fogUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	fog_t  temp;
+	temp.nearFog = INFINITY;
+	temp.farFog = INFINITY;
+
+	m_fogUBO->Update( &temp , sizeof( temp ) , sizeof( temp ) );
+
+	BindUniformBuffer( 4 , m_fogUBO );
 }
 
 void RenderContext::CreateBlendStates()

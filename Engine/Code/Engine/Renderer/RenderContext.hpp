@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-constexpr int MAX_LIGHTS= 1;
+constexpr int MAX_LIGHTS= 8;
 
 
 class BitmapFont;
@@ -54,9 +54,9 @@ enum class BlendMode
 
 enum eLightTypes
 {
-	POINT_LIGHT,
-	DIRECTIONAL_LIGHT,
-	SPOT_LIGHT,
+	POINT_LIGHT ,
+	DIRECTIONAL_LIGHT ,
+	SPOT_LIGHT ,
 };
 
 enum eBufferSlot
@@ -84,6 +84,14 @@ enum eAttenuations
 struct modelData_t
 {
 	Mat44 modal;
+};
+
+struct fog_t
+{
+	float nearFog=0.f;
+	Vec3 fogNearColor = Vec3(1.f,1.f,1.f);
+	float farFog=15.f;
+	Vec3 fogFarColor = Vec3(0.5f,0.5f,0.5f);
 };
 
 //Data for frame ubo
@@ -163,6 +171,7 @@ public:
 	RenderBuffer* m_modelUBO = nullptr;
 	RenderBuffer* m_lightUBO = nullptr;
 	RenderBuffer* m_materialUBO = nullptr;
+	RenderBuffer* m_fogUBO = nullptr;
 
 	Texture* m_texture;
 	ID3D11BlendState* m_alphaBlendState;
@@ -245,6 +254,10 @@ public:
 	void SetDiffuseAttenuation( Vec3 attenuation , unsigned int lightId );
 	void SetLightType( eLightTypes type, unsigned int lightId );
 	void BindMaterialData(void *data, unsigned int dataSize);
+	
+	void EnableFog(fog_t fogData);
+	void DisableFog();
+
 	
 
 private:

@@ -80,13 +80,14 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3 normal           = normalize( input.world_normal );
     float3 bitangent        = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
     float3x3 TBN            = float3x3( tangent, bitangent, normal );
-    float4 normal_color     = tNormal.Sample( sSampler , input.uv );
-    float3 surface_normal   = NormalColorToVector3( normal_color.xyz );
-    float3 world_normal     = mul( surface_normal , TBN );
-    float3 directionToSurface = normalize( input.world_position - CAMERA_POSITION );
-    float dp                = length( cross( directionToSurface , world_normal ) );
-    //return float4(FRESNEL_COLOR, 1);
-    float factor            = FRESNEL_FACTOR * pow( dp , FRESNEL_POWER * 16.0f + 15 * sin( SYSTEM_TIME_DELTASECONDS ) );
+    
+    float4 normalColor = tNormal.Sample( sSampler , input.uv );
+    float3 surfaceNormal = NormalColorToVector3( normalColor.xyz );
+    float3 worldNormal = mul( surfaceNormal , TBN );
+    
+    float3 dirToSurface = normalize( input.world_position - CAMERA_POSITION );
+    float dp = length( cross( dirToSurface , worldNormal ) );
+    
+    float factor = FRESNEL_FACTOR * pow( dp , FRESNEL_POWER * 16.0f + 15 * sin( SYSTEM_TIME_DELTASECONDS ) );
     return float4( FRESNEL_COLOR , factor );
 }
-//--------------------------------------------------------------------------------------

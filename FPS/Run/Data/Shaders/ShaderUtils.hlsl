@@ -66,14 +66,14 @@ float3 ComputeLightingAt(float3 worldPos, float3 worldNormal,float3 surfaceColor
   
     float3 spec = float3(0.f.xxx);
 	
-    //for (uint i = 0; i < MAX_LIGHTS; i++)
-    //{
-        float3 lightColor = LIGHT[0].color.xyz;
-        float2 lightFactors = ComputeLightFactor(LIGHT[0], worldPos, worldNormal, dirToEye);
+    for (uint i = 0; i < MAX_LIGHTS; i++)
+    {
+       float3 lightColor = LIGHT[i].color.xyz;
+       float2 lightFactors = ComputeLightFactor(LIGHT[i], worldPos, worldNormal, dirToEye);
        
-        diffuse += lightFactors.x * lightColor;
-        spec += lightFactors.y * lightColor;
-    //}
+       diffuse += lightFactors.x * lightColor;
+       spec += lightFactors.y * lightColor;
+    }
 	
     diffuse = min(diffuse, float3(1.f.xxx));
 	

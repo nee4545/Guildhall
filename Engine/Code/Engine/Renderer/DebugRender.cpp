@@ -1527,7 +1527,17 @@ AABB2 DebugRenderSystem::DebugGetScreenBounds()
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
 {
 	DebugPoint* obj = new DebugPoint( mode , DEBUG_RENDER_WORLD , pos , size , color , duration );
+
+	for ( int i = 0; i < DebugRenderSystem::sDebugRenderer->m_worldObjects.size(); i++ )
+	{
+		if ( DebugRenderSystem::sDebugRenderer->m_worldObjects[ i ] == nullptr )
+		{
+			DebugRenderSystem::sDebugRenderer->m_worldObjects[ i ] = obj;
+			return;
+		}
+	}
 	DebugRenderSystem::sDebugRenderer->m_worldObjects.push_back( obj );
+	
 }
 
 void DebugAddWorldPoint( Transform transform , float size , Rgba8 color , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
