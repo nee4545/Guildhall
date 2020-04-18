@@ -162,6 +162,15 @@ Game::Game()
 	quadTransform.m_position = Vec3( 6.f , 0.5f , -8.f );
 	sphereTransform.m_position = Vec3( -5.f , 0.5f , -8.f );
 
+	fresnalData.fresnalColor = Vec3( 0.f , 1.f , 0.f );
+	fresnalData.fresnalFactor = 1.f;
+	fresnalData.fresnalPower = 1.f;
+
+	dissolveData.burnAmount = 0.f;
+	dissolveData.burnStartColor = Vec3( 0.f , 0.f , 1.f );
+	dissolveData.burnEndColor = Vec3( 1.f , 0.f , 1.f );
+	dissolveData.burnEdgeWidth = 0.f;
+
 	//g_theRenderer->CreateRasterState( D3D11_FILL_SOLID , D3D11_CULL_BACK );
 
 }
@@ -313,7 +322,7 @@ void Game::Render()
 	g_theRenderer->SetSpecularPower( specularPower );
 	g_theRenderer->SetSpecularFactor( specularFactor );
 	tempLight.specularAttunation = specularAttenuation;
-
+	//tempLight.attenuation = specularAttenuation;
 	
 	if ( lightShouldAnimate )
 	{
@@ -343,11 +352,18 @@ void Game::Render()
 	g_theRenderer->SetModalMatrix( quadTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( quad );
 
+	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
+	g_theRenderer->DrawMesh( mesh );
+
 	g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( sphere );
 
-	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
-	g_theRenderer->DrawMesh( mesh );
+	/*g_theRenderer->SetDepthTest( COMPARE_LEQUAL );
+	g_theRenderer->BindShader( "Data/Shaders/fresnal.hlsl" );
+	g_theRenderer->BindMaterialData( ( void* ) &fresnalData , sizeof( fresnalData ) );
+	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
+	g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
+	g_theRenderer->DrawMesh( sphere );*/
 
 	g_theRenderer->EndCamera(*m_camera);
 
@@ -468,6 +484,15 @@ void Game::ToggleLightPositions()
 	if ( g_theInput->WasKeyJustPressed( F6 ) )
 	{
 		tempLight.position = m_camera->m_transform.m_position;
+
+		tempLight.directionFactor = 0.f;
+		Mat44 modal = m_camera->m_transform.ToMatrix();
+		Vec3 forwardVec = modal.GetKBasis3D();
+		tempLight.direction = -forwardVec.GetNormalized();
+	//tempLight.specularAttunation = Vec3( 0.f , 0.f , 1.f );
+		tempLight.dotInnerAngle = CosDegrees( 30.f );
+		tempLight.dotOuterAngle = CosDegrees( 30.f );
+		
 		lightFollowCamera = false;
 		lightShouldAnimate = false;
 	}

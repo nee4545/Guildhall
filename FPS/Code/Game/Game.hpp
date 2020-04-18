@@ -20,6 +20,23 @@ enum shaderType
 	TOTAL
 };
 
+
+struct Fresnal
+{
+	Vec3 fresnalColor;
+	float  fresnalPower;
+	Vec3 pad00;
+	float  fresnalFactor;
+};
+
+struct Dissolve
+{
+	Vec3 burnStartColor;
+	float  burnEdgeWidth;
+	Vec3 burnEndColor;
+	float  burnAmount;
+};
+
 class Game
 {
 	RandomNumberGenerator rng;
@@ -52,6 +69,9 @@ class Game
 
 	Vec3 specularAttenuation = Vec3( 0.f , 0.f , 1.f );
 	float roataionAngleForAnimation = 0.f;
+	Fresnal fresnalData;
+	Dissolve dissolveData;
+	float currentBurnAmt = 0.f;
 
 public:
 
@@ -80,6 +100,7 @@ public:
 	void ToggleSpecularPower();
 	void ToggleSpecularFactor();
 	void ToggleSpecularAttenuation();
+	void ToggleAttenuation();
 	void DisplayUIText();
 	void ToggleLightIntensity();
 };

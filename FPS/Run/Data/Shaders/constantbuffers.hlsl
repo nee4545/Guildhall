@@ -24,7 +24,7 @@ cbuffer time_constants:register( b0 )
 	float SYSTEM_TIME_SECONDS;
 	float SYSTEM_TIME_DELTASECONDS;
 	
-	float padding;
+	float GAMMA;
 	float INVERSE_GAMMA;
 };
 

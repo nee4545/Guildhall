@@ -32,11 +32,11 @@ struct v2f_t
 	float4 color : COLOR;
 	float2 uv : UV;
 
+
 	float3 world_position : WORLD_POSITION;
 	float3 world_normal : WORLD_NORMAL;
 	float4 world_tangent : WORLD_TANGENT;
 };
-
 //--------------------------------------------------------------------------------------
 //                          VERTEX SHADER
 //--------------------------------------------------------------------------------------
@@ -81,39 +81,94 @@ v2f_t VertexFunction(vs_input_t input)
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
 
-	float4 diffuseColor = tDiffuse.Sample(sSampler, input.uv);
-	float4 normalColor  = tNormal.Sample(sSampler, input.uv);
-	
-	//float INVERSE_GAMMA = 0.45454545f;
-	
-	float3 dir_to_eye = normalize(CAMERA_POSITION - input.world_position);
-	float3 tangent = normalize(input.world_tangent.xyz);
-	float3 normal = normalize(input.world_normal);
+    float4 diffuseColor = tDiffuse.Sample(sSampler, input.uv);
+    
+    float4 normalColor = tNormal.Sample(sSampler, input.uv);
+    float3 dir_to_eye = normalize(CAMERA_POSITION - input.world_position);
+    float3 tangent = normalize(input.world_tangent.xyz);
+    float3 normal = normalize(input.world_normal);
 
     float3 bitangent = normalize(cross(normal, tangent)) * input.world_tangent.w;
-	float3x3 TBN = float3x3(tangent, bitangent, normal);
+    float3x3 TBN = float3x3(tangent, bitangent, normal);
+	
+    float alpha = diffuseColor.w * input.color.w;
+	
+    float3 surfaceColor = (input.color * diffuseColor).xyz;
+	
+    float3 surfaceNormal = NormalColorToVector3(normalColor.xyz);
+    float3 worldNormal = mul(surfaceNormal, TBN);
+	
+    float3 finalColor = ComputeLightingAt(input.world_position, worldNormal, surfaceColor, 1.f);
+    
+	
+    return float4(finalColor, alpha);
+	
+ //   float4 diffuseColor = tDiffuse.Sample(sSampler, input.uv);
+ //   float4 normalColor = tNormal.Sample(sSampler, input.uv);
+	
+	////float INVERSE_GAMMA = 0.45454545f;
+ //   float3 dirToEye = normalize(CAMERA_POSITION - input.world_position);
+ //   float3 tangent = normalize(input.world_tangent.xyz);
+ //   float3 normal = normalize(input.world_normal);
+
+ //   float3 bitangent = normalize(cross(normal, tangent)) * input.world_tangent.w;
+ //   float3x3 TBN = float3x3(tangent, bitangent, normal);
 
     //float3 surfaceColor = pow(diffuseColor.xyz, 0.46f);
     //surfaceColor = surfaceColor * input.color.xyz;
-	float3 surfaceColor = (input.color * diffuseColor).xyz; 
-	float surfaceAlpha  = input.color.w * diffuseColor.w;
+    //float3 surfaceColor = (input.color * diffuseColor).xyz;
+    //float surfaceAlpha = input.color.w * diffuseColor.w;
 	
-	float3 diffuse = AMBIENT.xyz * AMBIENT.w;
-	float3 surfaceNormal = NormalColorToVector3(normalColor.xyz);
-	float3 worldNormal = mul(surfaceNormal,TBN);
+    //float3 diffuse = AMBIENT.xyz * AMBIENT.w;
+    
+    //float3 surfaceNormal = NormalColorToVector3(normalColor.xyz);
+    //surfaceNormal = normalize(input.world_normal);
+    //float3 worldNormal = mul(surfaceNormal, TBN);
+	
+    //float3 light_position = LIGHT[0].world_position;
+    //float3 dir_to_light = normalize(light_position - input.world_position);
+    //float dot3 = max(0.0f, dot(dir_to_light, surfaceNormal));
 
-	float3 specularFactor = float3(0.0f.xxx);
+    //diffuse += dot3;
+    
+    
+    //float3 vecToLight = LIGHT[0].world_position - input.world_position;
+    
+    
+    //float dist = length(vecToLight);
+    //float3 dirToLight = normalize(vecToLight);
+    
+    //vecToLight = lerp(-dir_to_light, LIGHT[0].direction, LIGHT[0].directionFactor);
+    
+    ////dirToLight = -dirToLight;
+    
+    ////float dotAngle = dot(-dir_to_light,)
 	
-	float3 lightColor = LIGHT[0].color.xyz;
-	float2 lightFactor = ComputeLightFactor(LIGHT[0], input.world_position, worldNormal, dir_to_eye);
+    //float3 attVec = float3(1.f, dist, dist * dist);
+    
+    //float diffAtt = LIGHT[0].intensity / dot(attVec, LIGHT[0].attenuation);
+    //float specAtt = LIGHT[0].intensity / dot(attVec, LIGHT[0].specularAttunation);
+    
+    //diffuse = diffuse * LIGHT[0].intensity;
+    //diffuse = min(float3(1, 1, 1), diffuse);
+    //diffuse = saturate(diffuse);
+    //diffuse = diffuse * diffAtt;
 	
-	diffuse += lightFactor.x * lightColor;
-	specularFactor += lightFactor.y * lightColor;
+    //float3 hv = normalize(dir_to_light + dirToEye);
+    //float specular = max(0.f, dot(input.world_normal, hv));
+    
+    //specular = SPECULAR_FACTOR * pow(specular, SPECULAR_POWER);
+    //specular *= specAtt;
+    
+    ////float3 spec = specular * LIGHT[0].color;
+    ////spec *= specAtt;
 	
-	diffuse = min( diffuse, 1.0f );
-		
-	float3 color = diffuse * surfaceColor + specularFactor;
-	return float4(color, surfaceAlpha);
+    //float3 finalColor = diffuse * surfaceColor + specular;
+    
+    //return float4(finalColor, surfaceAlpha);
+	
+    
+ 
 }
 
 //--------------------------------------------------------------------------------------

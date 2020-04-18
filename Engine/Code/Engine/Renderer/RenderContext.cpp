@@ -662,6 +662,12 @@ void RenderContext::Shutdown()
 		m_lightUBO = nullptr;
 	}
 
+	if ( m_materialUBO != nullptr )
+	{
+		delete m_materialUBO;
+		m_materialUBO = nullptr;
+	}
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
@@ -926,6 +932,37 @@ void RenderContext::SetDiffuseAttenuation( Vec3 attenuation , unsigned int light
 	m_lights.light[ lightId ].attenuation = attenuation;
 }
 
+void RenderContext::SetLightType( eLightTypes type, unsigned int lightId)
+{
+	switch ( type )
+	{
+	case POINT_LIGHT:
+	{
+		m_lights.light[ lightId ].directionFactor = 0.f;
+		break;
+	}
+	case DIRECTIONAL_LIGHT:
+	{
+		m_lights.light[ lightId ].directionFactor = 1.f;
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void RenderContext::BindMaterialData( void* data , unsigned int dataSize )
+{
+	if ( m_materialUBO == nullptr )
+	{
+		m_materialUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	m_materialUBO->Update( data , dataSize , dataSize );
+
+	BindUniformBuffer( 5 , m_materialUBO );
+}
+
 void RenderContext::CreateBlendStates()
 {
 	D3D11_BLEND_DESC alphaDesc;
@@ -989,7 +1026,7 @@ void RenderContext::ClaerScreen( const Rgba8 clearColor )
 }
 
 
-void RenderContext::BindTexture(const Texture* texture , eTextureSlot textureType )
+void RenderContext::BindTexture(const Texture* texture , eTextureSlot textureType, unsigned int index )
 {
 	Texture* tex;
 	
@@ -1004,7 +1041,7 @@ void RenderContext::BindTexture(const Texture* texture , eTextureSlot textureTyp
 
 	TextureView* shaderResourceView= tex->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetSRV();
-	m_context->PSSetShaderResources( ( UINT ) textureType , 1 , &srvHandle );
+	m_context->PSSetShaderResources( ( UINT ) textureType+index , 1 , &srvHandle );
 }
 
 void RenderContext::BindSampler( const Sampler* sampler )

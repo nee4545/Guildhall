@@ -25,24 +25,58 @@ float3 NormalColorToVector3( float3 color )
 
 float2 ComputeLightFactor(light_t light, float3 worldPos, float3 worldNormal, float3 dirToEye)
 {
-	float3 vecToLight = light.world_position - worldPos;
-
-	float dist = length(vecToLight);
-	float3 dirToLight = normalize(vecToLight);
-	float3 attVec = float3(1.0f, dist, dist * dist);
-
-	float diffAtt = light.intensity / dot(attVec, light.attenuation);
-	float specAtt = light.intensity / dot(attVec, light.specularAttunation);
-
-   // compute diffuse
-	float diffuse = max(0.0f, dot(dirToLight, worldNormal));
+    float3 vecToLight = light.world_position - worldPos;
+    
+    float dist = length(vecToLight);
+    float3 dirToLight = normalize(vecToLight);
+    //return dist.xx;
+    //dirToLight = -dirToLight;
 	
-   // blinn-phong
-	float3 hv = normalize(dirToLight + dirToEye);
-	float specular = max(0.0f, dot(normalize(worldNormal), hv));
+    float3 lightDir = lerp(-dirToLight, light.direction, light.directionFactor);
+    float3 attVec = float3(1.f, dist, dist * dist);
+    
+    float dotAngle = dot(-dirToLight, light.direction);
+    float coneAtt = smoothstep(light.dotOuterAngle, light.innerAngle, dotAngle);
+    //return float2(dotAngle.xx);
+    
+    float diffAtt = light.intensity / dot(attVec, light.attenuation) * coneAtt;
+    float specAtt = light.intensity / dot(attVec, light.specularAttunation) * coneAtt;
+    
+    
+    float dotIncident = dot(-lightDir, worldNormal);
+    float facing = smoothstep(-0.4f, 0.1f, dotIncident);
+    float diffuse = max(0.f, dotIncident);
+    
+    float3 hv = normalize(-lightDir + dirToEye);
+    float specular = max(0.f, dot(worldNormal, hv));
+    
+    specular = facing * specular;
+    specular = SPECULAR_FACTOR*pow(specular, SPECULAR_POWER);
+    
+    return float2(diffAtt * diffuse, specAtt * specular);
+    
+}
 
-   // finalize specular
-	specular = SPECULAR_FACTOR * pow(specular, SPECULAR_POWER);
 
-	return float2(diffAtt * diffuse, specAtt * specular);
+float3 ComputeLightingAt(float3 worldPos, float3 worldNormal,float3 surfaceColor, float specFactor)
+{
+    float3 dirToEye = normalize(CAMERA_POSITION - worldPos);
+	
+    float3 diffuse = AMBIENT.xyz * AMBIENT.w;
+  
+    float3 spec = float3(0.f.xxx);
+	
+    //for (uint i = 0; i < MAX_LIGHTS; i++)
+    //{
+        float3 lightColor = LIGHT[0].color.xyz;
+        float2 lightFactors = ComputeLightFactor(LIGHT[0], worldPos, worldNormal, dirToEye);
+       
+        diffuse += lightFactors.x * lightColor;
+        spec += lightFactors.y * lightColor;
+    //}
+	
+    diffuse = min(diffuse, float3(1.f.xxx));
+	
+    return (diffuse * surfaceColor) + spec;
+
 }

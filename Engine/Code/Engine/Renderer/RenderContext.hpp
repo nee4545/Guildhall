@@ -52,6 +52,13 @@ enum class BlendMode
 	OPAQE,
 };
 
+enum eLightTypes
+{
+	POINT_LIGHT,
+	DIRECTIONAL_LIGHT,
+	SPOT_LIGHT,
+};
+
 enum eBufferSlot
 {
 	UBO_FRAME_SLOT=0,
@@ -61,7 +68,10 @@ enum eBufferSlot
 enum eTextureSlot
 {
 	TEXTURE_SLOT_DIFFUSE = 0,
-	TEXTURE_SLOT_NORMAL = 1
+	TEXTURE_SLOT_NORMAL = 1,
+	TEXTURE_SLOT_EMMISSIVE =2,
+	TEXTURE_SLOT_SPECULAR = 3,
+	TEXTURE_SLOT_USER = 8
 };
 
 enum eAttenuations
@@ -98,10 +108,10 @@ struct light_t
 	float intensity;
 
 	Vec3 attenuation = Vec3(0.f,0.f,1.f);
-	float dotInnerAngle;
+	float dotInnerAngle=-1.f;
 
 	Vec3 specularAttunation = Vec3(1.f,0.f,0.f);
-	float dotOuterAngle;
+	float dotOuterAngle=-1.f;
 };
 
 struct lights_data
@@ -152,6 +162,7 @@ public:
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;
 	RenderBuffer* m_lightUBO = nullptr;
+	RenderBuffer* m_materialUBO = nullptr;
 
 	Texture* m_texture;
 	ID3D11BlendState* m_alphaBlendState;
@@ -207,7 +218,7 @@ public:
 
 	Texture* CreateTextureFromColor( Rgba8 color );
 
-	void BindTexture(  const Texture* texture , eTextureSlot textureType = eTextureSlot::TEXTURE_SLOT_DIFFUSE );
+	void BindTexture(  const Texture* texture , eTextureSlot textureType = eTextureSlot::TEXTURE_SLOT_DIFFUSE, unsigned int index=0 );
 	void BindSampler( const Sampler* sampler );
 
 	void ClaerScreen(const Rgba8 clearColor);
@@ -232,6 +243,9 @@ public:
 	void SetSpecularPower( float power );
 	void SetSpecularAttenuation( Vec3 attenuation , unsigned int lightId );
 	void SetDiffuseAttenuation( Vec3 attenuation , unsigned int lightId );
+	void SetLightType( eLightTypes type, unsigned int lightId );
+	void BindMaterialData(void *data, unsigned int dataSize);
+	
 
 private:
 
