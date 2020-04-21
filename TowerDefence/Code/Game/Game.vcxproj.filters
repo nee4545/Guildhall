@@ -43,6 +43,9 @@
     <ClCompile Include="Wall.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="AIController.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -62,5 +65,9 @@
     <ClInclude Include="Dino.hpp" />
     <ClInclude Include="Spike.hpp" />
     <ClInclude Include="Wall.hpp" />
+    <ClInclude Include="GameManager.hpp" />
+    <ClInclude Include="AIController.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

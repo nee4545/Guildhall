@@ -6,60 +6,108 @@
 #include "GameCommon.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Core/Clock.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
+AudioSystem* g_theAudio = nullptr;
 
 
 
-
-void App:: Startup()
+void App::Startup()
 {
 	g_theRenderer = new RenderContext();
-	g_theRenderer->Startup();
+	g_theRenderer->Startup( g_theWindow );
 	g_theRenderer->BeginFrame();
-	if(thegame==nullptr )
-	{ 
-	thegame =new Game();
+	g_theWindow->SetInputSysten( g_theInput );
+	if ( g_theAudio == nullptr )
+	{
+		//g_theAudio = new AudioSystem();
 	}
-	
+	if ( thegame == nullptr )
+	{
+		thegame = new Game();
+	}
+	g_theConsole.Startup();
+
+	Clock::SystemStartup();
+
+	DebugRenderSystem::sDebugRenderer->SystemStartUp();
+}
+
+App::~App()
+{
+	//	delete thegame;
+	//	thegame = nullptr;
 }
 
 void App::Shutdown() //Not used right now
 {
-	
+
+	delete thegame;
+	thegame = nullptr;
+
+	DebugRenderSystem::sDebugRenderer->SystemShutDown();
+
+	g_theRenderer->Shutdown();
+
 }
 
 
 
-void App::Update(float deltaSeconds)
+void App::Update( float deltaSeconds )
 {
 
-	if( g_theInput->IsKeyPressed( 'Y' ) )
+	g_theRenderer->UpdateFrameTime( deltaSeconds );
+	DebugRenderSystem::sDebugRenderer->Update();
+
+	/*if ( g_theInput->WasKeyJustPressed( 'G' ) )
 	{
-		deltaSeconds*=4.f;
+		HICON icon = LoadIcon( NULL , IDI_WARNING );
+
+		SendMessage( ( HWND ) g_theWindow->m_hwnd , WM_SETICON , ICON_BIG , ( LPARAM ) icon );
 	}
 
-	if( g_theInput->IsKeyPressed( 'T' ) )
+	if ( g_theInput->WasKeyJustPressed( 'H' ) )
 	{
-		deltaSeconds*=0.1f;
+		SetWindowText( ( HWND ) g_theWindow->m_hwnd , L"New Title" );
 	}
+
+	if ( g_theInput->WasKeyJustPressed( 'J' ) )
+	{
+		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+			WS_POPUP );
+		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWDEFAULT );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'K' ) )
+	{
+		SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+			WS_POPUP );
+		ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWMAXIMIZED );
+	}*/
 
 	g_theInput->UpdateMouse();
-	
-	thegame->Update(deltaSeconds);
 
-	if( g_theInput->WasKeyJustPressed( VK_ESCAPE ) )
+	if ( g_theInput->GetCursorMode() == MODE_RELATIVE )
 	{
-		m_isQuitting=true;
+		g_theInput->UpdateRelativeMode();
 	}
 
-	
-	
-	if( g_theInput->WasKeyJustPressed( 0x77 ) )
+	thegame->Update( deltaSeconds );
+
+	g_theConsole.Update( deltaSeconds );
+
+
+	if ( g_theWindow->m_quitRequested == true )
 	{
-		ResetGame();
+
+		HandleQuitRequested();
 	}
+
 
 }
 
@@ -72,38 +120,35 @@ void App::EndFrame() //Not used right now
 {
 	g_theInput->EndFrame();
 	g_theRenderer->EndFrame();
+	g_theConsole.EndFrame();
+
 }
 
 void App::Render() const
 {
 
-	g_theRenderer->ClaerScreen(Rgba8(0,0,0,1));
+	/*render->ClaerScreen(Rgba8(0,0,0,1));*/
 	thegame->Render();
+	//DebugRenderSystem::sDebugRenderer->Render();
 }
-
-
-
-
-
-
 
 void App::BeginFrame()
 {
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
-	
+	//g_theAudio->BeginFrame();
+	Clock::BeginFrame();
+
 }
 
 bool App::HandleQuitRequested()
 {
-	m_isQuitting=true;
+	m_isQuitting = true;
 	return m_isQuitting;
 }
 
 void App::ResetGame()
 {
-	delete(thegame);
-	thegame=nullptr;
-	thegame=new Game();
+
 }
 

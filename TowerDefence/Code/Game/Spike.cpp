@@ -19,6 +19,7 @@ Spike::Spike( Game* game , Vec2 position , Faction faction /*= FACTION_GOOD */ )
 	m_vertices_original[ 3 ] = Vertex_PCU( Vec3( 0.2f , -0.4f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( 1.f , 0.f ) );
 	m_vertices_original[ 4 ] = Vertex_PCU( Vec3( 0.2f , 0.4f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( 1.f , 1.f ) );
 	m_vertices_original[ 5 ] = Vertex_PCU( Vec3( -0.2f , 0.4f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( 0.f , 1.f ) );
+
 }
 
 void Spike::Update( float deltaSeconds )

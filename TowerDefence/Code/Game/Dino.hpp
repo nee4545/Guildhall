@@ -1,6 +1,8 @@
 #pragma once
 #include "Game/Entity.hpp"
 
+class SpriteAnimDefTex;
+class Texture;
 
 class Dino :public Entity
 {
@@ -16,6 +18,13 @@ public:
 	virtual void Render() override;
 	virtual void Die() override;
 
+	float m_speed = 1.f;
+	float m_time = 0.f;
+
 	void DebugRender();
 	void ResetVertices();
+
+	SpriteAnimDefTex* m_anims=nullptr;
+	std::vector<Texture*> m_dinos;
+
 };

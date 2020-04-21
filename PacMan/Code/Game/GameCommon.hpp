@@ -2,11 +2,16 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game/App.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
-constexpr float CLIENT_ASPECT = 16.f/9.f; // We are requesting a 2:1 aspect (square) window area
+class Window;
+
+constexpr float CLIENT_ASPECT = 16.f / 9.f;
 extern RenderContext* g_theRenderer;
 extern App* g_theapp;
+extern Window* g_theWindow;
 extern InputSystem* g_theInput;
+extern AudioSystem* g_theAudio;
 
 constexpr int WORLD_SIZE_X = 30;
 constexpr int WORLD_SIZE_Y = 30;

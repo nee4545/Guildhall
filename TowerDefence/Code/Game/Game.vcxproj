@@ -189,6 +189,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AIController.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Dino.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -203,12 +204,14 @@
     <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIController.hpp" />
     <ClInclude Include="App.hpp" />
     <ClInclude Include="Dino.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
+    <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="Hero.hpp" />
     <ClInclude Include="HUD.hpp" />
     <ClInclude Include="Map.hpp" />

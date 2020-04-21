@@ -15,6 +15,7 @@ Game::Game()
 {
 	m_camera = new Camera();
 	m_camera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 54.f , 30.f ) );
+	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , 0 );
 	TileDefinition::CreateTileDefinitions();
 	m_map = new Map( this , IntVec2( 54 , 25 ) );
 	
@@ -29,6 +30,7 @@ void Game::Render()
 {
 	g_theRenderer->BeginCamera( *m_camera );
 	m_map->Render();
+	g_theRenderer->EndCamera( *m_camera );
 	
 }
 

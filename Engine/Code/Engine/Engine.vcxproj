@@ -73,6 +73,7 @@
     <ClCompile Include="Renderer\Sampler.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\SpriteAnimDefinition.cpp" />
+    <ClCompile Include="Renderer\SpriteAnimDefTex.cpp" />
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\SpriteDefinition.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="Renderer\Sampler.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimDefinition.hpp" />
+    <ClInclude Include="Renderer\SpriteAnimDefTex.hpp" />
     <ClInclude Include="Renderer\SpriteAnimSet.hpp" />
     <ClInclude Include="Renderer\SpriteDefinition.hpp" />
     <ClInclude Include="Renderer\SpriteSheet.hpp" />

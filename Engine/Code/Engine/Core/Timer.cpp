@@ -26,7 +26,7 @@ void Timer::SetSeconds( double timeToWait )
 
 void Timer::Reset()
 {
-	m_durationSeconds = m_clock->GetTotalElapsedSeconds();
+	m_startSeconds = m_clock->GetTotalElapsedSeconds();
 }
 
 void Timer::Stop()

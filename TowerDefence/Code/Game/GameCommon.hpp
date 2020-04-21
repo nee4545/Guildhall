@@ -2,18 +2,20 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game/App.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
-constexpr float CLIENT_ASPECT = 16.f/9.f; 
+class Window;
+
+constexpr float CLIENT_ASPECT = 16.f / 9.f;
 extern RenderContext* g_theRenderer;
 extern App* g_theapp;
+extern Window* g_theWindow;
 extern InputSystem* g_theInput;
+extern AudioSystem* g_theAudio;
 
 
-
-constexpr int MAX_DEBRIS= 1000;
-
-constexpr float UI_XMAX=1600.f;
-constexpr float UI_YMaX=800.f;
+constexpr float HERO_MAX_HEALTH = 5.f;
+constexpr float DINO_SPEED = 4.f;
 
 
 

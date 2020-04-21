@@ -328,6 +328,14 @@ m_uvTexCoords=uvTexCoords;
 	 }
  }
 
+ void TransformVertexArray( int numVertices , Vertex_PCU* vertices , float scale , float rotationDegrees , const Vec2& translation )
+ {
+	 for ( int index = 0; index < numVertices; index++ )
+	 {
+		 vertices[ index ].m_position = TransformPosition3DXY( vertices[ index ].m_position , scale , rotationDegrees , translation );
+	 }
+ }
+
  buffer_attribute_t::buffer_attribute_t( char const* n , eBufferFormatType t , unsigned int offset )
  {
 	 name = n;
