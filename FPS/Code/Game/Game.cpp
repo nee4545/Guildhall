@@ -13,6 +13,8 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Core/VertexLit.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/ObjFileLoader.hpp"
+#include "Engine/Core/D3D11Common.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -90,9 +92,18 @@ bool DebugSetAmbientColor( EventArgs& args )
 	return true;
 }
 
+GPUMesh* me;
 
 Game::Game()
 {
+	MeshBuilderOptions m;
+	m.calculateNoramls = true;
+	m.generateTangents = true;
+
+
+	me = OBJLoader::LoadObjFileIntoGpuMesh( m , "Data/Objs/test_models/scifi_fighter/mesh.obj" );
+	//x.ParseObjFile( "Data/Objs/test_models/scifi_fighter/mesh.obj" );
+
 	rng= RandomNumberGenerator();
 	m_camera=new Camera();
 	m_devConsoleCamera = new Camera();
@@ -326,7 +337,7 @@ void Game::Render()
 	switch ( currentShaderNumber )
 	{
 	case 0: g_theRenderer->BindShader( "Data/Shaders/lit.hlsl" );
-		g_theRenderer->EnableFog( fog );
+		g_theRenderer->DisableFog();
 		break;
 	case 1: g_theRenderer->BindShader( "Data/Shaders/Default.hlsl" );
 		g_theRenderer->DisableFog();
@@ -390,6 +401,14 @@ void Game::Render()
 
 	g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( sphere );
+
+	Texture* t = g_theRenderer->GetOrCreateTextureFromFile( "Data/Objs/test_models/scifi_fighter/diffuse.jpg" );
+
+	g_theRenderer->BindTexture( t,TEXTURE_SLOT_DIFFUSE );
+	//g_theRenderer->CreateRasterState( D3D11_FILL_SOLID , D3D11_CULL_BACK ,false);
+	g_theRenderer->SetModalMatrix( Mat44() );
+	g_theRenderer->DrawMesh( me );
+	//g_theRenderer->BindTexture( nullptr );
 
 	g_theRenderer->SetDepthTest( COMPARE_LEQUAL );
 	g_theRenderer->BindShader( "Data/Shaders/fresnal.hlsl" );

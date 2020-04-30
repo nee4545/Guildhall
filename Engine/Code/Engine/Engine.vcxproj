@@ -67,17 +67,21 @@
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\DebugRender.cpp" />
     <ClCompile Include="Renderer\GPUMesh.cpp" />
+    <ClCompile Include="Renderer\Material.cpp" />
     <ClCompile Include="Renderer\MeshUtils.cpp" />
+    <ClCompile Include="Renderer\ObjFileLoader.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
     <ClCompile Include="Renderer\Sampler.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
+    <ClCompile Include="Renderer\ShaderState.cpp" />
     <ClCompile Include="Renderer\SpriteAnimDefinition.cpp" />
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\SpriteDefinition.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
     <ClCompile Include="Renderer\SwapChain.cpp" />
     <ClCompile Include="Renderer\TextureView.cpp" />
+    <ClCompile Include="ThirdParty\MikktSpace.c" />
     <ClCompile Include="ThirdParty\tinyxml2.cpp" />
     <ClCompile Include="Vec4.cpp" />
   </ItemGroup>
@@ -136,11 +140,15 @@
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\DebugRender.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />
+    <ClInclude Include="Renderer\Header.h" />
+    <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\MeshUtils.hpp" />
+    <ClInclude Include="Renderer\ObjFileLoader.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
     <ClInclude Include="Renderer\Sampler.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
+    <ClInclude Include="Renderer\ShaderState.hpp" />
     <ClInclude Include="Renderer\SpriteAnimDefinition.hpp" />
     <ClInclude Include="Renderer\SpriteAnimSet.hpp" />
     <ClInclude Include="Renderer\SpriteDefinition.hpp" />
@@ -155,6 +163,7 @@
     <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h" />
     <ClInclude Include="ThirdParty\fmod\fmod_errors.h" />
     <ClInclude Include="ThirdParty\fmod\fmod_output.h" />
+    <ClInclude Include="ThirdParty\MikktSpace.h" />
     <ClInclude Include="ThirdParty\tinyxml2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

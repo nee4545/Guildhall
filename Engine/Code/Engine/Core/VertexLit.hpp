@@ -10,6 +10,7 @@ struct AABB2;
 struct VertexLit
 {
 public:
+	VertexLit() {};
 	explicit VertexLit( Vec3 position , Rgba8 color , Vec2 uv , Vec3 normal = Vec3( 1.f , 0.f , 0.f ) );
 	explicit VertexLit( Vec3 position , Vec4 color , Vec2 uv , Vec3 normal = Vec3( 1.f , 0.f , 0.f ) );
 	explicit VertexLit( Vec3 position , Vec4 color , Vec2 uv , Vec3 normal = Vec3( 1.f , 0.f , 0.f ) , Vec4 tangent = Vec4( 1.f , 0.f , 0.f , 1.f ) );

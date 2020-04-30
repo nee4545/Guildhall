@@ -33,6 +33,19 @@ struct D3D11_RASTERIZER_DESC;
 enum D3D11_FILL_MODE: int;
 enum D3D11_CULL_MODE: int;
 
+enum eFillMode
+{
+	SOLID,
+	WIRE_FRAME
+};
+
+enum eCullMode
+{
+	CULL_NONE,
+	CULL_FRONT,
+	CULL_BACK,
+};
+
 enum eCompareOp            // A04
 {
 	COMPARE_NEVER ,       // false,      "never"
