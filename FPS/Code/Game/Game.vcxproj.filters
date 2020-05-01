@@ -8,6 +8,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{b75875a6-c29a-4a57-a32b-d1307a7be7c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{c00c5f98-c782-4f88-8032-798fe9d39fc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -71,5 +74,13 @@
     <FxCompile Include="..\..\Run\Data\Shaders\dissolve.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\XML\dissolve.xml">
+      <Filter>NewFilter1</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\XML\dissolveShaderState.xml">
+      <Filter>NewFilter1</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

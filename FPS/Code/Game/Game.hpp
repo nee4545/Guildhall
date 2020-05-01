@@ -9,6 +9,7 @@ class BitMapFont;
 class Texture;
 class Shader;
 class GPUMesh;
+class Material;
 
 enum shaderType
 {
@@ -52,6 +53,8 @@ class Game
 	Texture* tileNormal = nullptr;
 	Texture* noise = nullptr;
 
+	Material* dissolveMaterial = nullptr;
+
 	GPUMesh* mesh = nullptr;
 	GPUMesh* sphere = nullptr;
 	GPUMesh* quad = nullptr;
@@ -64,7 +67,7 @@ class Game
 	bool lightShouldAnimate = false;
 	bool lightFollowCamera = false;
 
-	float ambientLightIntensity = 0.f;
+	float ambientLightIntensity = 0.3f;
 	float specularPower = 32.f;
 	float specularFactor = 1.f;
 

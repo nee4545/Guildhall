@@ -298,10 +298,23 @@ GPUMesh* OBJLoader::LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::st
 			v3.m_position = postions[ (iForVerts[ i ][ 2 ])-1 ];
 			v4.m_position = postions[ (iForVerts[ i ][ 3 ])-1 ];
 
+			v1.m_position = options.transform.TransformPosition3D( v1.m_position );
+			v2.m_position = options.transform.TransformPosition3D( v2.m_position );
+			v3.m_position = options.transform.TransformPosition3D( v3.m_position );
+			v4.m_position = options.transform.TransformPosition3D( v4.m_position );
+
 			v1.m_uv = uvs[ ( iForTex[ i ][ 0 ] ) - 1 ];
 			v2.m_uv = uvs[ ( iForTex[ i ][ 1 ] ) - 1 ];
 			v3.m_uv = uvs[ ( iForTex[ i ][ 2 ] ) - 1 ];
 			v4.m_uv = uvs[ ( iForTex[ i ][ 3 ] ) - 1 ];
+
+			if ( options.invertV )
+			{
+				v1.m_uv.y = 1.f - v1.m_uv.y;
+				v2.m_uv.y = 1.f - v2.m_uv.y;
+				v3.m_uv.y = 1.f - v3.m_uv.y;
+				v4.m_uv.y = 1.f - v4.m_uv.y;
+			}
 
 			if ( iForNormals.size() > 0 )
 			{
@@ -309,6 +322,12 @@ GPUMesh* OBJLoader::LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::st
 				v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 				v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
 				v4.m_normal = normals[ ( iForNormals[ i ][ 3 ] ) - 1 ];
+
+				v1.m_normal = options.transform.TransformPosition3D( v1.m_normal );
+				v2.m_normal = options.transform.TransformPosition3D( v2.m_normal );
+				v3.m_normal = options.transform.TransformPosition3D( v3.m_normal );
+				v4.m_normal = options.transform.TransformPosition3D( v4.m_normal );
+
 			}
 
 			
@@ -350,15 +369,31 @@ GPUMesh* OBJLoader::LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::st
 			v2.m_position = postions[ (iForVerts[ i ][ 1 ]) - 1 ];
 			v3.m_position = postions[ (iForVerts[ i ][ 2 ]) - 1 ];
 
+			v1.m_position = options.transform.TransformPosition3D( v1.m_position );
+			v2.m_position = options.transform.TransformPosition3D( v2.m_position );
+			v3.m_position = options.transform.TransformPosition3D( v3.m_position );
+
 			if ( iForNormals.size() > 0 )
 			{
 				v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
 				v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 				v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
 
-				v1.m_uv = uvs[ ( iForTex[ i ][ 0 ] ) - 1 ];
-				v2.m_uv = uvs[ ( iForTex[ i ][ 1 ] ) - 1 ];
-				v3.m_uv = uvs[ ( iForTex[ i ][ 2 ] ) - 1 ];
+				v1.m_normal = options.transform.TransformPosition3D( v1.m_normal );
+				v2.m_normal = options.transform.TransformPosition3D( v2.m_normal );
+				v3.m_normal = options.transform.TransformPosition3D( v3.m_normal );
+
+			}
+
+			v1.m_uv = uvs[ ( iForTex[ i ][ 0 ] ) - 1 ];
+			v2.m_uv = uvs[ ( iForTex[ i ][ 1 ] ) - 1 ];
+			v3.m_uv = uvs[ ( iForTex[ i ][ 2 ] ) - 1 ];
+
+			if ( options.invertV )
+			{
+				v1.m_uv.y = 1.f - v1.m_uv.y;
+				v2.m_uv.y = 1.f - v2.m_uv.y;
+				v3.m_uv.y = 1.f - v3.m_uv.y;
 			}
 
 			

@@ -17,6 +17,8 @@ class VertexBuffer;
 class Polygon2D;
 class GPUMesh;
 class IndexBuffer;
+class ShaderState;
+class Material;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -76,6 +78,7 @@ enum eBufferSlot
 {
 	UBO_FRAME_SLOT=0,
 	UBO_CAMERA_SLOT=1,
+	UBO_MATERIAL_SLOT=5,
 };
 
 enum eTextureSlot
@@ -221,6 +224,8 @@ public:
 
 	void BindShader( Shader* shader );
 	void BindShader( std::string filename );
+	void BindShaderState( ShaderState* state );
+	void BindMaterial(Material* material);
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
 	void BindDepthStencil( Texture* dsv );
@@ -233,7 +238,7 @@ public:
 	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo );
 	void CreateRasterState( D3D11_FILL_MODE fillmode , D3D11_CULL_MODE cullmode , bool frontCounterClockWise = true );
 	void CreateRasterState( D3D11_RASTERIZER_DESC desc );
-	
+	void CreateRasterState( eFillMode fillmode , eCullMode cullmode , bool frontCounterClockWise = true );
 
 	Texture* CreateTextureFromFile( const char* imageFilePath);
 	Texture* GetOrCreateTextureFromFile(const char* imageFilePath);

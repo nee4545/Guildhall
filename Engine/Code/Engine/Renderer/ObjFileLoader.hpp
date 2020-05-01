@@ -8,6 +8,7 @@ class GPUMesh;
 struct MeshBuilderOptions
 {
 	Mat44 transform;
+	bool invertV = false;
 	bool calculateNoramls = false;
 	bool generateTangents = false;
 	bool inverWindindOrder = false;

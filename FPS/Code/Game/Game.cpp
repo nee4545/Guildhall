@@ -15,6 +15,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/ObjFileLoader.hpp"
 #include "Engine/Core/D3D11Common.hpp"
+#include "Engine/Renderer/Material.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -31,7 +32,6 @@ Light tempLight[8];
 Rgba8 lightColor = Rgba8( 255 , 255 , 255 , 255 );
 int currentLightIndex = 0;
 fog_t fog;
-
 
 
 bool Help( EventArgs& args )
@@ -103,6 +103,9 @@ Game::Game()
 
 	me = OBJLoader::LoadObjFileIntoGpuMesh( m , "Data/Objs/test_models/scifi_fighter/mesh.obj" );
 	//x.ParseObjFile( "Data/Objs/test_models/scifi_fighter/mesh.obj" );
+
+	dissolveMaterial = new Material();
+	dissolveMaterial->CreateFromFile( "Data/XML/dissolve.xml" );
 
 	rng= RandomNumberGenerator();
 	m_camera=new Camera();
@@ -189,9 +192,9 @@ Game::Game()
 	mesh->UpdateVertices( ( unsigned int ) cubeVertices.size() , &cubeVertices[ 0 ] );
 	mesh->UpdateIndices( ( unsigned int ) cubeIndices.size() , &cubeIndices[0] );
 
-	cubeTransform.m_position = Vec3( 1.f , 0.5f , -8.f );
-	quadTransform.m_position = Vec3( 6.f , 0.5f , -8.f );
-	sphereTransform.m_position = Vec3( -5.f , 0.5f , -8.f );
+	cubeTransform.m_position = Vec3( 1.f , 0.5f , -20.f );
+	quadTransform.m_position = Vec3( 6.f , 0.5f , -20.f );
+	sphereTransform.m_position = Vec3( -5.f , 0.5f , -20.f );
 
 	fresnalData.fresnalColor = Vec3( 0.f , 1.f , 0.f );
 	fresnalData.fresnalFactor = 1.f;
@@ -214,6 +217,8 @@ Game::~Game()
 	delete mesh;
 	delete sphere;
 	delete quad;
+	delete me;
+	delete dissolveMaterial;
 }
 
 void Game::Update( float deltaseconds )
@@ -362,7 +367,6 @@ void Game::Render()
 	g_theRenderer->SetSpecularPower( specularPower );
 	g_theRenderer->SetSpecularFactor( specularFactor );
 	tempLight[currentLightIndex].light.specularAttunation = specularAttenuation;
-	//tempLight.attenuation = specularAttenuation;
 	
 	for ( int i = 0; i < 8; i++ )
 	{
@@ -405,10 +409,11 @@ void Game::Render()
 	Texture* t = g_theRenderer->GetOrCreateTextureFromFile( "Data/Objs/test_models/scifi_fighter/diffuse.jpg" );
 
 	g_theRenderer->BindTexture( t,TEXTURE_SLOT_DIFFUSE );
-	//g_theRenderer->CreateRasterState( D3D11_FILL_SOLID , D3D11_CULL_BACK ,false);
-	g_theRenderer->SetModalMatrix( Mat44() );
+	Transform objTransform;
+	objTransform.SetPosition( Vec3( 0.f , 0.f , -10.f  ) );
+	g_theRenderer->SetModalMatrix( objTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( me );
-	//g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindTexture( nullptr );
 
 	g_theRenderer->SetDepthTest( COMPARE_LEQUAL );
 	g_theRenderer->BindShader( "Data/Shaders/fresnal.hlsl" );
@@ -417,10 +422,8 @@ void Game::Render()
 	g_theRenderer->SetModalMatrix( sphereTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( sphere );
 
-	g_theRenderer->BindShader( "Data/Shaders/dissolve.hlsl" );
-	g_theRenderer->BindTexture( noise , TEXTURE_SLOT_USER );
-	g_theRenderer->SetBlendMode( BlendMode::OPAQE );
-	g_theRenderer->BindMaterialData( &dissolveData , sizeof( dissolveData ) );
+	dissolveMaterial->SetData( dissolveData );
+	g_theRenderer->BindMaterial( dissolveMaterial );
 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( mesh );
 
@@ -432,7 +435,6 @@ void Game::Render()
 	{
 		DebugAddWorldPoint( tempLight[ i ].light.position , 0.1f , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , DEBUG_RENDER_USE_DEPTH );
 	}
-
 
 	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
 
@@ -448,7 +450,6 @@ void Game::Render()
 
 	//DebuggerPrintf( "%f,%f,%f \n" , tempLight.specularAttunation.x , tempLight.specularAttunation.y , tempLight.specularAttunation.z );
 
-	
 
 }
 

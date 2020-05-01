@@ -15,6 +15,8 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Renderer/ShaderState.hpp"
+#include "Engine/Renderer/Material.hpp"
 
 
 #define UNUSED(x) (void)(x);
@@ -247,6 +249,57 @@ void RenderContext::BindShader( std::string filename )
 	m_currentShader=GetOrCreateShader( filename.c_str() );
 }
 
+void RenderContext::BindShaderState( ShaderState* state )
+{
+	if ( state == nullptr )
+	{
+		BindShader( nullptr );
+		SetBlendMode( BlendMode::ALPHA );
+		return;
+	}
+
+	BindShader( state->m_shader );
+	CreateRasterState( state->m_fillmode , state->m_culling , state->m_windingOrderCounterClockwise );
+	SetDepthTest( state->m_depthTest,state->m_writeDepth );
+	SetBlendMode( state->m_blendMode );
+
+}
+
+void RenderContext::BindMaterial( Material* material )
+{
+	if ( material == nullptr )
+	{
+		BindShaderState( nullptr );
+		BindTexture( nullptr );
+		BindSampler( m_defaultSampler );
+		m_materialUBO = nullptr;
+		m_materialUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+		BindUniformBuffer( UBO_MATERIAL_SLOT , m_materialUBO );
+	}
+	BindShaderState( material->GetShaderState() );
+
+	
+	if (  material->m_ubo !=nullptr )
+	{
+		BindUniformBuffer( UBO_MATERIAL_SLOT , material->m_ubo );
+	}
+	for ( auto index : material->m_texturePerSlot )
+	{
+		BindTexture( index.second , (eTextureSlot)index.first );
+	}
+	if ( material->m_samplersPerSlot.size() > 0 )
+	{
+		BindSampler( material->m_samplersPerSlot[ 0 ] );					
+	}
+	else
+	{
+		BindSampler( m_defaultSampler );
+	}
+
+	m_lights.specularFactor = material->m_specularFactor;
+	m_lights.specularPower = material->m_specularPower;
+}
+
 void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
@@ -444,6 +497,57 @@ void RenderContext::CreateRasterState( D3D11_RASTERIZER_DESC desc )
 	}
 
 	device->CreateRasterizerState( &desc , &m_rasterState );
+}
+
+void RenderContext::CreateRasterState( eFillMode fillmode , eCullMode cullmode , bool frontCounterClockWise /*= true */ )
+{
+	D3D11_RASTERIZER_DESC desc;
+
+	switch ( fillmode )
+	{
+	case SOLID:
+		desc.FillMode = D3D11_FILL_SOLID;
+		break;
+	case WIRE_FRAME:
+		desc.FillMode = D3D11_FILL_WIREFRAME;
+		break;
+	default:
+		break;
+	}
+	
+	switch ( cullmode )
+	{
+	case CULL_NONE:
+		desc.CullMode = D3D11_CULL_NONE;
+		break;
+	case CULL_FRONT:
+		desc.CullMode = D3D11_CULL_FRONT;
+		break;
+	case CULL_BACK:
+		desc.CullMode = D3D11_CULL_BACK;
+		break;
+	default:
+		break;
+	}
+
+	desc.FrontCounterClockwise = frontCounterClockWise;
+	desc.DepthBias = 0U;
+	desc.DepthBiasClamp = 0.0f;
+	desc.SlopeScaledDepthBias = 0.0f;
+	desc.DepthClipEnable = TRUE;
+	desc.ScissorEnable = FALSE;
+	desc.MultisampleEnable = FALSE;
+	desc.AntialiasedLineEnable = FALSE;
+
+	ID3D11Device* device = m_device;
+
+	if ( m_rasterState != nullptr )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
+	device->CreateRasterizerState( &desc , &m_rasterState );
+
 }
 
 void RenderContext::DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness )

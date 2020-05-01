@@ -2,22 +2,14 @@
 
 #include <map>
 #include <vector>
-
 #include "Engine/Core/Rgba8.hpp"
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Shader;
 class RenderBuffer;
 class Texture;
 class ShaderState;
 class Sampler;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-typedef unsigned int uint;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Material
 {
@@ -65,8 +57,8 @@ public:
 	float										m_specularPower = 32.f;
 
 	// GENERALDATA
-	std::map< uint , Texture* >					m_texturePerSlot;
-	std::vector<Sampler*>						m_samplersPerSlot;
+	std::map< unsigned int , Texture* >					m_texturePerSlot;
+	std::map< unsigned int , Sampler*>						m_samplersPerSlot;
 
 	std::vector<unsigned char>					m_uboCPUData;
 	RenderBuffer* m_ubo = nullptr;

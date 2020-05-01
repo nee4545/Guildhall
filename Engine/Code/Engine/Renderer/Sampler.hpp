@@ -9,6 +9,7 @@ enum eSamplerType
 {
 	SAMPLER_POINT,
 	SAMPLER_BILINEAR,
+	SAMPLER_TOTAL
 };
 
 
