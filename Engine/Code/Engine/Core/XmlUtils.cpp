@@ -57,7 +57,12 @@ char ParseXmlAttribute( const tinyxml2::XMLElement& element, const char* attribu
 
 bool ParseXmlAttribute( const tinyxml2::XMLElement& element, const char* attributeName, bool defaultValue )
 {
-	std::string valueText = element.Attribute(attributeName);
+	std::string valueText = ParseXmlAttribute( element , attributeName , "null" );
+	if ( valueText == "null" )
+	{
+		return defaultValue;
+	}
+
 	if( valueText.compare("true")==0 )
 	{
 		return true;

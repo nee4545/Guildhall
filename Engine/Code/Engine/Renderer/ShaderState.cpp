@@ -37,9 +37,9 @@ void ShaderState::SetupFromXML( tinyxml2::XMLElement const& node )
 {
 	m_depthTest = ( eCompareOp ) ParseXmlAttribute( node , "DepthTest" , ( int ) m_depthTest );
 	m_blendMode = ( BlendMode ) ParseXmlAttribute( node , "BlendMode" , ( int ) m_blendMode );
-	//m_writeDepth =  ParseXmlAttribute( node , "WriteDepth" , ( bool ) m_writeDepth );
+	m_writeDepth =  ParseXmlAttribute( node , "WriteDepth" , true );
 
-	//m_windingOrderCounterClockwise =  ParseXmlAttribute( node , "WindingOrder" ,  true );
+	m_windingOrderCounterClockwise =  ParseXmlAttribute( node , "WindingOrder" ,  true );
 	m_culling = ( eCullMode ) ParseXmlAttribute( node , "CullMode" , ( int ) m_culling );
 	m_fillmode = ( eFillMode ) ParseXmlAttribute( node , "FillMode" , ( int ) m_fillmode );
 
