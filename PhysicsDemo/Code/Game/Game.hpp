@@ -2,6 +2,7 @@
 #include "GameCommon.hpp"
 #include "Engine/Core/AABB2.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include <vector>
 
 
@@ -12,6 +13,15 @@ class Poygon2D;
 class BitmapFont;
 
 static Physics2D* physicsSystem = nullptr;
+
+class Dummy
+{
+public:
+	bool something( EventArgs& args )
+	{
+		return true;
+	}
+};
 
 class Game
 {
@@ -52,6 +62,8 @@ public:
 	void DisplayToolTip();
 	void UpdateFramePositions();
 	void ToggleDevConsole();
+
+	Dummy d;
 
 private:
 	RandomNumberGenerator m_rng;

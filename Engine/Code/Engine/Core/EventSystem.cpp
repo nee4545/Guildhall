@@ -18,6 +18,17 @@ void EventSystem::SubscribeToEvent( const std::string& eventName, EventCallBackF
 	m_subscriptions.push_back( newSubscription );
 }
 
+template<typename OBJ_TYPE>
+void EventSystem::SubscribeToMethod( const std::string& eventName , OBJ_TYPE *obj , bool ( OBJ_TYPE::*mcb )( EventArgs& args ) )
+{
+	MethodSubscriptions* newSubscription = new MethodSubscriptions();
+	newSubscription->eventName = eventName;
+	newSubscription->objId = obj;
+	newSubscription->func = [ = ](EventArgs args) { ( obj->*mcb )( args ); };
+
+	m_methodSubscriptions.push_back( newSubscription );
+}
+
 void EventSystem::FireEvent( const std::string& eventName, EventArgs& args )
 {
 	for( int eventIndex = 0; eventIndex < (int)m_subscriptions.size(); eventIndex++ )
@@ -28,6 +39,17 @@ void EventSystem::FireEvent( const std::string& eventName, EventArgs& args )
 			if ( subscription->m_eventName == eventName )
 			{
 				subscription->m_eventToListen( args );
+			}
+		}
+	}
+
+	for ( int i = 0; i < ( int ) m_methodSubscriptions.size(); i++ )
+	{
+		if ( m_methodSubscriptions[ i ] != nullptr )
+		{
+			if ( m_methodSubscriptions[ i ]->eventName == eventName )
+			{
+				m_methodSubscriptions[ i ]->func(args);
 			}
 		}
 	}

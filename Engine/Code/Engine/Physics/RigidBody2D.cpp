@@ -94,6 +94,8 @@ void Rigidbody2D::MarkForDestroy()
 	m_isGarbage = true;
 }
 
+
+
 void Rigidbody2D::ApplyGravity( float deltaTime, float gravityMultiplier )
 {
 	if ( !enableSimulation )
@@ -211,6 +213,16 @@ void Rigidbody2D::Rotate( float deltaRoationDegrees )
 		PolygonCollider2D* poly = ( PolygonCollider2D* ) m_collider;
 		poly->Rotate( deltaRoationDegrees );
 	}
+}
+
+void Rigidbody2D::SetLayer( Layers layer )
+{
+	m_layer = layer;
+}
+
+Layers Rigidbody2D::GetLayer()
+{
+	return m_layer;
 }
 
 Rigidbody2D::~Rigidbody2D()

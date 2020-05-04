@@ -129,7 +129,7 @@ void App::EndFrame() //Not used right now
 	g_theInput->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theConsole.EndFrame();
-
+	thegame->EndFrame();
 }
 
 void App::Render() const
@@ -146,7 +146,7 @@ void App::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
 	Clock::BeginFrame();
-
+	thegame->BeginFrame();
 }
 
 bool App::HandleQuitRequested()

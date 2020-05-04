@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
+#include "Engine/Physics/PhysicsCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +15,8 @@ enum eSimulationMode
 	KINAMETIC,
 	DYNAMIC,
 };
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +53,8 @@ public:
 	void ReverseVelocityYAxis();
 	void SetSimulationMode( eSimulationMode mode );
 	void Rotate( float deltaRoationDegrees );
+	void SetLayer( Layers layer );
+	Layers GetLayer();
 
 private: 
 
@@ -57,6 +62,8 @@ private:
 	bool		m_isGarbage = false;
 
 public:
+	
+
 	bool enableSimulation = true;
 	Physics2D* m_system=nullptr;						// which scene created/owns this object
 	Collider2D* m_collider=nullptr;
@@ -76,6 +83,7 @@ public:
 	float m_angularVelocity = 0.0f;
 	float m_frameTorque = 0.f;
 	float m_moment = 0.f;
+	Layers m_layer = LAYER_DEFAULT;
 
 private:
 	~Rigidbody2D();								// destroys the collider

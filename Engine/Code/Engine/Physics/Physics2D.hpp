@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Physics/Collision2D.hpp"
+#include "Engine/Physics/PhysicsCommon.hpp"
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -14,6 +15,14 @@ class Clock;
 class Timer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct CollissionInfo
+{
+	int colliderId1;
+	int colliderId2;
+	bool wasCollidingLastFrame = false;
+	bool isCollidingThisFrame = false;
+};
 
 class Physics2D
 {
@@ -41,6 +50,13 @@ public:
 	void ResolveCollissions();
 	void ResolveCollission( Collision2D collission );
 
+	void HandleCollissionInfo(int colliderId1, int colliderId2);
+	Collider2D* GetCColliderForID( int id );
+
+	void FireStartEvents( int colliderId1 , int colliderId2 );
+	void FireExitEvents( int colliderId1 , int colliderId2 );
+	void FireStayEvents( int colliderId1 , int colliderId2 );
+
 	Vec2 GetImpulse( Collision2D& collision, Vec2& outTangentImpusle );
 
 	void SetSceneGravity( float gravity );
@@ -51,15 +67,23 @@ public:
 public:
 	// add members you may need to store these
 	// storage for all rigid bodies
+	static int colliderIds;
 	std::vector<Rigidbody2D*>	m_rigidBodies2D;
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;
 	float m_gravityMultiplier = 9.8f;
 	std::vector<Collision2D> m_frameCollisions;
 
+	std::vector<CollissionInfo*> m_collissionInfo;
+
 	Clock* m_clock = nullptr;
 	Timer* m_stepTimer = nullptr;
 	double m_fixedDeltaTime = 0.1;
+
+	static bool LayerInteractions[ TOTAL_LAYERS ][ TOTAL_LAYERS ];
+
+	bool DoLayersInteract( Layers layer1 , Layers layer2 );
+	void SetLayerInteraction( Layers layer1 , Layers layer2 , bool enableInteraction );
 
 
 };

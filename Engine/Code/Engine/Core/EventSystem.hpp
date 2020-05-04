@@ -2,9 +2,20 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include <vector>
 #include <map >
+#include <functional>
 
 typedef NamedStrings EventArgs;
 typedef bool(*EventCallBackFunction)(EventArgs& args);
+
+using EventCallback = std::function<EventCallBackFunction>;
+
+struct MethodSubscriptions
+{
+public:
+	std::string eventName;
+	void* objId = nullptr;
+	std::function<EventCallBackFunction(EventArgs)> func = nullptr;
+};
 
 struct EventSubscription
 {
@@ -15,15 +26,20 @@ struct EventSubscription
 class EventSystem
 {
 private:
-	std::vector<EventSubscription*> m_subscriptions; 
+	std::vector<EventSubscription*> m_subscriptions;
+	std::vector<MethodSubscriptions*> m_methodSubscriptions;
+
 public:
 	void StartUp();
 	void ShutDown();
 	void SubscribeToEvent( const std::string& eventName, EventCallBackFunction eventToListen );
 	void FireEvent(const std::string& eventName,EventArgs& args);
 	void UnSubscribeToEvent( const std::string& eventName, EventCallBackFunction eventToUnscribe);
-	  
+	template<typename OBJ_TYPE>
+	void SubscribeToMethod( const std::string& eventName , OBJ_TYPE* obj , bool ( OBJ_TYPE::* mcb )( EventArgs& args ) );
+	
 };
+
 
 
 

@@ -15,9 +15,55 @@ manifoldGenerations gManifoldGenerations[ NUM_COLLIDER_TYPES * NUM_COLLIDER_TYPE
 	GeneratePolygonAndDiscManifold, GeneratePolygonPolygonManifold
 };
 
+bool Physics2D::LayerInteractions[ TOTAL_LAYERS ][ TOTAL_LAYERS ] = 
+{
+	{true, true, true, true, true},
+	{true, true, true, true, true},
+	{true, true, true, true, true},
+	{true, true, true, true, true},
+	{true, true, true, true, true}
+};
+
+bool Physics2D::DoLayersInteract( Layers layer1 , Layers layer2 )
+{
+	return LayerInteractions[ layer1 ][ layer2 ];
+}
+
+void Physics2D::SetLayerInteraction( Layers layer1 , Layers layer2 , bool enableInteraction )
+{
+	LayerInteractions[ layer1 ][ layer2 ] = enableInteraction;
+	LayerInteractions[ layer2 ][ layer1 ] = enableInteraction;
+}
 
 void Physics2D::BeginFrame()
 {
+	
+	for ( int i = 0; i < m_collissionInfo.size(); i++ )
+	{
+		if ( m_collissionInfo[ i ] == nullptr )
+		{
+			continue;
+		}
+
+		Collider2D* col1 = GetCColliderForID( m_collissionInfo[ i ]->colliderId1 );
+		Collider2D* col2 = GetCColliderForID( m_collissionInfo[ i ]->colliderId2 );
+
+		if ( col1 == nullptr || col2 == nullptr )
+		{
+			continue;
+		}
+
+		if ( !col1->Intersects( col2 ) )
+		{
+			//Fire Exit events
+			FireExitEvents( m_collissionInfo[ i ]->colliderId1 , m_collissionInfo[ i ]->colliderId2 );
+
+			delete m_collissionInfo[ i ];
+			m_collissionInfo[ i ] = nullptr;
+
+		}
+
+	}
 
 }
 
@@ -47,9 +93,6 @@ void Physics2D::Update()
 		AdvanceSimulation( m_fixedDeltaTime );
 		m_frameCollisions.clear();
 	}
-
-	
-	//AdvanceSimulation( m_clock->GetLastDeltaSeconds());
 	
 }
 
@@ -68,8 +111,6 @@ void Physics2D::EndFrame()
 {
 
 	//Set Verlet velocity
-	
-
 	for ( int i = 0; i < m_rigidBodies2D.size(); i++ )
 	{
 		if ( m_rigidBodies2D[ i ] == nullptr )
@@ -79,6 +120,8 @@ void Physics2D::EndFrame()
 
 		m_rigidBodies2D[ i ]->m_verletVelocity = ( m_rigidBodies2D[ i ]->GetWorldPosition() - m_rigidBodies2D[ i ]->m_frameStartPosition ) / (float)m_fixedDeltaTime;
 	}
+
+
 
 }
 
@@ -115,8 +158,9 @@ void Physics2D::DestroyRigidbody( Rigidbody2D* rigidbody )
 DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition , float radius )
 {
 	DiscCollider2D* collider = new DiscCollider2D(localPosition,radius);
-	m_colliders2D.push_back( collider );
 	collider->m_colliderType = COLLIDER2D_DISC;
+	collider->colliderId = ++colliderIds;
+	m_colliders2D.push_back( collider );
 	return collider;
 }
 
@@ -124,8 +168,9 @@ DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition , float radius
 PolygonCollider2D* Physics2D::CreatePolygonCollider( Vec2 localPosition , Polygon2D* polygon )
 {
 	PolygonCollider2D* collider = new PolygonCollider2D( localPosition , polygon );
-	m_colliders2D.push_back( collider );
 	collider->m_colliderType = COLLIDER2D_POLYGON;
+	collider->colliderId = ++colliderIds;
+	m_colliders2D.push_back( collider );
 	return collider;
 }
 
@@ -286,28 +331,27 @@ void Physics2D::DetectCollissions()
 				continue;
 			}
 
-			
-			if ( m_rigidBodies2D[ i ]->m_collider->Intersects( m_rigidBodies2D[ j ]->m_collider ) )
+			if ( DoLayersInteract( m_rigidBodies2D[ i ]->GetLayer() , m_rigidBodies2D[ j ]->GetLayer() ) )
 			{
-				/*if ( m_rigidBodies2D[ i ]->m_collider->m_colliderType == COLLIDER2D_POLYGON && m_rigidBodies2D[ j ]->m_collider->m_colliderType == COLLIDER2D_POLYGON )
+				if ( m_rigidBodies2D[ i ]->m_collider->Intersects( m_rigidBodies2D[ j ]->m_collider ) )
 				{
-					continue;
-				}*/
+					HandleCollissionInfo( m_rigidBodies2D[ i ]->m_collider->colliderId , m_rigidBodies2D[ j ]->m_collider->colliderId );
 
-				COLLIDER2D_TYPE myType = m_rigidBodies2D[ i ]->m_collider->m_colliderType;
-				COLLIDER2D_TYPE otherType = m_rigidBodies2D[ j ]->m_collider->m_colliderType;
-				int idx = otherType * NUM_COLLIDER_TYPES + myType;
-				manifoldGenerations check = gManifoldGenerations[ idx ];
+					COLLIDER2D_TYPE myType = m_rigidBodies2D[ i ]->m_collider->m_colliderType;
+					COLLIDER2D_TYPE otherType = m_rigidBodies2D[ j ]->m_collider->m_colliderType;
+					int idx = otherType * NUM_COLLIDER_TYPES + myType;
+					manifoldGenerations check = gManifoldGenerations[ idx ];
 
-				if ( check != nullptr )
-				{
-					Collision2D collission;
-					collission.me = m_rigidBodies2D[ i ]->m_collider;
-					collission.them = m_rigidBodies2D[ j ]->m_collider;
-					collission.manifold = check( m_rigidBodies2D[ i ]->m_collider , m_rigidBodies2D[ j ]->m_collider );
-					m_frameCollisions.push_back( collission );
+					if ( check != nullptr )
+					{
+						Collision2D collission;
+						collission.me = m_rigidBodies2D[ i ]->m_collider;
+						collission.them = m_rigidBodies2D[ j ]->m_collider;
+						collission.manifold = check( m_rigidBodies2D[ i ]->m_collider , m_rigidBodies2D[ j ]->m_collider );
+						m_frameCollisions.push_back( collission );
+					}
+
 				}
-
 			}
 		}
 	}
@@ -324,6 +368,11 @@ void Physics2D::ResolveCollissions()
 
 void Physics2D::ResolveCollission( Collision2D collision )
 {
+
+	if ( collision.me->m_rigidbody->m_collider->isTrigger || collision.them->m_rigidbody->m_collider->isTrigger )
+	{
+		return;
+	}
 
 	Vec2 contactPoint = (collision.manifold.contactPoint1 + collision.manifold.contactPoint2)*0.5f;
 	
@@ -402,6 +451,137 @@ void Physics2D::ResolveCollission( Collision2D collision )
 		collision.me->m_rigidbody->ApplyTorque( imp , contactPoint );
 	}
 
+}
+
+void Physics2D::HandleCollissionInfo( int colliderId1 , int colliderId2 )
+{
+	bool isCollissionNew = true;
+
+	for ( int i = 0; i < m_collissionInfo.size(); i++ )
+	{
+		if ( m_collissionInfo[ i ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_collissionInfo[ i ]->colliderId1 == colliderId1 && m_collissionInfo[ i ]->colliderId2 )
+		{
+			isCollissionNew = false;
+
+			m_collissionInfo[ i ]->isCollidingThisFrame = true;
+			m_collissionInfo[ i ]->wasCollidingLastFrame = true;
+			FireStayEvents( colliderId1 , colliderId2 );
+			break;
+		}
+
+	}
+
+	if ( isCollissionNew )
+	{
+		CollissionInfo* info = new CollissionInfo();
+		info->colliderId1 = colliderId1;
+		info->colliderId2 = colliderId2;
+		info->isCollidingThisFrame = true;
+		info->wasCollidingLastFrame = false;
+
+		m_collissionInfo.push_back( info );
+
+		FireStartEvents( colliderId1 , colliderId2 );
+	}
+
+}
+
+Collider2D* Physics2D::GetCColliderForID( int id )
+{
+	for ( int i = 0; i < m_colliders2D.size(); i++ )
+	{
+		if ( m_colliders2D[ i ] == nullptr )
+		{
+			continue;
+		}
+
+		if ( m_colliders2D[ i ]->colliderId == id )
+		{
+			return m_colliders2D[ i ];
+		}
+	}
+
+	return nullptr;
+}
+
+void Physics2D::FireStartEvents( int colliderId1 , int colliderId2 )
+{
+	Collider2D* col1 = GetCColliderForID( colliderId1 );
+	Collider2D* col2 = GetCColliderForID( colliderId2 );
+
+	if ( col1->isTrigger && col2->isTrigger )
+	{
+		col1->FireTriggerStartEvents( colliderId2 );
+		col2->FireTriggerStartEvents( colliderId1 );
+	}
+	else if ( col1->isTrigger && !col2->isTrigger )
+	{
+		col1->FireTriggerStartEvents( colliderId2 );
+	}
+	else if ( !col1->isTrigger && col2->isTrigger )
+	{
+		col2->FireTriggerStartEvents( colliderId1 );
+	}
+	else
+	{
+		col1->FireOverLapStartEvents( colliderId2 );
+		col2->FireOverLapStartEvents( colliderId1 );
+	}
+}
+
+void Physics2D::FireExitEvents( int colliderId1 , int colliderId2 )
+{
+	Collider2D* col1 = GetCColliderForID( colliderId1 );
+	Collider2D* col2 = GetCColliderForID( colliderId2 );
+
+	if ( col1->isTrigger && col2->isTrigger )
+	{
+		col1->FireTiggerEndEvents( colliderId2 );
+		col2->FireTiggerEndEvents( colliderId1 );
+	}
+	else if ( col1->isTrigger && !col2->isTrigger )
+	{
+		col1->FireTiggerEndEvents( colliderId2 );
+	}
+	else if ( !col1->isTrigger && col2->isTrigger )
+	{
+		col2->FireTiggerEndEvents( colliderId1 );
+	}
+	else
+	{
+		col1->FireOverLapEndEvents( colliderId2 );
+		col2->FireOverLapEndEvents( colliderId1 );
+	}
+}
+
+void Physics2D::FireStayEvents( int colliderId1 , int colliderId2 )
+{
+	Collider2D* col1 = GetCColliderForID( colliderId1 );
+	Collider2D* col2 = GetCColliderForID( colliderId2 );
+
+	if ( col1->isTrigger && col2->isTrigger )
+	{
+		col1->FireTriggerStayEvents( colliderId2 );
+		col2->FireTriggerStayEvents( colliderId1 );
+	}
+	else if ( col1->isTrigger && !col2->isTrigger )
+	{
+		col1->FireTriggerStayEvents( colliderId2 );
+	}
+	else if ( !col1->isTrigger && col2->isTrigger )
+	{
+		col2->FireTriggerStayEvents( colliderId1 );
+	}
+	else
+	{
+		col1->FireOverLapStayEvents( colliderId2 );
+		col2->FireOverLapStayEvents( colliderId1 );
+	}
 }
 
 Vec2 Physics2D::GetImpulse( Collision2D& collision, Vec2 &outTangentImpusle )
@@ -536,6 +716,7 @@ void Physics2D::SetSceneGravity( float gravity )
 
 void Physics2D::CleanUp()
 {
+
 	for ( int index = 0; index < m_colliders2D.size(); index++ )
 	{
 		if ( m_colliders2D[ index ] == nullptr )
@@ -544,6 +725,24 @@ void Physics2D::CleanUp()
 		}
 		if ( m_colliders2D[ index ]->m_isGarbage )
 		{
+			//Fire exit events if it was colliding
+			for ( int x = 0; x < m_collissionInfo.size(); x++ )
+			{
+				if ( m_collissionInfo[ x ] == nullptr )
+				{
+					continue;
+				}
+
+				if ( m_collissionInfo[ x ]->colliderId1 == m_colliders2D[ index ]->colliderId || m_collissionInfo[ x ]->colliderId2 == m_colliders2D[ index ]->colliderId )
+				{
+					//Fire exit events for both colliders
+					FireExitEvents( m_collissionInfo[ x ]->colliderId1 , m_collissionInfo[ x ]->colliderId2 );
+
+					delete m_collissionInfo[ x ];
+					m_collissionInfo[ x ] = nullptr;
+				}
+			}
+
 			delete m_colliders2D[ index ];
 			m_colliders2D[ index ] = nullptr;
 		}
@@ -565,6 +764,7 @@ void Physics2D::CleanUp()
 			m_rigidBodies2D[ index ] = nullptr;
 		}
 	}
+
 }
 
 
@@ -584,6 +784,10 @@ void Physics2D::SetFixedStepTime( double newDt )
 {
 	m_fixedDeltaTime = newDt;
 }
+
+int Physics2D::colliderIds=0;
+
+
 
 Manifold2 GenerateDiscAndDiscManifold( Collider2D const* col0 , Collider2D const* col1 )
 {

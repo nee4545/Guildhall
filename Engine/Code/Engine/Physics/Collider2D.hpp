@@ -3,6 +3,7 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Physics/PhysicsMaterial.hpp"
+#include "Engine/Core/EventSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +20,11 @@ enum COLLIDER2D_TYPE
 	NUM_COLLIDER_TYPES
 };
 
-
+struct Subscription
+{
+	std::string eventName;
+	EventArgs args;
+};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -48,6 +53,22 @@ public:
 	void IncreamentFriction( float increament );
 	void DecreamentFriction( float decreament );
 
+	void AddEventToOverlapStart( Subscription subscription );
+	void AddEventToOverlapEnd( Subscription subscription );
+	void AddEventToOverlapStay( Subscription subscription );
+
+	void AddEventToTriggerStart( Subscription subscription );
+	void AddEventToTriggerStay( Subscription subscription );
+	void AddEventToTriggerExit( Subscription subscription );
+
+	void FireOverLapStartEvents(int otherColliderId);
+	void FireOverLapEndEvents( int otherColliderId );
+	void FireOverLapStayEvents( int otherColliderId );
+
+	void FireTriggerStartEvents( int otherColliderId );
+	void FireTiggerEndEvents( int otherColliderId );
+	void FireTriggerStayEvents( int otherColliderId );
+
 protected:
 	virtual ~Collider2D() {}; // private - make sure this is virtual so correct deconstructor gets called
 	bool				m_isGarbage = false;
@@ -57,10 +78,20 @@ public:
 	virtual void MarkForDestroy() =0;
 
 public:
-	COLLIDER2D_TYPE		m_colliderType;				// keep track of the type - will help with collision later
+	COLLIDER2D_TYPE		m_colliderType;
+	int colliderId;										// keep track of the type - will help with collision later
 	Physics2D* m_system;                   // system who created or destr
 	Rigidbody2D* m_rigidbody = nullptr;		// owning rigidbody, used for calculating world shape
 	PhysicsMaterial m_material;
+	bool isTrigger = false;
+
+	std::vector<Subscription> m_overlapStartSubscriptions;
+	std::vector<Subscription> m_overlapEndSubscriptions;
+	std::vector<Subscription> m_overlapStaySubscriptions;
+	std::vector<Subscription> m_triggerEnterSubscriptions;
+	std::vector<Subscription> m_triggerStaySubscriptions;
+	std::vector<Subscription> m_triggerExitSubscriptions;
+
 };
 
 

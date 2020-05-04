@@ -15,6 +15,7 @@
 #define UNUSED(x) (void)(x);
 
 
+
 bool Help( EventArgs& args )
 {
 	UNUSED( args );
@@ -48,6 +49,41 @@ bool SetPhysicsUpdateStep( EventArgs& args )
 	return false;
 }
 
+bool TriggerStartEvent( EventArgs& args )
+{
+	g_theConsole.PrintString(Rgba8(0,0,100,255), "This is triggerStart Event" );
+	return false;
+}
+
+bool TriggerEndEvent( EventArgs& args )
+{
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is triggerEnd Event" );
+	return false;
+}
+
+bool TriggerStayEvent( EventArgs& args )
+{
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100, 255 ) , "This is trigger Stay Event" );
+	return false;
+}
+
+bool CollissionStartEvent( EventArgs& args )
+{
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is collissionStartEvent" );
+	return false;
+}
+
+bool CollissionEndEvent( EventArgs& args )
+{
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is collissionEndEvent" );
+	return false;
+}
+
+bool CollissionStayEvent( EventArgs& args )
+{
+	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This collission Stay event" );
+	return false;
+}
 
 
 Game::Game()
@@ -62,10 +98,22 @@ Game::Game()
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
 
+
+	//g_theEventSystem.SubscribeToMethod( "gg" , &d , &Dummy::something );
+	
+
+
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );
 	g_theEventSystem.SubscribeToEvent( "close" , Close );
 	g_theEventSystem.SubscribeToEvent( "set_physics_update_freq" , SetPhysicsUpdateStep );
+
+	g_theEventSystem.SubscribeToEvent( "TriggerStart" , TriggerStartEvent );
+	g_theEventSystem.SubscribeToEvent( "TriggerEnd" , TriggerEndEvent );
+	g_theEventSystem.SubscribeToEvent( "TriggerStay" , TriggerStayEvent );
+	g_theEventSystem.SubscribeToEvent( "ColStart" , CollissionStartEvent );
+	g_theEventSystem.SubscribeToEvent( "ColEnd" , CollissionEndEvent );
+	g_theEventSystem.SubscribeToEvent( "ColStay" , CollissionStayEvent );
 
 	m_cameraHeight = 90.f;
 	m_camera->SetClearMode( CLEAR_COLOR_BIT , Rgba8( 0 , 0 , 0 , 255 ) );
@@ -153,8 +201,16 @@ void Game::PopulateInitialObjects()
 	DiscCollider2D* collider1 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 4.f );
 	obj1->m_rigidbody->TakeCollider( collider1 );
 	obj1->m_rigidbody->m_collider->CalculateMoment();
+	Subscription s;
+	EventArgs a;
+	s.eventName = "ColStart";
+	s.args = a;
+	obj1->m_rigidbody->m_collider->AddEventToOverlapStart( s );
+	s.eventName = "ColEnd";
+	obj1->m_rigidbody->m_collider->AddEventToOverlapEnd( s );
+	s.eventName = "ColStay";
+	obj1->m_rigidbody->m_collider->AddEventToOverlapStay( s );
 	m_gameObjects.push_back( obj1 );
-
 
 	Polygon2D *polygon= new Polygon2D();
 
@@ -178,6 +234,25 @@ void Game::PopulateInitialObjects()
 	obj2->m_rigidbody->m_collider->CalculateMoment();
 	obj2->m_rigidbody->SetPosition( Vec2( 0.f , -40.f ) );
 	m_gameObjects.push_back( obj2 );
+
+	GameObject* obj3 = new GameObject();
+	obj3->m_rigidbody = physicsSystem->CreateRigidbody();
+	obj3->m_rigidbody->SetPosition( Vec2( 30.f , 30.f ) );
+
+	DiscCollider2D* collider3 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 4.f );
+	obj3->m_rigidbody->TakeCollider( collider3 );
+	obj3->m_rigidbody->m_collider->CalculateMoment();
+	obj3->m_rigidbody->m_collider->isTrigger = true;
+	EventArgs args;
+	Subscription sub;
+	sub.eventName = "TriggerStart";
+	sub.args = args;
+	obj3->m_rigidbody->m_collider->AddEventToTriggerStart( sub );
+	sub.eventName = "TriggerEnd";
+	obj3->m_rigidbody->m_collider->AddEventToTriggerExit( sub );
+	sub.eventName = "TriggerStay";
+	obj3->m_rigidbody->m_collider->AddEventToTriggerStay( sub );
+	m_gameObjects.push_back( obj3 );
 }
 
 
