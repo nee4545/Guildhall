@@ -172,6 +172,9 @@
       <Filter>DebugRender</Filter>
     </ClCompile>
     <ClCompile Include="Core\Plane.cpp" />
+    <ClCompile Include="Core\NamedProperties.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -692,6 +695,9 @@
     <ClInclude Include="Core\Plane.hpp" />
     <ClInclude Include="Physics\PhysicsCommon.hpp">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\NamedProperties.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

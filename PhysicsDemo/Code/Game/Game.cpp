@@ -101,7 +101,28 @@ Game::Game()
 
 	//g_theEventSystem.SubscribeToMethod( "gg" , &d , &Dummy::something );
 	
+	NamedProperties p = NamedProperties();
 
+	float val = p.GetValue( "gago" , 0.f );
+
+	Rgba8 rr =  Rgba8( 100 , 0 , 0 , 255 );
+
+	p.SetValue( "color" , rr );
+
+	val;
+
+	Rgba8 c = p.GetValue( "color" , Rgba8(255,255,255,255) );
+
+	Camera x = Camera();
+	x.bottom_Left = Vec2( 10.f , 10.f );
+
+	p.SetValue( "camera" , x );
+
+	Camera y = Camera();
+	
+	y = p.GetValue( "camera" , y );
+
+	y;
 
 	g_theEventSystem.SubscribeToEvent( "help" , Help );
 	g_theEventSystem.SubscribeToEvent( "quit" , Quit );

@@ -19,7 +19,7 @@ enum  eCameraClearBitFlag : unsigned int
 
 class Camera
 {
-private:
+public:
 	Vec2 bottom_Left;
 	Vec2 top_Right;
 	Rgba8 m_clearColor;

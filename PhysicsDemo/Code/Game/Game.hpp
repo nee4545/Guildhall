@@ -4,6 +4,7 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include <vector>
+#include "Engine/Core/NamedProperties.hpp"
 
 
 class BitmapFont;

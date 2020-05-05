@@ -7,7 +7,6 @@
 typedef NamedStrings EventArgs;
 typedef bool(*EventCallBackFunction)(EventArgs& args);
 
-using EventCallback = std::function<EventCallBackFunction>;
 
 struct MethodSubscriptions
 {
@@ -35,9 +34,17 @@ public:
 	void SubscribeToEvent( const std::string& eventName, EventCallBackFunction eventToListen );
 	void FireEvent(const std::string& eventName,EventArgs& args);
 	void UnSubscribeToEvent( const std::string& eventName, EventCallBackFunction eventToUnscribe);
-	template<typename OBJ_TYPE>
-	void SubscribeToMethod( const std::string& eventName , OBJ_TYPE* obj , bool ( OBJ_TYPE::* mcb )( EventArgs& args ) );
 	
+	template<typename OBJ_TYPE>
+	void SubscribeToMethod( const std::string& eventName , OBJ_TYPE* obj , bool ( OBJ_TYPE::* mcb )( EventArgs& args ) )
+	{
+		MethodSubscriptions* newSubscription = new MethodSubscriptions();
+		newSubscription->eventName = eventName;
+		newSubscription->objId = obj;
+		newSubscription->func = [ = ] ( EventArgs args ) { ( obj->*mcb )( args ); };
+
+		m_methodSubscriptions.push_back( newSubscription );
+	};
 };
 
 
