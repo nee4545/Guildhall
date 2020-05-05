@@ -45,7 +45,6 @@ public:
 
 	Vec2 GetOrthoBottomLeft();
 	Vec2 GetOrthoTopRight();
-	Texture* GetColorTarget() const;
 	void SetOutputsize( Vec2 size );
 	float GetCameraHeight();
 	void SetPosition( Vec2 position );
@@ -68,7 +67,12 @@ public:
 	Vec3 ClientToWorldPosition( Vec2 clientPos , float ndcZ = 0 );
 	Mat44 GetViewMatrix();
 
-	
+	Texture*		 GetColorTarget() const;
+	Texture*		 GetColorTarget( int index ) const;
+	unsigned int	 GetColorTargetCount() const;
+	Vec2			 GetColorTargetSize() const;
+	void			 SetColorTarget( Texture* texture );
+	void			 SetColorTarget( int index , Texture* texture );
 
 	Camera()
 	{
@@ -78,6 +82,6 @@ public:
 
 	~Camera();
 
-	Texture* m_texture = nullptr;
-	Texture* m_backBuffer = nullptr;
+	std::vector< Texture* > m_texture;
+	Texture*		m_backBuffer = nullptr;
 };

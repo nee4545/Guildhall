@@ -57,8 +57,13 @@ float2 ComputeLightFactor(light_t light, float3 worldPos, float3 worldNormal, fl
     
 }
 
+struct lightRes
+{
+    float3 diffuseRes;
+    float3 specRes;
+};
 
-float3 ComputeLightingAt(float3 worldPos, float3 worldNormal,float3 surfaceColor, float specFactor)
+lightRes ComputeLightingAt(float3 worldPos, float3 worldNormal, float3 surfaceColor, float specFactor)
 {
     float3 dirToEye = normalize(CAMERA_POSITION - worldPos);
 	
@@ -77,6 +82,9 @@ float3 ComputeLightingAt(float3 worldPos, float3 worldNormal,float3 surfaceColor
 	
     diffuse = min(diffuse, float3(1.f.xxx));
 	
-    return (diffuse * surfaceColor) + spec;
-
+    lightRes result;
+    
+    result.diffuseRes = (diffuse * surfaceColor) + spec;
+    result.specRes = spec;
+    return result;
 }

@@ -89,6 +89,7 @@ public:
 	bool toggleCamera = false;
 	bool paused = false;
 	bool isDebugging = false;
+	bool isBloomOn = false;
 
 	void Update( float deltaseconds );
 	void Render();
@@ -110,4 +111,5 @@ public:
 	void UpdateDissolveDetails();
 	void ToggleLights();
 	void ToggleLightTypes();
+	void ToggleBloom();
 };

@@ -1382,17 +1382,18 @@ void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 	}
 
 	Camera camera;	
-	if ( output != nullptr )
+	if ( output == nullptr )
 	{
-		camera.m_texture = output;
+
 		Vec2 min = Vec2( 0.f , 0.f );
-		Vec2 max = Vec2( output->GetTexelSizeCoords() );
-		camera.SetOrthoView(min,max);
+		Vec2 max = Vec2( ( 16.f / 9.f ) * m_defaultScreenHeight , m_defaultScreenHeight );
+		camera.SetOrthoView( min , max );
 	}
 	else
 	{
+		camera.m_texture[ 0 ] = output;
 		Vec2 min = Vec2( 0.f , 0.f );
-		Vec2 max = Vec2( ( 16.f / 9.f ) * m_defaultScreenHeight ,m_defaultScreenHeight );
+		Vec2 max = Vec2( output->GetTexelSizeCoords() );
 		camera.SetOrthoView( min , max );
 	}
 

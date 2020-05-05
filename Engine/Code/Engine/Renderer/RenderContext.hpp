@@ -163,10 +163,11 @@ class RenderContext
 {
 
 
-	std::map<std::string,Texture*> m_LoadedTextures;
+	std::map<std::string,Texture*>    m_LoadedTextures;
 	std::map<std::string,BitmapFont*> m_LoadedFonts;
-	std::map<std::string , Shader*> m_loadedShaders;
-
+	std::map<std::string , Shader*>   m_loadedShaders;
+	std::vector<Texture*>			  m_renderTargetPool;
+	int								  m_renderTargetPoolSize = 0;
 public:
 
 	//debug
@@ -190,6 +191,7 @@ public:
 	RenderBuffer* m_fogUBO = nullptr;
 
 	Texture* m_texture;
+	Texture* m_textureTarget = nullptr;
 	ID3D11BlendState* m_alphaBlendState;
 	ID3D11BlendState* m_additiveBlendState;
 	ID3D11BlendState* m_opaqueBlendState;
@@ -197,6 +199,9 @@ public:
 	ID3D11RasterizerState* m_rasterState = nullptr;
 	bool m_isDrawing = false;
 	lights_data m_lights;
+
+	Camera m_effectCamera;
+	Camera* m_currentCamera = nullptr;
 
 public:
 	
@@ -276,7 +281,15 @@ public:
 	void EnableFog(fog_t fogData);
 	void DisableFog();
 
-	
+	Texture* CreateRenderTarget( IntVec2 texelSize );
+	void	 CopyTexture( Texture* destination , Texture* source );
+	void	 StartEffect( Texture* destination , Texture* source , Shader* shader );
+	void	 EndEffect();
+
+	Texture* GetOrCreatematchingRenderTarget( Texture* texture );
+	void	 ReleaseRenderTarget( Texture* texture );
+	int		 GetTotalRenderTargetPoolSize() const { return m_renderTargetPoolSize; }
+	int		 GetTexturePoolFreeCount() const { return 8 - m_renderTargetPoolSize; }
 
 private:
 

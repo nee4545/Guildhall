@@ -332,17 +332,36 @@ void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 
 void RenderContext::BindDepthStencil( Texture* dsv )
 {
+	int rtvCount = m_currentCamera->GetColorTargetCount();
+	std::vector<ID3D11RenderTargetView*> rtvs;
+
+	rtvs.resize( rtvCount );
+
+	for ( int i = 0; i < rtvCount; i++ )
+	{
+		rtvs[ i ] = nullptr;
+
+		Texture* colorTarget = m_currentCamera->GetColorTarget( i );
+		TextureView* rtv = nullptr;
+
+		if ( colorTarget != nullptr )
+		{
+			rtv = colorTarget->GetOrCreateRenderTargetView();
+			rtvs[ i ] = rtv->GetRTVHandle();
+		}
+	}
+
 	ID3D11RenderTargetView* rtvCopy = m_texture->GetRenderTargetView()->GetRTVHandle();
 	ID3D11RenderTargetView* const* rtv = &rtvCopy;
 
 	if ( dsv == nullptr )
 	{
-		m_context->OMSetRenderTargets( 1 , rtv , nullptr );
+		m_context->OMSetRenderTargets( rtvCount , rtvs.data() , nullptr );
 		return;
 	}
 
 	TextureView* tempDsv = dsv->GetOrCreateDepthBuffer( m_texture->GetTexelSizeCoords() , this );
-	m_context->OMSetRenderTargets( 1 , rtv , tempDsv->m_dsv );
+	m_context->OMSetRenderTargets( rtvCount , rtvs.data() , tempDsv->m_dsv );
 }
 
 void RenderContext::SetDepthTest( eCompareOp comparision , bool writePass  )
@@ -599,6 +618,62 @@ void RenderContext::DrawPolygonFilled( const Polygon2D& polygon , const Rgba8& c
 	}
 }
 
+Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize )
+{
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = texelSize.x;
+	desc.Height = texelSize.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;															// Multi sampling Anti-Aliasing
+	desc.SampleDesc.Quality = 0;															// Multi sampling Anti-Aliasing
+	desc.Usage = D3D11_USAGE_DEFAULT;											//  if we do mip-chains, we change this to GPU/DEFAULT
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;															// does the CPU write to this? 0  = no
+	desc.MiscFlags = 0;															// extension features like cube maps
+
+	// DirectX Creation
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc , nullptr , &texHandle );
+
+	Texture* temp = new Texture( this , texHandle );
+
+	std::string debugName = "Render Target Texture";
+	return temp;
+}
+
+
+Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
+{
+	IntVec2 size = texture->GetDimensions();
+
+	for ( int index = 0; index < m_renderTargetPool.size(); index++ )
+	{
+		Texture* renderTarget = m_renderTargetPool[ index ];
+
+		if ( renderTarget->GetDimensions() == size )
+		{
+			// fast remove at index
+			m_renderTargetPool[ index ] = m_renderTargetPool[ m_renderTargetPool.size() - 1 ];
+			m_renderTargetPool.pop_back();
+			// return the object from pool
+			return renderTarget;
+		}
+	}
+
+	Texture* newRenderTarget = CreateRenderTarget( size );
+	//m_renderTargetPool.push_back( newRenderTarget );
+	m_renderTargetPoolSize++;
+	return newRenderTarget;
+}
+
+void RenderContext::ReleaseRenderTarget( Texture* texture )
+{
+	m_renderTargetPool.push_back( texture );
+}
+
+
 Texture* RenderContext::CreateTextureFromFile(  const char* imageFilePath )
 {
 	
@@ -716,7 +791,17 @@ void RenderContext::Startup( Window* window )
 
 void RenderContext::Shutdown()
 {
-	
+	GUARANTEE_OR_DIE( m_renderTargetPool.size() == m_renderTargetPoolSize , "Someone Did not release a Render Target " );
+
+	for ( auto& renderTargetIndex : m_renderTargetPool )
+	{
+		if ( renderTargetIndex != nullptr )
+		{
+			delete renderTargetIndex;
+			renderTargetIndex = nullptr;
+		}
+	}
+
 	delete g_theBitMapFont;
 
 	for ( auto& x : m_loadedShaders )
@@ -832,6 +917,28 @@ void RenderContext::BeginCamera( Camera &camera)
 	#endif
 
 	m_isDrawing = true;
+
+	m_currentCamera = &camera;
+	
+	int rtvCount = camera.GetColorTargetCount();
+	std::vector<ID3D11RenderTargetView*> rtvs;
+
+	rtvs.resize( rtvCount );
+
+	for ( int i = 0; i < rtvCount; i++ )
+	{
+		rtvs[ i ] = nullptr;
+
+		Texture* colorTarget = camera.GetColorTarget( i );
+		TextureView* rtv = nullptr;
+
+		if ( colorTarget != nullptr )
+		{
+			rtv = colorTarget->GetOrCreateRenderTargetView();
+			rtvs[ i ] = rtv->GetRTVHandle();
+		}
+	}
+		
 	Texture* colorTarget = camera.GetColorTarget();
 	{
 		if ( colorTarget == nullptr )
@@ -848,16 +955,16 @@ void RenderContext::BeginCamera( Camera &camera)
 	TextureView* view = colorTarget->GetRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
 
-	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+	m_context->OMSetRenderTargets( rtvCount , rtvs.data() , nullptr );
 
 
-	if ( camera.m_texture != nullptr )
-	{
-		m_texture = camera.m_texture;
-	} else
+	if ( camera.m_texture.size() == 0  || camera.m_texture[0] == nullptr )
 	{
 		m_texture = m_swapChain->GetBackBuffer();
-		camera.m_texture = m_swapChain->GetBackBuffer();
+		camera.m_texture.push_back( m_swapChain->GetBackBuffer() );
+	} else
+	{
+		m_texture = camera.m_texture[0];
 	}
 
 	IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
@@ -874,8 +981,43 @@ void RenderContext::BeginCamera( Camera &camera)
 
 	if ( camera.m_clearMode & CLEAR_COLOR_BIT )
 	{
-		ClaerScreen(camera.GetClearColor());
+		//ClaerScreen(camera.GetClearColor());
+		float clearFloats[ 4 ];
+		float scaleToFloat = 1 / 255.f;
+
+		Rgba8 clearColor = camera.GetClearColor();
+
+		clearFloats[ 0 ] = ( float ) clearColor.r * scaleToFloat;
+		clearFloats[ 1 ] = ( float ) clearColor.g * scaleToFloat;
+		clearFloats[ 2 ] = ( float ) clearColor.b * scaleToFloat;
+		clearFloats[ 3 ] = ( float ) clearColor.a * scaleToFloat;
+
+		// can be put under clear Texture function
+
+		for ( size_t index = 0; index < rtvCount; index++ )
+		{
+			if ( nullptr != rtvs[ index ] )
+			{
+				m_context->ClearRenderTargetView( rtvs[ index ] , clearFloats );
+			}
+		}
+
+		Texture* backbuffer = camera.GetColorTarget();
+		TextureView* backbuffer_rtv = backbuffer->GetOrCreateRenderTargetView();
+
+		rtv = backbuffer_rtv->GetRTVHandle();
+		m_context->ClearRenderTargetView( rtv , clearFloats );
+		//ClearScreen( camera.GetClearColor() );
 	}
+
+	m_textureTarget = camera.GetColorTarget();
+
+	if ( m_textureTarget == nullptr )
+	{
+		m_textureTarget = m_swapChain->GetBackBuffer();
+		m_currentCamera->SetColorTarget( m_textureTarget );
+	}
+	
 	BindShader( "" );
 
 	m_lastBoundVBO = nullptr;
@@ -1099,6 +1241,27 @@ void RenderContext::DisableFog()
 	m_fogUBO->Update( &temp , sizeof( temp ) , sizeof( temp ) );
 
 	BindUniformBuffer( 4 , m_fogUBO );
+}
+
+
+void RenderContext::CopyTexture( Texture* destination , Texture* source )
+{
+	m_context->CopyResource( destination->m_handle , source->m_handle );
+}
+
+void RenderContext::StartEffect( Texture* destination , Texture* source , Shader* shader )
+{
+	m_effectCamera.SetColorTarget( destination );
+	BeginCamera( m_effectCamera );
+	BindShader( shader );
+	BindTexture( source );
+}
+
+void RenderContext::EndEffect()
+{
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	Draw( 3 , 0 );
+	EndCamera( m_effectCamera );
 }
 
 void RenderContext::CreateBlendStates()

@@ -16,6 +16,8 @@
 #include "Engine/Renderer/ObjFileLoader.hpp"
 #include "Engine/Core/D3D11Common.hpp"
 #include "Engine/Renderer/Material.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 
 #define UNUSED(x) (void)(x);
 
@@ -117,7 +119,7 @@ Game::Game()
 	m_UICamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
 	m_devConsoleCamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 ,0 , 0 , 255 ) , 0.f , 0 );
 	m_UICamera->SetClearMode( 0 | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 0 , 0 , 0 , 255 ) , 0.f , 0 );
-	m_camera->SetClearMode( CLEAR_COLOR_BIT /*| CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT*/ , Rgba8( 0 , 0 , 100 , 255 ) , 1.f , 0 );
+	m_camera->SetClearMode( CLEAR_COLOR_BIT /*| CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT*/ , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , 0 );
 
 	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
@@ -240,7 +242,7 @@ void Game::Update( float deltaseconds )
 	UpdateDissolveDetails();
 	ToggleLights();
 	ToggleLightTypes();
-
+	ToggleBloom();
 	if ( g_theConsole.IsOpen() )
 	{
 		return;
@@ -329,6 +331,11 @@ void Game::Update( float deltaseconds )
 
 void Game::Render()
 {
+	Texture* backBuffer = g_theRenderer->m_swapChain->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* bloomTarget = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	m_camera->SetColorTarget( colorTarget );
+	m_camera->SetColorTarget( 1 , bloomTarget );
 	g_theRenderer->BeginCamera(*m_camera);
 	m_camera->CreateDepthStencilTarget( g_theRenderer );
 	g_theRenderer->SetDepthTest();
@@ -426,31 +433,60 @@ void Game::Render()
 	g_theRenderer->BindMaterial( dissolveMaterial );
 	g_theRenderer->SetModalMatrix( cubeTransform.ToMatrix() );
 	g_theRenderer->DrawMesh( mesh );
-
+	m_camera->SetColorTarget( backBuffer );
 	g_theRenderer->EndCamera(*m_camera);
 
-	DisplayUIText();
+	if ( isBloomOn )
+	{
+		Shader* blur = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
+		Texture* blurredBloom = g_theRenderer->GetOrCreatematchingRenderTarget( bloomTarget );
+		g_theRenderer->StartEffect( blurredBloom , bloomTarget , blur );
+		g_theRenderer->BindTexture( bloomTarget , TEXTURE_SLOT_USER );
+		g_theRenderer->EndEffect();
 
+		Shader* combineImg = g_theRenderer->GetOrCreateShader( "Data/Shaders/combine.hlsl" );;
+		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		g_theRenderer->StartEffect( finalImage , colorTarget , combineImg );
+		g_theRenderer->BindTexture( blurredBloom , TEXTURE_SLOT_USER , 0 );
+		g_theRenderer->BindTexture( colorTarget , TEXTURE_SLOT_USER , 1 );
+		g_theRenderer->EndEffect();
+		g_theRenderer->CopyTexture( backBuffer , finalImage );
+		g_theRenderer->ReleaseRenderTarget( blurredBloom );
+		g_theRenderer->ReleaseRenderTarget( finalImage );
+	}
+	else
+	{
+		Shader* combineImg = g_theRenderer->GetOrCreateShader( "Data/Shaders/combine.hlsl" );
+		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		g_theRenderer->StartEffect( finalImage , colorTarget , combineImg );
+		g_theRenderer->BindTexture( bloomTarget , TEXTURE_SLOT_USER );
+		g_theRenderer->BindTexture( colorTarget , TEXTURE_SLOT_USER , 1 );
+		g_theRenderer->EndEffect();
+		g_theRenderer->CopyTexture( backBuffer , finalImage );
+		g_theRenderer->ReleaseRenderTarget( finalImage );
+	}
+		g_theRenderer->CopyTexture( backBuffer , colorTarget );
+		g_theRenderer->ReleaseRenderTarget( bloomTarget );
+		g_theRenderer->ReleaseRenderTarget( colorTarget );
+
+	DisplayUIText();
+	
 	for ( int i = 0; i < 8; i++ )
 	{
 		DebugAddWorldPoint( tempLight[ i ].light.position , 0.16f , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , DEBUG_RENDER_USE_DEPTH );
 	}
-
+	//
 	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );
-
-	if ( !g_theConsole.IsOpen() )
-	{
-		DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
-	}
-
+	//
+	//if ( !g_theConsole.IsOpen() )
+	//{
+	//	DebugRenderSystem::sDebugRenderer->DebugRenderToScreen( m_camera->GetColorTarget() );
+	//}
+	//
 	if ( g_theConsole.IsOpen() )
 	{
 		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.5f , 1.5f );
 	}
-
-	//DebuggerPrintf( "%f,%f,%f \n" , tempLight.specularAttunation.x , tempLight.specularAttunation.y , tempLight.specularAttunation.z );
-
-
 }
 
 void Game::UpdateCamera()
@@ -923,24 +959,10 @@ void Game::ToggleLightTypes()
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void Game::ToggleBloom()
+{
+	if ( g_theInput->WasKeyJustPressed( 0x71 ))
+	{
+		isBloomOn = !isBloomOn;
+	}
+}

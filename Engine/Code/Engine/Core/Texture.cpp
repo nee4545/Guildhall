@@ -53,6 +53,26 @@ TextureView* Texture::GetRenderTargetView()
 	return m_renderTargetView;
 }
 
+TextureView* Texture::GetOrCreateRenderTargetView()
+{
+	if ( m_renderTargetView )
+	{
+		return m_renderTargetView;
+	}
+
+	ID3D11Device* device = m_owner->m_device;
+	ID3D11RenderTargetView* rtv = nullptr;
+	device->CreateRenderTargetView( m_handle , nullptr , &rtv );
+
+	if ( nullptr != rtv )
+	{
+		m_renderTargetView = new TextureView();
+		m_renderTargetView->m_rtv = rtv;
+	}
+
+	return m_renderTargetView;
+}
+
 TextureView* Texture::GetOrCreateShaderResourceView()
 {
 	if ( m_shaderResourceView )

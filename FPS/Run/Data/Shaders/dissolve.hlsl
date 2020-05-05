@@ -93,7 +93,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float alpha = diffuseColor.w * input.color.w;
     float3 surfaceNormal = NormalColorToVector3( normalColor.xyz );
     float3 worldNormal = mul( surfaceNormal , TBN );
-    surfaceColor = ComputeLightingAt( input.world_position , worldNormal , surfaceColor, SPECULAR_FACTOR );
+    surfaceColor = ComputeLightingAt( input.world_position , worldNormal , surfaceColor, SPECULAR_FACTOR ).diffuseRes;
    
     float3 finalColor =  surfaceColor.xyz;
            finalColor = lerp( burnColor , finalColor , burnMix );

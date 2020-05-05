@@ -78,7 +78,13 @@ v2f_t VertexFunction(vs_input_t input)
 // is being drawn to the first bound color target.
 //--------------------------------------------------------------------------------------
 
-float4 FragmentFunction(v2f_t input) : SV_Target0
+struct ffo_t
+{
+    float4 color : SV_Target0;
+    float4 bloom : SV_Target1;
+};
+
+ffo_t FragmentFunction(v2f_t input)
 {
 
     float4 diffuseColor = tDiffuse.Sample(sSampler, input.uv);
@@ -98,11 +104,17 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3 surfaceNormal = NormalColorToVector3(normalColor.xyz);
     float3 worldNormal = mul(surfaceNormal, TBN);
 	
-    float3 finalColor = ComputeLightingAt(input.world_position, worldNormal, surfaceColor, 1.f);   
+    lightRes result =  ComputeLightingAt(input.world_position, worldNormal, surfaceColor, 1.f);   
+    float3 finalColor = result.diffuseRes;
 	
     finalColor = ApplyLinearFog(input.world_position, finalColor);
     
-    return float4(finalColor, alpha);
+    ffo_t output;
+	
+    output.color = float4(finalColor, alpha);
+    output.bloom = float4(result.specRes, 1);
+	
+    return output;
     
 }
 

@@ -5,8 +5,12 @@
 #include "Engine/Core/Texture.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Math/Mat44.hpp"
+#include "Game/GameCommon.hpp"
 #define UNUSED(x) (void)(x);
+
+extern  RenderContext* g_theRenderer;
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {
@@ -56,12 +60,55 @@ Vec2 Camera::GetOrthoTopRight()
 
 Texture* Camera::GetColorTarget() const
 {
-	if ( m_texture != nullptr )
+	if ( m_texture.size() == 0 )
 	{
-		return m_texture;
+		return nullptr;
+	}
+	return m_texture[ 0 ];
+}
+
+Texture* Camera::GetColorTarget( int index ) const
+{
+	if ( index < m_texture.size() )
+	{
+		return m_texture[ index ];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+unsigned int Camera::GetColorTargetCount() const
+{
+	return ( unsigned int ) m_texture.size();
+}
+
+Vec2 Camera::GetColorTargetSize() const
+{
+	if ( m_texture[ 0 ] != nullptr )
+	{
+		return Vec2( m_texture[ 0 ]->GetDimensions() );
+	}
+	else
+	{
+		return Vec2( g_theRenderer->m_swapChain->GetBackBuffer()->GetDimensions() );
+	}
+}
+
+void Camera::SetColorTarget( Texture* texture )
+{
+	SetColorTarget( 0 , texture );
+}
+
+void Camera::SetColorTarget( int index , Texture* texture )
+{
+	if ( index >= m_texture.size() )
+	{
+		m_texture.resize( index + 1 );
 	}
 
-	return nullptr;
+	m_texture[ index ] = texture;
 }
 
 void Camera::SetOutputsize( Vec2 size )
@@ -137,7 +184,7 @@ void Camera::CreateDepthStencilTarget( RenderContext* ctx )
 	if ( m_backBuffer == nullptr )
 	{
 		Texture* dsTarget = new Texture();
-		IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
+		IntVec2 textureDimensions = m_texture[0]->GetTexelSizeCoords();
 		dsTarget->GetOrCreateDepthBuffer( textureDimensions , ctx );
 		m_backBuffer = dsTarget;
 	}
@@ -227,7 +274,7 @@ Camera::~Camera()
 	m_cameraUBO = nullptr;
 
 	//delete m_texture;
-	m_texture = nullptr;
+	//m_texture = nullptr;
 
 	if ( m_backBuffer != nullptr )
 	{
