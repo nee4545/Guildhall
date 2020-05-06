@@ -51,36 +51,42 @@ bool SetPhysicsUpdateStep( EventArgs& args )
 
 bool TriggerStartEvent( EventArgs& args )
 {
+	UNUSED( args );
 	g_theConsole.PrintString(Rgba8(0,0,100,255), "This is triggerStart Event" );
 	return false;
 }
 
 bool TriggerEndEvent( EventArgs& args )
 {
+	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is triggerEnd Event" );
 	return false;
 }
 
 bool TriggerStayEvent( EventArgs& args )
 {
+	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100, 255 ) , "This is trigger Stay Event" );
 	return false;
 }
 
 bool CollissionStartEvent( EventArgs& args )
 {
+	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is collissionStartEvent" );
 	return false;
 }
 
 bool CollissionEndEvent( EventArgs& args )
 {
+	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is collissionEndEvent" );
 	return false;
 }
 
 bool CollissionStayEvent( EventArgs& args )
 {
+	UNUSED( args );
 	g_theConsole.PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This collission Stay event" );
 	return false;
 }

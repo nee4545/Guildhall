@@ -6,7 +6,6 @@
 #include <vector>
 #include "Engine/Core/NamedProperties.hpp"
 
-
 class BitmapFont;
 class Physics2D;
 class GameObject;
@@ -15,14 +14,6 @@ class BitmapFont;
 
 static Physics2D* physicsSystem = nullptr;
 
-class Dummy
-{
-public:
-	bool something( EventArgs& args )
-	{
-		return true;
-	}
-};
 
 class Game
 {
@@ -64,8 +55,6 @@ public:
 	void UpdateFramePositions();
 	void ToggleDevConsole();
 
-	Dummy d;
-
 private:
 	RandomNumberGenerator m_rng;
 	BitmapFont* m_BitmapFont = nullptr;
@@ -96,7 +85,5 @@ private:
 	Vec2 throwFinalPoint;
 	bool finalPointSet = false;
 	bool devConsoleOpen = false;
-
-
 
 };

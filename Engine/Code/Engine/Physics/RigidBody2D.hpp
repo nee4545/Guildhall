@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Physics/PhysicsCommon.hpp"
+#include "Engine/Core/NamedProperties.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -56,6 +57,9 @@ public:
 	void SetLayer( Layers layer );
 	Layers GetLayer();
 
+	void SetUserData( std::string keyName , void* value );
+	void* GetUserData( std::string keyName );
+
 private: 
 
 	void MarkForDestroy();
@@ -84,6 +88,7 @@ public:
 	float m_frameTorque = 0.f;
 	float m_moment = 0.f;
 	Layers m_layer = LAYER_DEFAULT;
+	NamedProperties m_userData=NamedProperties();
 
 private:
 	~Rigidbody2D();								// destroys the collider

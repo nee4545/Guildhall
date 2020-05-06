@@ -149,6 +149,17 @@ public:
 		return defValue;
 	};
 
+
+	void SetValue( std::string const& keyname , char const* val )
+	{
+		SetValue<std::string>( keyname , val );
+	}
+
+	std::string GetValue( std::string const& keyName , char const* val ) const
+	{
+		return GetValue<std::string>( keyName , val );
+	}
+
 private:
 	std::map<std::string,TypedPropertyBase*> m_keyValuePairs;
 

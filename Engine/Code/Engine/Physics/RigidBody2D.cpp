@@ -225,6 +225,17 @@ Layers Rigidbody2D::GetLayer()
 	return m_layer;
 }
 
+void Rigidbody2D::SetUserData( std::string keyName , void* value )
+{
+	m_userData.SetValue( keyName , value );
+}
+
+void* Rigidbody2D::GetUserData( std::string keyName )
+{
+	void* defaultVaule = nullptr;
+	return m_userData.GetValue( keyName, defaultVaule );
+}
+
 Rigidbody2D::~Rigidbody2D()
 {
 
