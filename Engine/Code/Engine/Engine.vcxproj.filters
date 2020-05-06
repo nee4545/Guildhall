@@ -178,6 +178,9 @@
     <ClCompile Include="ThirdParty\MikktSpace.c" />
     <ClCompile Include="Renderer\Material.cpp" />
     <ClCompile Include="Renderer\ShaderState.cpp" />
+    <ClCompile Include="Core\NamedProperties.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -709,6 +712,9 @@
     <ClInclude Include="Renderer\Header.h" />
     <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\ShaderState.hpp" />
+    <ClInclude Include="Core\NamedProperties.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">

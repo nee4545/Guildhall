@@ -29,6 +29,7 @@
     <ClCompile Include="Core\FloatRange.cpp" />
     <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\IntRange.cpp" />
+    <ClCompile Include="Core\NamedProperties.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\OBB2.cpp" />
     <ClCompile Include="Core\Plane.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="Core\FloatRange.hpp" />
     <ClInclude Include="Core\Image.hpp" />
     <ClInclude Include="Core\IntRange.hpp" />
+    <ClInclude Include="Core\NamedProperties.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\OBB2.hpp" />
     <ClInclude Include="Core\Plane.hpp" />

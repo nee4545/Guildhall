@@ -488,7 +488,7 @@ void Game::Render()
 	
 	for ( int i = 0; i < 8; i++ )
 	{
-		DebugAddWorldPoint( tempLight[ i ].light.position , 0.16f , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , DEBUG_RENDER_USE_DEPTH );
+		DebugAddWorldPoint( tempLight[ i ].light.position , 0.1f , Rgba8( 255 , 255 , 255 , 255 ) , 0.f , DEBUG_RENDER_USE_DEPTH );
 	}
 	//
 	DebugRenderSystem::sDebugRenderer->DebugRenderWorldToCamera( m_camera );

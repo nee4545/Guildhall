@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/NamedProperties.hpp"
 #include <vector>
 #include <map >
 
-typedef NamedStrings EventArgs;
+typedef NamedProperties EventArgs;
 typedef bool(*EventCallBackFunction)(EventArgs& args);
 
 struct EventSubscription

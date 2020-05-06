@@ -8,6 +8,7 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Core/NamedProperties.hpp"
 
 extern BitmapFont* g_theBitMapFont;
 extern InputSystem* g_theInput;
