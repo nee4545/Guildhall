@@ -31,6 +31,17 @@ void EventSystem::FireEvent( const std::string& eventName, EventArgs& args )
 			}
 		}
 	}
+
+	for ( int i = 0; i < ( int ) m_methodSubscriptions.size(); i++ )
+	{
+		if ( m_methodSubscriptions[ i ] != nullptr )
+		{
+			if ( m_methodSubscriptions[ i ]->eventName == eventName )
+			{
+				m_methodSubscriptions[ i ]->func( args );
+			}
+		}
+	}
 }
 
 void EventSystem::UnSubscribeToEvent( const std::string& eventName, EventCallBackFunction eventToUnscribe )

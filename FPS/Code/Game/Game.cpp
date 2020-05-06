@@ -96,15 +96,30 @@ bool DebugSetAmbientColor( EventArgs& args )
 
 GPUMesh* me;
 
+class Temp
+{
+public:
+	bool SomeMethod( EventArgs& args )
+	{
+		UNUSED( args );
+		g_theConsole.PrintString( Rgba8( 255 , 255 , 255 , 255 ) , "This is a class method" );
+		return false;
+	}
+};
+
 Game::Game()
 {
 	MeshBuilderOptions m;
 	m.calculateNoramls = true;
 	m.generateTangents = true;
 
+	Temp d = Temp();
+	g_theEventSystem.SubscribeToMethod( "Test" , &d , &Temp::SomeMethod );
+
+	EventArgs arg;
+	g_theEventSystem.FireEvent( "Test" , arg );
 
 	me = OBJLoader::LoadObjFileIntoGpuMesh( m , "Data/Objs/test_models/scifi_fighter/mesh.obj" );
-	//x.ParseObjFile( "Data/Objs/test_models/scifi_fighter/mesh.obj" );
 
 	dissolveMaterial = new Material();
 	dissolveMaterial->CreateFromFile( "Data/XML/dissolve.xml" );
@@ -988,6 +1003,34 @@ void Game::ToggleColorTone()
 	{
 		isColorToneOn = !isColorToneOn;
 	}
+
+	if ( g_theInput->WasKeyJustPressed( '2' ) )
+	{
+		m_toneMapTransform.Tw -= 0.1f;
+		m_toneMapTransform.Tw = ClampZeroToOne( m_toneMapTransform.Tw );
+		return;
+	}
+	if ( g_theInput->WasKeyJustPressed( '3' ) )
+	{
+		m_toneMapTransform.Tw += 0.1f;
+		m_toneMapTransform.Tw = ClampZeroToOne( m_toneMapTransform.Tw );
+		return;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '4' ) )
+	{
+		m_colorPower -= 0.1f;
+		m_colorPower = ClampZeroToOne( m_colorPower );
+		return;
+	}
+	if ( g_theInput->WasKeyJustPressed( '5' ) )
+	{
+		m_colorPower += 0.1f;
+		m_colorPower = ClampZeroToOne( m_colorPower );
+		return;
+	}
+
+
 	if ( g_theInput->WasKeyJustPressed( 0x26 ) )
 	{
 		m_currentToneMap = ColorTone( ( m_currentToneMap + 1 ) % ColorTone::TOTAL_TONEMAPS );
@@ -1024,5 +1067,5 @@ void Game::ToggleColorTone()
 		m_toneMapTransform.SetBasisVectors3D( newRed , newGreen , newBlue );
 	}break;
 	}
-	
+	m_toneMapTransform.ScaleUniform3D( m_colorPower );
 }

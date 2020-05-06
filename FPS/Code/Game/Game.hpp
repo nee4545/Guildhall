@@ -43,7 +43,6 @@ enum ColorTone
 	NOTINT,
 	GRAY,
 	REDBRON,
-
 	TOTAL_TONEMAPS,
 };
 
@@ -87,6 +86,7 @@ class Game
 	float currentBurnAmt = 0.f;
 	Mat44 m_toneMapTransform;
 	ColorTone m_currentToneMap = ColorTone::NOTINT;
+	float m_colorPower = 1.f;
 
 public:
 
