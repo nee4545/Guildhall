@@ -57,8 +57,17 @@ public:
 	void SetLayer( Layers layer );
 	Layers GetLayer();
 
-	void SetUserData( std::string keyName , void* value );
-	void* GetUserData( std::string keyName );
+	template<typename T>
+	void SetUserData( std::string keyName , T value )
+	{
+		m_userData.SetValue( keyName , T );
+	}
+
+	template<typename T>
+	T GetUserData( std::string keyName , T defaultVaule )
+	{
+		return m_userData.GetValue( keyName , defaultVaule );
+	}
 
 private: 
 
