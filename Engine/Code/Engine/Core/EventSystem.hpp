@@ -13,7 +13,7 @@ struct MethodSubscriptions
 public:
 	std::string eventName;
 	void* objId = nullptr;
-	std::function<EventCallBackFunction(EventArgs)> func = nullptr;
+	std::function<bool(EventArgs&)> func = nullptr;
 };
 
 struct EventSubscription
@@ -41,12 +41,31 @@ public:
 		MethodSubscriptions* newSubscription = new MethodSubscriptions();
 		newSubscription->eventName = eventName;
 		newSubscription->objId = obj;
-		newSubscription->func = [ = ] ( EventArgs args ) { ( obj->*mcb )( args ); };
+		newSubscription->func = [ = ] ( EventArgs& args ) -> bool { return ( obj->*mcb )( args ); };
 
 		m_methodSubscriptions.push_back( newSubscription );
 	};
-};
 
+	template<typename OBJ_TYPE>
+	void UnsubscribeMethod( const std::string& eventName , OBJ_TYPE *obj )
+	{
+		for ( int i = 0; i < m_methodSubscriptions.size(); i++ )
+		{
+			if ( m_methodSubscriptions[ i ] != nullptr )
+			{
+				if ( m_methodSubscriptions[ i ]->eventName == eventName )
+				{
+					if ( m_methodSubscriptions[ i ]->objId == obj )
+					{
+						delete m_methodSubscriptions[ i ];
+						m_methodSubscriptions[ i ] = nullptr;
+					}
+				}
+			}
+		}
+	}
+
+};
 
 
 

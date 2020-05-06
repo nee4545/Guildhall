@@ -91,6 +91,17 @@ bool CollissionStayEvent( EventArgs& args )
 	return false;
 }
 
+class X
+{
+public:
+	bool SomeMethod( EventArgs& args )
+	{
+		UNUSED( args );
+		return false;
+	}
+};
+
+
 
 Game::Game()
 {
@@ -104,6 +115,11 @@ Game::Game()
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 2.5f );
 
+	X gg = X();
+
+	g_theEventSystem.SubscribeToMethod( "gg" , &gg , &X::SomeMethod );
+	g_theEventSystem.UnsubscribeMethod( "gg" , &gg );
+	g_theEventSystem.FireEvent( "gg" , g_gameConfigBlackboard );
 
 	//g_theEventSystem.SubscribeToMethod( "gg" , &d , &Dummy::something );
 	
