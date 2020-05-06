@@ -200,7 +200,7 @@ public:
 	bool m_isDrawing = false;
 	lights_data m_lights;
 
-	Camera m_effectCamera;
+	Camera* m_effectCamera;
 	Camera* m_currentCamera = nullptr;
 
 public:

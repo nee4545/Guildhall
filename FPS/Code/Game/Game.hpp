@@ -38,6 +38,15 @@ struct Dissolve
 	float  burnAmount;
 };
 
+enum ColorTone
+{
+	NOTINT,
+	GRAY,
+	REDBRON,
+
+	TOTAL_TONEMAPS,
+};
+
 class Game
 {
 	RandomNumberGenerator rng;
@@ -76,7 +85,8 @@ class Game
 	Fresnal fresnalData;
 	Dissolve dissolveData;
 	float currentBurnAmt = 0.f;
-	
+	Mat44 m_toneMapTransform;
+	ColorTone m_currentToneMap = ColorTone::NOTINT;
 
 public:
 
@@ -90,6 +100,7 @@ public:
 	bool paused = false;
 	bool isDebugging = false;
 	bool isBloomOn = false;
+	bool isColorToneOn = false;
 
 	void Update( float deltaseconds );
 	void Render();
@@ -112,4 +123,5 @@ public:
 	void ToggleLights();
 	void ToggleLightTypes();
 	void ToggleBloom();
+	void ToggleColorTone();
 };

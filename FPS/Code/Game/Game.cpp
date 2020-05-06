@@ -243,6 +243,8 @@ void Game::Update( float deltaseconds )
 	ToggleLights();
 	ToggleLightTypes();
 	ToggleBloom();
+	ToggleColorTone();
+
 	if ( g_theConsole.IsOpen() )
 	{
 		return;
@@ -465,7 +467,20 @@ void Game::Render()
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
 	}
-		g_theRenderer->CopyTexture( backBuffer , colorTarget );
+
+	if ( isColorToneOn )
+	{
+		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+		g_theRenderer->CopyTexture( currentView , backBuffer );
+		Shader* color = g_theRenderer->GetOrCreateShader( "Data/Shaders/colorTone.hlsl" );
+		g_theRenderer->StartEffect( toneMapTarget , currentView , color );
+		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
+		g_theRenderer->EndEffect();
+		g_theRenderer->CopyTexture( backBuffer , toneMapTarget );
+		g_theRenderer->ReleaseRenderTarget( currentView );
+		g_theRenderer->ReleaseRenderTarget( toneMapTarget );
+	}
 		g_theRenderer->ReleaseRenderTarget( bloomTarget );
 		g_theRenderer->ReleaseRenderTarget( colorTarget );
 
@@ -965,4 +980,49 @@ void Game::ToggleBloom()
 	{
 		isBloomOn = !isBloomOn;
 	}
+}
+
+void Game::ToggleColorTone()
+{
+	if ( g_theInput->WasKeyJustPressed( 0x72 ) )
+	{
+		isColorToneOn = !isColorToneOn;
+	}
+	if ( g_theInput->WasKeyJustPressed( 0x26 ) )
+	{
+		m_currentToneMap = ColorTone( ( m_currentToneMap + 1 ) % ColorTone::TOTAL_TONEMAPS );
+	}
+	if ( g_theInput->WasKeyJustPressed( 0x28 ) )
+	{
+		m_currentToneMap = ColorTone( ( m_currentToneMap - 1 ) );
+
+		if ( m_currentToneMap < 0 )
+		{
+			m_currentToneMap = ColorTone( ColorTone::TOTAL_TONEMAPS - 1 );
+			return;
+		}
+
+		m_currentToneMap = ColorTone( m_currentToneMap % ColorTone::TOTAL_TONEMAPS );
+	}
+	switch ( m_currentToneMap )
+	{
+	case ColorTone::NOTINT:
+	{
+		Mat44 temp;
+		m_toneMapTransform = temp;
+	}break;
+	case ColorTone::GRAY:
+	{
+		Vec3 grayScale = Vec3( 0.2126f , 0.7152f , 0.0722f );
+		m_toneMapTransform.SetBasisVectors3D( grayScale , grayScale , grayScale );
+	}break;
+	case ColorTone::REDBRON:
+	{
+		Vec3 newRed = Vec3( 0.393f , 0.769f , 0.189f );
+		Vec3 newGreen = Vec3( 0.394f , 0.686f , 0.168f );
+		Vec3 newBlue = Vec3( 0.272f , 0.534f , 0.131f );
+		m_toneMapTransform.SetBasisVectors3D( newRed , newGreen , newBlue );
+	}break;
+	}
+	
 }

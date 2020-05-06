@@ -787,10 +787,14 @@ void RenderContext::Startup( Window* window )
 	CreateBlendStates();
 	g_theBitMapFont = CreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
+	m_effectCamera = new Camera();
 }
 
 void RenderContext::Shutdown()
 {
+	delete m_effectCamera;
+	m_effectCamera = nullptr;
+
 	GUARANTEE_OR_DIE( m_renderTargetPool.size() == m_renderTargetPoolSize , "Someone Did not release a Render Target " );
 
 	for ( auto& renderTargetIndex : m_renderTargetPool )
@@ -1251,8 +1255,8 @@ void RenderContext::CopyTexture( Texture* destination , Texture* source )
 
 void RenderContext::StartEffect( Texture* destination , Texture* source , Shader* shader )
 {
-	m_effectCamera.SetColorTarget( destination );
-	BeginCamera( m_effectCamera );
+	m_effectCamera->SetColorTarget( destination );
+	BeginCamera( *m_effectCamera );
 	BindShader( shader );
 	BindTexture( source );
 }
@@ -1261,7 +1265,7 @@ void RenderContext::EndEffect()
 {
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	Draw( 3 , 0 );
-	EndCamera( m_effectCamera );
+	EndCamera( *m_effectCamera );
 }
 
 void RenderContext::CreateBlendStates()

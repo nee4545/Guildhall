@@ -74,6 +74,9 @@
     <FxCompile Include="..\..\Run\Data\Shaders\dissolve.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\colorTone.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\XML\dissolve.xml">
