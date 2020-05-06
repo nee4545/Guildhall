@@ -5,8 +5,8 @@ C29.SD2.A09 Render Targets
 ## Tasks
 - [x] `NamedProperties`
     - [x] Switch `EventArgs` to use `NamedProperties` instead `NamedStrings`
-- [ ] Add ability to subscribe methods to your event system. 
-- [ ] Add ability to unsubscribe an object from the event system (unsubscribes all methods on that object)
+- [X] Add ability to subscribe methods to your event system. 
+- [X] Add ability to unsubscribe an object from the event system (unsubscribes all methods on that object)
 
 - [x] Color Transform (ex: Grayscale) Effect
     - [x] Create/Recycle a color target matching your swapchain's output.
