@@ -60,7 +60,7 @@ public:
 	template<typename T>
 	void SetUserData( std::string keyName , T value )
 	{
-		m_userData.SetValue( keyName , T );
+		m_userData.SetValue( keyName , value );
 	}
 
 	template<typename T>

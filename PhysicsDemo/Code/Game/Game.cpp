@@ -296,6 +296,23 @@ void Game::PopulateInitialObjects()
 	sub.eventName = "TriggerStay";
 	obj3->m_rigidbody->m_collider->AddEventToTriggerStay( sub );
 	m_gameObjects.push_back( obj3 );
+
+
+	GameObject* obj4 = new GameObject();
+	obj4->m_rigidbody = physicsSystem->CreateRigidbody();
+	obj4->m_rigidbody->SetPosition( Vec2( 50.f , 50.f ) );
+
+	DiscCollider2D* collider4 = physicsSystem->CreateDiscCollider( Vec2( 0.f , 0.f ) , 5.f );
+	obj4->m_rigidbody->TakeCollider( collider4 );
+	obj4->m_rigidbody->m_collider->CalculateMoment();
+	obj4->m_rigidbody->SetLayer( LAYER_1 );
+	physicsSystem->SetLayerInteraction( LAYER_DEFAULT , LAYER_1 , true );
+
+	obj4->m_rigidbody->SetUserData( "Num" , 35.f );
+	float userData = obj4->m_rigidbody->GetUserData( "Num" , 0.f );
+	g_theConsole.PrintString( Rgba8( 100 , 100 , 100 , 255 ) , "UserData From RigidBody" + std::to_string( userData ) );
+
+	m_gameObjects.push_back( obj4 );
 }
 
 
