@@ -2,6 +2,7 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/Vec4.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 struct Mat44
 {
@@ -80,7 +81,7 @@ struct Mat44
 	static const Mat44 CreateUniformScale3D(float uniformScale3D);
 	static const Mat44 CreateNonUniformScale3D(const Vec3& scaleFactorsXYZ);
 
-	static const Mat44 CreateFromScaleRotationPosition( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position );
+	static const Mat44 CreateFromScaleRotationPosition( const Vec3& scale , float pitch, float yaw, float roll , const Vec3& position , Convensions convention = CONVENTION_XRIGHT_YUP_ZBACK);
 
 	//projection
 	static const Mat44 CreateOrthographicProjection( const Vec3& min , const Vec3& max );

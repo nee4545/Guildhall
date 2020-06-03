@@ -5,10 +5,13 @@
 constexpr int MAX_XBOX_CONTROLLERS=4;
 constexpr int MAX_KEYBOARD_STATES=256;
 
+constexpr int F1 = 0x70;
 constexpr int F5 = 0x74;
 constexpr int F6 = 0x75;
 constexpr int F7 = 0x76;
 constexpr int F8 = 0x77;
+constexpr int SHIFT = 0x10;
+constexpr int ESC = 0x1B;
 
 enum eMousePositionMode
 {

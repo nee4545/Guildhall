@@ -11,9 +11,9 @@ class RenderContext;
 
 enum  eCameraClearBitFlag : unsigned int
 {
-	CLEAR_COLOR_BIT =(1 << 0),
-	CLEAR_DEPTH_BIT =(1 << 1 ),
-	CLEAR_STENCIL_BIT =(1 << 2 )
+	CLEAR_COLOR_BIT = ( 1 << 0 ) ,
+	CLEAR_DEPTH_BIT = ( 1 << 1 ) ,
+	CLEAR_STENCIL_BIT = ( 1 << 2 )
 
 };
 
@@ -32,19 +32,20 @@ private:
 
 	Mat44 m_projection;
 	Mat44 m_view;
-	
+
 public:
 	unsigned int m_clearMode = 0;
 	Transform m_transform;
-	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
+	void SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight );
 	void SetOrthoGraphicProjection( float height , float nearZ = -1.f , float farZ = 1.f );
-	void SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip );
+	void SetProjectionPerspective( float fovDegrees , float aspect , float nearZClip , float farZClip );
 
 	Mat44 GetProjection();
-	void SetProjection(Mat44 newProjection);
+	void SetProjection( Mat44 newProjection );
 
 	Vec2 GetOrthoBottomLeft();
 	Vec2 GetOrthoTopRight();
+	Texture* GetColorTarget() const;
 	void SetOutputsize( Vec2 size );
 	float GetCameraHeight();
 	void SetPosition( Vec2 position );
@@ -54,34 +55,29 @@ public:
 	void SetProjectionOrthographic( float height , float nearZ = -1.f , float farZ = 1.f );
 	float GetAspectRatio() const;
 
-	void Translate2D(Vec2 translation2D);
-	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth=0.f , unsigned int stencil=0.f );
+	void Translate2D( Vec2 translation2D );
+	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0.f );
 
 	void SetPosition( const Vec3& position );
 	void Translate( const Vec3& translation );
 	void CreateDepthStencilTarget( RenderContext* ctx );
 
 	Rgba8 GetClearColor() const;
-	RenderBuffer* UpdateAndGetUBO(RenderContext* ctx );
-	Vec2 ClientToWordPosition2D( Vec2 clientPos,float ndcZ=0 );
+	RenderBuffer* UpdateAndGetUBO( RenderContext* ctx );
+	Vec2 ClientToWordPosition2D( Vec2 clientPos , float ndcZ = 0 );
 	Vec3 ClientToWorldPosition( Vec2 clientPos , float ndcZ = 0 );
 	Mat44 GetViewMatrix();
 
-	Texture*		 GetColorTarget() const;
-	Texture*		 GetColorTarget( int index ) const;
-	unsigned int	 GetColorTargetCount() const;
-	Vec2			 GetColorTargetSize() const;
-	void			 SetColorTarget( Texture* texture );
-	void			 SetColorTarget( int index , Texture* texture );
+
 
 	Camera()
 	{
-		bottom_Left=Vec2(0.0f,0.0f);
-		top_Right=Vec2(0.0f,0.0f);
+		bottom_Left = Vec2( 0.0f , 0.0f );
+		top_Right = Vec2( 0.0f , 0.0f );
 	}
 
 	~Camera();
 
-	std::vector< Texture* > m_texture;
-	Texture*		m_backBuffer = nullptr;
+	Texture* m_texture = nullptr;
+	Texture* m_backBuffer = nullptr;
 };

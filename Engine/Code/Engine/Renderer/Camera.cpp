@@ -5,35 +5,31 @@
 #include "Engine/Core/Texture.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Math/Mat44.hpp"
-#include "Game/GameCommon.hpp"
 #define UNUSED(x) (void)(x);
 
-extern  RenderContext* g_theRenderer;
-
-void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
+void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 {
 	/*this->bottom_Left.x = bottomLeft.x;
 	this->bottom_Left.y = bottomLeft.y;
 	this->top_Right.x = topRight.x;
 	this->top_Right.y = topRight.y;*/
 
-	m_projection = Mat44::CreateOrthographicProjection(Vec3(bottomLeft,-100.f),Vec3(topRight,100.f));
-}	
+	m_projection = Mat44::CreateOrthographicProjection( Vec3( bottomLeft , -100.f ) , Vec3( topRight , 100.f ) );
+}
 
 void Camera::SetOrthoGraphicProjection( float height , float nearZ /*= -1.f */ , float farZ /*= 1.f */ )
 {
 	m_outpitsize.x = height * GetAspectRatio();
 	m_outpitsize.y = height;
 
-	m_projection = Mat44::CreateOrthographicProjection( Vec3( 0.f , 0.f, nearZ ) , Vec3( m_outpitsize  , farZ ) );
+	m_projection = Mat44::CreateOrthographicProjection( Vec3( 0.f , 0.f , nearZ ) , Vec3( m_outpitsize , farZ ) );
 }
 
-void Camera::SetProjectionPerspective( float fovDegrees ,float aspect, float nearZClip , float farZClip )
+void Camera::SetProjectionPerspective( float fovDegrees , float aspect , float nearZClip , float farZClip )
 {
 	m_projection = Mat44::CreatePerspectiveProjection( fovDegrees , aspect , nearZClip , farZClip );
-	
+
 }
 
 Mat44 Camera::GetProjection()
@@ -60,55 +56,12 @@ Vec2 Camera::GetOrthoTopRight()
 
 Texture* Camera::GetColorTarget() const
 {
-	if ( m_texture.size() == 0 )
+	if ( m_texture != nullptr )
 	{
-		return nullptr;
-	}
-	return m_texture[ 0 ];
-}
-
-Texture* Camera::GetColorTarget( int index ) const
-{
-	if ( index < m_texture.size() )
-	{
-		return m_texture[ index ];
-	}
-	else
-	{
-		return nullptr;
-	}
-}
-
-unsigned int Camera::GetColorTargetCount() const
-{
-	return ( unsigned int ) m_texture.size();
-}
-
-Vec2 Camera::GetColorTargetSize() const
-{
-	if ( m_texture[ 0 ] != nullptr )
-	{
-		return Vec2( m_texture[ 0 ]->GetDimensions() );
-	}
-	else
-	{
-		return Vec2( g_theRenderer->m_swapChain->GetBackBuffer()->GetDimensions() );
-	}
-}
-
-void Camera::SetColorTarget( Texture* texture )
-{
-	SetColorTarget( 0 , texture );
-}
-
-void Camera::SetColorTarget( int index , Texture* texture )
-{
-	if ( index >= m_texture.size() )
-	{
-		m_texture.resize( index + 1 );
+		return m_texture;
 	}
 
-	m_texture[ index ] = texture;
+	return nullptr;
 }
 
 void Camera::SetOutputsize( Vec2 size )
@@ -128,13 +81,13 @@ void Camera::SetPosition( Vec2 position )
 	m_transform.m_position.x = position.x;
 	m_transform.m_position.y = position.y;
 	SetOrthoViewForCameraPosition();
-	
+
 }
 
 void Camera::SetOrthoViewForCameraPosition()
 {
-	bottom_Left =  -m_outpitsize * 0.5f;
-	top_Right =  m_outpitsize * 0.5f;
+	bottom_Left = -m_outpitsize * 0.5f;
+	top_Right = m_outpitsize * 0.5f;
 	m_projection = Mat44::CreateOrthographicProjection( Vec3( bottom_Left , 0.f ) , Vec3( top_Right , 1.f ) );
 }
 
@@ -162,8 +115,8 @@ void Camera::Translate2D( Vec2 translation2D )
 void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth/*=0.f */ , unsigned int stencil/*=0.f */ )
 {
 	m_clearColor = color;
-	m_clearMode = (eCameraClearBitFlag)clearFlags;
-	m_clearStencil = (float)stencil;
+	m_clearMode = ( eCameraClearBitFlag ) clearFlags;
+	m_clearStencil = ( float ) stencil;
 	m_clearDepth = depth;
 }
 
@@ -184,7 +137,7 @@ void Camera::CreateDepthStencilTarget( RenderContext* ctx )
 	if ( m_backBuffer == nullptr )
 	{
 		Texture* dsTarget = new Texture();
-		IntVec2 textureDimensions = m_texture[0]->GetTexelSizeCoords();
+		IntVec2 textureDimensions = m_texture->GetTexelSizeCoords();
 		dsTarget->GetOrCreateDepthBuffer( textureDimensions , ctx );
 		m_backBuffer = dsTarget;
 	}
@@ -195,7 +148,7 @@ Rgba8 Camera::GetClearColor() const
 	return m_clearColor;
 }
 
-RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
+RenderBuffer* Camera::UpdateAndGetUBO( RenderContext* ctx )
 {
 	if ( m_cameraUBO == nullptr )
 	{
@@ -211,11 +164,11 @@ RenderBuffer* Camera::UpdateAndGetUBO(RenderContext* ctx )
 	cameraData.cameraPosition = m_transform.m_position;
 
 
-	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ));
+	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 	return m_cameraUBO;
 }
 
-Vec2 Camera::ClientToWordPosition2D( Vec2 clientPos,float ndcZ )
+Vec2 Camera::ClientToWordPosition2D( Vec2 clientPos , float ndcZ )
 {
 	Vec3 ndc;
 	ndc.x = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , clientPos.x );
@@ -262,7 +215,21 @@ Vec3 Camera::ClientToWorldPosition( Vec2 clientPos , float ndcZ /*= 0 */ )
 
 Mat44 Camera::GetViewMatrix()
 {
+	/*Mat44 model = m_transform.ToMatrix();
+	model.MatrixInvertOrthoNormal( model );
+	m_view = model;
+	return m_view;*/
+
 	Mat44 model = m_transform.ToMatrix();
+	Mat44 worldToEye;
+
+	if ( m_transform.m_convention == CONVENSION_XEAST_YNORTH_ZUP )
+	{
+		worldToEye.SetBasisVectors3D( Vec3( 0.f , 0.f , -1.f ) , Vec3( -1.f , 0.f , 0.f ) , Vec3( 0.f , 1.f , 0.f ) );
+	}
+
+	Mat44::MatrixTranspose( worldToEye );
+	model.TransformBy( worldToEye );
 	model.MatrixInvertOrthoNormal( model );
 	m_view = model;
 	return m_view;
@@ -274,7 +241,7 @@ Camera::~Camera()
 	m_cameraUBO = nullptr;
 
 	//delete m_texture;
-	//m_texture = nullptr;
+	m_texture = nullptr;
 
 	if ( m_backBuffer != nullptr )
 	{

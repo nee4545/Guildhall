@@ -1391,7 +1391,7 @@ void DebugRenderSystem::DebugRenderToScreen( Texture* output )
 	}
 	else
 	{
-		camera.m_texture[ 0 ] = output;
+		camera.m_texture = output;
 		Vec2 min = Vec2( 0.f , 0.f );
 		Vec2 max = Vec2( output->GetTexelSizeCoords() );
 		camera.SetOrthoView( min , max );

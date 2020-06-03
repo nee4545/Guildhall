@@ -400,22 +400,45 @@ const Mat44 Mat44::CreateOrthographicProjection( const Vec3& min , const Vec3& m
 	return Mat44( mat );
 }
 
-const Mat44 Mat44::CreateFromScaleRotationPosition( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position )
+const Mat44 Mat44::CreateFromScaleRotationPosition( const Vec3& scale , float pitch, float yaw, float roll , const Vec3& position, Convensions convention /*= CONVENTSION_DEFAULT*/ )
 {
 	Mat44 transform;
-	Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
-	Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
-	Mat44 tranformYaw = CreateYRotationDegrees( eulerRotation.y );
-	Mat44 tranformRoll = CreateZRotationDegrees( eulerRotation.z );
-	Mat44 translateBy = CreateTranslation3D( position );
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	transform.TransformBy( translateBy );
-	transform.TransformBy( tranformRoll );
-	transform.TransformBy( tranformYaw );
-	transform.TransformBy( tranformPitch );
-	transform.TransformBy( scaleMatrix );
+	if ( convention == CONVENTION_XRIGHT_YUP_ZBACK )
+	{
+		Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
+		Mat44 tranformPitch = CreateXRotationDegrees( pitch );
+		Mat44 tranformYaw = CreateYRotationDegrees( yaw );
+		Mat44 tranformRoll = CreateZRotationDegrees( roll );
+		Mat44 translateBy = CreateTranslation3D( position );
+
+		//--------------------------------------------------------------------------------------------------------------------------------------------
+		transform.TransformBy( translateBy );
+		transform.TransformBy( tranformRoll );
+		transform.TransformBy( tranformYaw );
+		transform.TransformBy( tranformPitch );
+		transform.TransformBy( scaleMatrix );
+	}
+
+	if ( convention == CONVENSION_XEAST_YNORTH_ZUP )
+	{
+		Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
+		Mat44 tranformPitch = CreateYRotationDegrees( pitch );
+		Mat44 tranformYaw = CreateZRotationDegrees( yaw );
+		Mat44 tranformRoll = CreateXRotationDegrees( roll );
+		Mat44 translateBy = CreateTranslation3D( position );
+
+		//--------------------------------------------------------------------------------------------------------------------------------------------
+		transform.TransformBy( translateBy );
+		transform.TransformBy( tranformRoll );
+		transform.TransformBy( tranformYaw );
+		transform.TransformBy( tranformPitch );
+		transform.TransformBy( scaleMatrix );
+	}
+
 	return transform;
 }
+
+
 
 const Mat44 Mat44::CreatePerspectiveProjection( float fovDegrees , float aspectRatio , float nearZ , float farZ )
 {
@@ -439,6 +462,8 @@ const Mat44 Mat44::CreatePerspectiveProjection( float fovDegrees , float aspectR
 void Mat44::MatrixTranspose( Mat44& mat )
 {
 	Mat44 temp;
+	//temp.SetBasisVectors3D( mat.GetIBasis3D() , mat.GetJBasis3D() , mat.GetKBasis3D() );
+
 	temp.Ix = mat.Ix;
 	temp.Iy = mat.Jx;
 	temp.Iz = mat.Kx;

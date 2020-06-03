@@ -328,6 +328,66 @@ m_uvTexCoords=uvTexCoords;
 	 }
  }
 
+ void AppendCuboidV2( std::vector<Vertex_PCU>& verts, std::vector<unsigned int>& indices , const AABB3 box , const Rgba8& tint )
+ {
+	 Vertex_PCU cuboidVerts[ 24 ] = {
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2(0.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2(1.f,0.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2(1.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2(0.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2(0.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2(1.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2(1.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2(0.f,1.f) ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2(0.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2(1.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2(1.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2(0.f,1.f) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2(0.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2(1.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2(1.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2(0.f,1.f) ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2(0.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2(1.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2(1.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2(0.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2(0.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2(1.f,0.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2(1.f,1.f) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2(0.f,1.f) ),
+	};
+
+
+	 for ( int index = 0; index < 24; index++ )
+	 {
+		 verts.push_back( cuboidVerts[ index ] );
+	 }
+
+	 unsigned int cuboidIndices[ 36 ] = {
+			0,1,2,
+			2,3,0,
+			4,5,6,
+			6,7,4,
+			8,9,10,
+			10,11,8,
+			12,13,14,
+			14,15,12,
+			16,17,18,
+			18,19,16,
+			20,21,22,
+			22,23,20,
+	 };
+
+	 for ( int i = 0; i < 36; i++ )
+	 {
+		 indices.push_back( cuboidIndices[ i ] );
+	 }
+
+ }
+
  buffer_attribute_t::buffer_attribute_t( char const* n , eBufferFormatType t , unsigned int offset )
  {
 	 name = n;
