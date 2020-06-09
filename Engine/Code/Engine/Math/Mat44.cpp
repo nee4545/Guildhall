@@ -398,6 +398,7 @@ const Mat44 Mat44::CreateOrthographicProjection( const Vec3& min , const Vec3& m
 					-sum.x / diff.x,    -sum.y / diff.y,-min.z / diff.z,   1.f };
 
 	return Mat44( mat );
+
 }
 
 const Mat44 Mat44::CreateFromScaleRotationPosition( const Vec3& scale , float pitch, float yaw, float roll , const Vec3& position, Convensions convention /*= CONVENTSION_DEFAULT*/ )

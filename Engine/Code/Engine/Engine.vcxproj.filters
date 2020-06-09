@@ -181,6 +181,7 @@
     <ClCompile Include="Core\NamedProperties.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\SpriteAnimDefTex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -715,6 +716,7 @@
     <ClInclude Include="Core\NamedProperties.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\SpriteAnimDefTex.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">

@@ -1,0 +1,8 @@
+<Material
+  
+	ShaderState   = "Data/XML/dissolveShaderState.xml"          
+>
+
+	<Texture texPath = "Data/Images/noise.png" bindSlot = "8 " />
+	<Sampler type    = "1" bindSlot = "0" />
+</Material>

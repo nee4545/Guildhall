@@ -1043,6 +1043,63 @@ const Vec2 GetNearestPointOnInfiniteLine2D( const Vec2& refPos, const Vec2& some
 	return result;
 }
 
+void GetClosestEdgeFromRefrerencePointOnAABB2( const Vec2& refPos , const AABB2& aabb , Vec2& outEdge1 , Vec2& outEdge2 )
+{
+	if ( refPos.x <= aabb.mins.x )
+	{
+		if ( refPos.y >= aabb.mins.y && refPos.y <= aabb.maxs.y )
+		{
+			outEdge1 = aabb.mins;
+			outEdge2 = Vec2( aabb.mins.x , aabb.maxs.y );
+		}
+		else if ( refPos.y < aabb.mins.y )
+		{
+			outEdge1 = aabb.mins;
+			outEdge2 = Vec2( aabb.maxs.x , aabb.mins.y );
+		}
+		else
+		{
+			outEdge1 = Vec2( aabb.mins.x , aabb.maxs.y );
+			outEdge2 = aabb.maxs;
+		}
+
+	}
+
+	if ( refPos.x >= aabb.maxs.x )
+	{
+		if ( refPos.y >= aabb.mins.y && refPos.y <= aabb.maxs.y )
+		{
+			outEdge1 = Vec2(aabb.maxs.x,aabb.mins.y);
+			outEdge2 = aabb.maxs;
+		}
+		else if ( refPos.y < aabb.mins.y )
+		{
+			outEdge1 = aabb.mins;
+			outEdge2 = Vec2( aabb.maxs.x , aabb.mins.y );
+		}
+		else
+		{
+			outEdge1 = Vec2( aabb.mins.x , aabb.maxs.y );
+			outEdge2 = aabb.maxs;
+		}
+	}
+
+	if ( refPos.x >= aabb.mins.x && refPos.x <= aabb.maxs.x )
+	{
+		if ( refPos.y <= aabb.mins.y )
+		{
+			outEdge1 = aabb.mins;
+			outEdge2 = Vec2( aabb.maxs.x , aabb.mins.y );
+		}
+		else
+		{
+			outEdge1 = Vec2( aabb.mins.x , aabb.maxs.y );
+			outEdge2 = aabb.maxs;
+		}
+	}
+
+}
+
 Vec3 GetSphericalCoordinates( float theta , float phi , float r )
 {
 	Vec3 toReturn;
