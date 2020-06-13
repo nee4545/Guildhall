@@ -41,6 +41,7 @@ public:
 	void CarveBoxOffRight( float fractionOfWidth , float additionalWidth = 0.f );
 	void CarveBoxOffTop( float fractionOfHeight , float additionalHeight = 0.f );
 	void CarveBoxOffBottom( float fractionOfHeight , float additionalHeight = 0.f );
+	AABB2 GetPercentageOfAABB( float percentage );
 
 
 

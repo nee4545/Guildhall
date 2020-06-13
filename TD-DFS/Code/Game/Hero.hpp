@@ -2,16 +2,27 @@
 #include "Game/Entity.hpp"
 
 class Texture;
+class Timer;
 
 class Hero :public Entity
 {
 public:
 	Vertex_PCU m_vertices[ 6 ];
 	Vertex_PCU m_vertices_original[ 6 ];
-	float m_time = 0.f;
 
-	bool isAttacking = false;
-	bool isRunning = true;
+	float m_time = 0.f;
+	float m_speed = 5.f;
+	float m_attackSpeed = 1.f;
+	float m_damage = 1.f;
+	float m_animationSpeed = 1.f;
+
+	Timer* m_attackTimer = nullptr;
+
+	bool isAttacking = true;
+	bool isRunning = false;
+
+
+	Hero* m_heroToAttack = nullptr;
 
 	Faction m_faction = FACTION_GOOD;
 	Upgrade m_upgrade = UPGRADE_NONE;
@@ -22,8 +33,12 @@ public:
 	virtual void Render() override;
 	virtual void Die() override;
 
+	void TakeDamage( float damageAmt );
+
 	void DebugRender();
 	void ResetVertices();
 	Texture* GetTextureBasedOnCurrentState();
 
+	void PopulateHeroStatesBasedOnUpgrade();
+	void GetHeroToAttack();
 };

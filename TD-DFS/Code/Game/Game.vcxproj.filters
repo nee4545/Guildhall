@@ -31,6 +31,12 @@
     <ClCompile Include="Tower.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="HUD.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="RangeHero.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -44,6 +50,8 @@
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Hero.hpp" />
     <ClInclude Include="Tower.hpp" />
+    <ClInclude Include="HUD.hpp" />
+    <ClInclude Include="RangeHero.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Run\Data\Shaders\constantbuffers.hlsl">

@@ -10,6 +10,10 @@
 class GPUMesh;
 class SpriteAnimDefTex;
 class Hero;
+class Timer;
+class Clock;
+class HUD;
+class RangeHero;
 
 struct LayeredObject
 {
@@ -22,6 +26,8 @@ struct LayeredObject
 
 class Game
 {
+	friend class Hero;
+
 	RandomNumberGenerator m_rng;
 	mutable Camera* m_camera = nullptr;
 	Camera* m_devConsoleCamera = nullptr;
@@ -32,9 +38,12 @@ class Game
 
 
 	std::vector<Vertex_PCU> m_basisVerts;
-	std::vector<Hero*> m_Heros;
+	std::vector<Hero*> m_playerMeleeHeros;
+	std::vector<Hero*> m_enemyHeros;
+	std::vector<RangeHero*> m_playerRangeHeros;
 
 	SoundID testSound;
+	Texture* m_guiBackround;
 
 	//Textures
 public:
@@ -55,6 +64,48 @@ public:
 	SpriteAnimDefTex* m_PlayerUpgrade3MeleeAttack;
 	SpriteAnimDefTex* m_PlayerUpgrade3MeleeRun;
 
+	SpriteAnimDefTex* m_PlayerUpgrade0RangeRun;
+	SpriteAnimDefTex* m_PlayerUpgade0RangeAttack;
+	SpriteAnimDefTex* m_PlayerUpgrade1RangeRun;
+	SpriteAnimDefTex* m_PlayerUpgade1RangeAttack;
+	SpriteAnimDefTex* m_PlayerUpgrade2RangeRun;
+	SpriteAnimDefTex* m_PlayerUpgrade2RangeAttack;
+	SpriteAnimDefTex* m_PlayerUpgrade3RangeRun;
+	SpriteAnimDefTex* m_PlayerUpgrade3RangeAttack;
+
+
+	SpriteAnimDefTex* m_EnemyUpgrade0MeleeRun;
+	SpriteAnimDefTex* m_EnemyUpgrade0MeleeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade1MeleeRun;
+	SpriteAnimDefTex* m_EnemyUpgrade1MeleeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade2MeleeRun;
+	SpriteAnimDefTex* m_EnemyUpgrade2MeleeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade3MeleeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade3MeleeRun;
+
+	SpriteAnimDefTex* m_EnemyUpgrade0RangeRun;
+	SpriteAnimDefTex* m_EnemyUpgrade0RangeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade1RangeRun;
+	SpriteAnimDefTex* m_EnemyUpgrade1RangeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade2RangeRun;
+	SpriteAnimDefTex* m_EnemyUpgrade2RangeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade3RangeAttack;
+	SpriteAnimDefTex* m_EnemyUpgrade3RangeRun;
+
+
+	/*AABB2 MeleeHeroBox;
+	AABB2 MeleeHeroCostBox;
+	AABB2 MeleeHeroUpgradeBox;
+	AABB2 MeleeHeroUpgradeCostBox;*/
+
+	AABB2 temp;
+	AABB2 a;
+
+	
+	HUD* m_meleeHeroHud = nullptr;
+	HUD* m_rangeHeroHud = nullptr;
+
+
 public:
 
 	Game();
@@ -73,7 +124,14 @@ public:
 	void DisplayUI();
 	void SoundTest();
 	void DisplayMouseInfo();
-	void LoadAnimations();
+	void LoadPlayerMeleeAnimations();
+	void LoadEnemyMeleeAnimations();
+	void LoadPlayerRangeAnimations();
+	void LoadEnemyRangeAnimations();
 	
-	void CreateMeleeHeros( Faction faction , Upgrade upg , Lanes lane);
+	void MeleeHeroTest( Faction faction , Upgrade upg , Lanes lane);
+	void RangeHeroTest( Faction faction , Upgrade upg , Lanes lane );
+	void DeleteGarbageEntities();
+	void CreateHUD();
+	void DetectPlayerActions();
 };

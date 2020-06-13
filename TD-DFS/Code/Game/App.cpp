@@ -23,6 +23,7 @@ void App:: Startup()
 	g_theRenderer->Startup(g_theWindow);
 	g_theRenderer->BeginFrame();
 	g_theWindow->SetInputSysten( g_theInput );
+	Clock::SystemStartup();
 	if ( g_theAudio == nullptr )
 	{
 		g_theAudio = new AudioSystem();
@@ -33,7 +34,6 @@ void App:: Startup()
 	}
 	g_theConsole.Startup();
 
-	Clock::SystemStartup();
 
 	DebugRenderSystem::sDebugRenderer->SystemStartUp();
 }

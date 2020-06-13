@@ -310,6 +310,20 @@ void AABB2::CarveBoxOffBottom( float fractionOfHeight , float additionalHeight /
 	*this = newAAbb;
 }
 
+AABB2 AABB2::GetPercentageOfAABB( float percentage )
+{
+	AABB2 toReturn;
+	Vec2 dimenstions = GetDimensions();
+	float width = percentage * dimenstions.x;
+	float height = percentage * dimenstions.y;
+
+	toReturn.mins = Vec2( 0.f , 0.f );
+	toReturn.maxs = Vec2( width , height );
+	toReturn.SetCenter( GetCenter() );
+
+	return toReturn;
+}
+
 void AABB2::operator=( const AABB2& assignFrom )
 {
 	mins=assignFrom.mins;
