@@ -34,12 +34,14 @@ public:
 
 	void ResetGame();
 
+	int GetFPS();
+
 	
 private:
 
 	bool m_isQuitting=false;
 	
-	Game* thegame=nullptr;
+	//Game* thegame=nullptr;
 
 	
 };

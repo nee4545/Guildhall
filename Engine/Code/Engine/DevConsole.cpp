@@ -72,6 +72,17 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 
 }
 
+void DevConsole::PrintError( const std::string& errorMessage )
+{
+	ColoredLine newLine;
+	newLine.lineColor = Rgba8( 255 , 0 , 0 , 255 );
+	newLine.text = errorMessage;
+
+	m_lines.push_back( newLine );
+
+	SetIsOpen( true );
+}
+
 void DevConsole::Render( RenderContext& renderer , Camera& camera , float textSize , float lineHeight ) const
 {
 
@@ -512,6 +523,8 @@ void DevConsole::InitializeCommands()
 	m_commands.push_back( "debug_add_world_billboardtext" );
 	m_commands.push_back( "debug_add_screen_text" );
 	m_commands.push_back( "light_set_ambient_color" );
+	m_commands.push_back( "maps" );
+	m_commands.push_back( "map" );
 
 }
 

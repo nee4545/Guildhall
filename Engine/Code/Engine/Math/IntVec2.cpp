@@ -124,6 +124,12 @@ const IntVec2 IntVec2::operator*( const IntVec2& vecToMultiply ) const
 void IntVec2::SetFromText( const char* asText )
 {
 	std::vector< std::string > splitStrings = SplitStringOnDelimiter( asText, ',' );
+
+	if ( splitStrings.size() == 1 )
+	{
+		splitStrings = SplitStringOnDelimiter( asText , '~' );
+	}
+
 	GUARANTEE_OR_DIE( splitStrings.size() == 2, Stringf( "Vec2 can't construct from improper string \"%s\"", asText ) );
 	x = atoi( splitStrings[0].c_str() );
 	y = atoi( splitStrings[1].c_str() );

@@ -21,6 +21,11 @@ public:
 	template <typename VERTEX_TYPE>
 	void UpdateVertices( unsigned int vcount , VERTEX_TYPE const* vertices )
 	{
+		if ( vcount == 0 )
+		{
+
+		}
+
 		m_vertices->m_attribute = VERTEX_TYPE::LAYOUT;
 		m_vertices->m_stride = sizeof( VERTEX_TYPE );
 		UpdateVertices( vcount , vertices , sizeof( VERTEX_TYPE ) , VERTEX_TYPE::LAYOUT );

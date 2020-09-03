@@ -11,6 +11,7 @@ public:
 		float durationSeconds );
 
 	Texture* GetSpriteTextureAtTime( float seconds ) const;
+	void SetAnimationDuration( float duration );
 	std::vector <Texture*> m_animations;
 
 private:

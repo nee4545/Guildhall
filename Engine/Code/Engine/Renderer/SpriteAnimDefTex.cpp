@@ -13,3 +13,8 @@ Texture* SpriteAnimDefTex::GetSpriteTextureAtTime( float seconds ) const
 	int index = ( int ) ( fmod( seconds , m_durationSeconds ) / interval ) + m_startSpriteIndex;
 	return m_animations[ index ];
 }
+
+void SpriteAnimDefTex::SetAnimationDuration( float duration )
+{
+	m_durationSeconds = duration;
+}

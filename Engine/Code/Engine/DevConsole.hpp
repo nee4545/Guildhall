@@ -27,6 +27,7 @@ public:
 	void Update( float deltaSeconds );
 
 	void PrintString( const Rgba8& textColor , const std::string& devConsolePrintString );
+	void PrintError( const std::string& errorMessage );
 	void Render( RenderContext& renderer , Camera& camera , float textSize , float lineHeight ) const;
 	void ProcessInput();
 	void HandleCarrotChanges();

@@ -6,6 +6,9 @@ constexpr int MAX_XBOX_CONTROLLERS=4;
 constexpr int MAX_KEYBOARD_STATES=256;
 
 constexpr int F1 = 0x70;
+constexpr int F2 = 0x71;
+constexpr int F3 = 0x72;
+constexpr int F4 = 0x73;
 constexpr int F5 = 0x74;
 constexpr int F6 = 0x75;
 constexpr int F7 = 0x76;

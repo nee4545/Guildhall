@@ -120,6 +120,76 @@ m_uvTexCoords=uvTexCoords;
 	 }
  }
 
+ void AppendUVSPhere( unsigned int hCuts , unsigned int vCuts , std::vector<Vertex_PCU>& sphereVerts ,std::vector<unsigned int>& sphereIndices, float radius , Vec3 center , const Rgba8 color )
+ {
+
+	 float deltaTheta = 360.f / ( float ) hCuts;
+	 float deltaPhi = 180.f / ( float ) vCuts;
+	 for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
+	 {
+		 for ( float theta = -360.f; theta <= 0.0; theta += deltaTheta )
+		 {
+			 Vec3 currentCoordsNormal = GetSphericalCoordinates( theta , phi , radius );
+			 float u = RangeMapFloat( -360.f , 0.f , 0.f , 1.f , theta );
+			 float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
+
+			 Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoordsNormal , color , Vec2( u , v ) );
+			 sphereVerts.push_back( currentCoordVerts );
+		 }
+	 }
+
+	 for ( int hcutIndex = 0; hcutIndex < hCuts; hcutIndex++ )
+	 {
+		 for ( int vCutIndex = 0; vCutIndex < vCuts; vCutIndex++ )
+		 {
+			 int index0 = hcutIndex + ( ( hCuts + 1 ) * vCutIndex );
+			 int index1 = index0 + 1;
+			 int index2 = index0 + hCuts + 1;
+			 int index3 = index2 + 1;
+			 sphereIndices.push_back( index0 );
+			 sphereIndices.push_back( index1 );
+			 sphereIndices.push_back( index3 );
+			 sphereIndices.push_back( index0 );
+			 sphereIndices.push_back( index3 );
+			 sphereIndices.push_back( index2 );
+		 }
+	 }
+ }
+
+	 /*float deltaTheta = 360.f / ( float ) hCuts;
+	 float deltaPhi = 180.f / ( float ) vCuts;
+
+	 for ( float i = -90.f; i <= 90.f; i += deltaPhi )
+	 {
+		 for ( float j = -360.f; j <= 0.0; j += deltaTheta )
+		 {
+			 float cosTheta = CosDegrees( j );
+			 float sinTheta = SinDegrees( j );
+			 float cosPhi = CosDegrees( i );
+			 float sinPhi = SinDegrees( i );
+			 Vec3 normal;
+			 normal.x = cosPhi * cosTheta;
+			 normal.y = sinPhi;
+			 normal.z = -cosPhi * sinTheta;
+			 normal = normal.GetNormalized();
+			 Vec4 tangent;
+			 tangent.x = cosPhi * -sinTheta;
+			 tangent.y = 0.f;
+			 tangent.z = cosPhi * -cosTheta;
+			 tangent.w = 1.f;
+
+			 float u = RangeMapFloat( -360.f , 0.f , 0.f , 1.f , j );
+			 float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , i );
+
+			 Vertex_PCU verts = Vertex_PCU(
+				 center + ( normal * radius ) , color ,
+				 Vec2( 1.f , 1.f ) - Vec2( u , v ) );
+
+			 sphereVerts.push_back( verts );
+		 }
+	 }*/
+ 
+
  void AppendCyinder( std::vector<Vertex_PCU>& cylinderVerts , Vec3 start , Vec3 end , float startRadius , float endRadius , Rgba8 startColor , Rgba8 endColor )
  {
 	 Mat44 transformation = Mat44::LookAt( start , end );

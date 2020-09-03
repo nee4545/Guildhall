@@ -10,11 +10,14 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Core/Clock.hpp"
+#include "Engine/Core/Time.hpp"
+#include "Engine/JobSystem.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* input=nullptr;
 AudioSystem* g_theAudio = nullptr;
-
+Game* thegame = nullptr;
+JobSystem* g_theJobSystem = nullptr;
 
 
 void App:: Startup()
@@ -22,6 +25,8 @@ void App:: Startup()
 	g_theRenderer = new RenderContext();
 	g_theRenderer->Startup(g_theWindow);
 	g_theRenderer->BeginFrame();
+	g_theJobSystem = new JobSystem();
+	g_theJobSystem->StartUp();
 	g_theWindow->SetInputSysten( g_theInput );
 	if ( g_theAudio == nullptr )
 	{
@@ -53,6 +58,7 @@ void App::Shutdown() //Not used right now
 	DebugRenderSystem::sDebugRenderer->SystemShutDown();
 	
 	g_theRenderer->Shutdown();
+	g_theJobSystem->ShutDown();
 
 }
 
@@ -142,6 +148,7 @@ void App::BeginFrame()
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
+	g_theJobSystem->BeginFrame();
 	Clock::BeginFrame();
 	
 }
@@ -155,5 +162,17 @@ bool App::HandleQuitRequested()
 void App::ResetGame()
 {
 	
+}
+
+int App::GetFPS()
+{
+	static double timeLastFrameStarted = GetCurrentTimeSeconds();
+	double timethisFrameStarted = GetCurrentTimeSeconds();
+	double deltaseconds = timethisFrameStarted - timeLastFrameStarted;
+	int fps = ( int ) (1.0 / deltaseconds);
+	timeLastFrameStarted = timethisFrameStarted;
+
+	return fps;
+
 }
 

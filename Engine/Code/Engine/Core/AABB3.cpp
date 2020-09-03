@@ -21,3 +21,9 @@ AABB3::AABB3( float minX , float minY , float minZ , float maxX , float maxY , f
 	m_maxs.y = maxY;
 	m_maxs.z = maxZ;
 }
+
+void AABB3::Translate( Vec3 translation )
+{
+	m_mins += translation;
+	m_maxs += translation;
+}

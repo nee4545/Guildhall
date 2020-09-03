@@ -26,6 +26,7 @@
     <ClCompile Include="Core\EngineCommon.cpp" />
     <ClCompile Include="Core\ErrorWarningAssert.cpp" />
     <ClCompile Include="Core\EventSystem.cpp" />
+    <ClCompile Include="Core\FileUtils.cpp" />
     <ClCompile Include="Core\FloatRange.cpp" />
     <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\IntRange.cpp" />
@@ -49,6 +50,8 @@
     <ClCompile Include="Input\InputSystem.cpp" />
     <ClCompile Include="Input\KeyButtonState.cpp" />
     <ClCompile Include="Input\XboxController.cpp" />
+    <ClCompile Include="Job.cpp" />
+    <ClCompile Include="JobSystem.cpp" />
     <ClCompile Include="Math\IntVec2.cpp" />
     <ClCompile Include="Math\Mat44.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
@@ -96,6 +99,7 @@
     <ClInclude Include="Core\EngineCommon.hpp" />
     <ClInclude Include="Core\ErrorWarningAssert.hpp" />
     <ClInclude Include="Core\EventSystem.hpp" />
+    <ClInclude Include="Core\FileUtils.hpp" />
     <ClInclude Include="Core\FloatRange.hpp" />
     <ClInclude Include="Core\Image.hpp" />
     <ClInclude Include="Core\IntRange.hpp" />
@@ -120,6 +124,8 @@
     <ClInclude Include="Input\InputSystem.hpp" />
     <ClInclude Include="Input\KeyButtonState.hpp" />
     <ClInclude Include="Input\XboxController.hpp" />
+    <ClInclude Include="Job.hpp" />
+    <ClInclude Include="JobSystem.hpp" />
     <ClInclude Include="Math\IntVec2.hpp" />
     <ClInclude Include="Math\Mat44.hpp" />
     <ClInclude Include="Math\MathUtils.hpp" />
@@ -143,7 +149,6 @@
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\DebugRender.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />
-    <ClInclude Include="Renderer\Header.h" />
     <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\MeshUtils.hpp" />
     <ClInclude Include="Renderer\ObjFileLoader.hpp" />

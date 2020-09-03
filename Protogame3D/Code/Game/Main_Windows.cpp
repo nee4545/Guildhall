@@ -6,6 +6,7 @@
 #include "GameCommon.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Input/InputSystem.hpp"
 #define UNUSED(x) (void)(x);
 
 

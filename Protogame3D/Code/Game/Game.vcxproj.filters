@@ -11,6 +11,9 @@
     <Filter Include="NewFilter1">
       <UniqueIdentifier>{c00c5f98-c782-4f88-8032-798fe9d39fc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="World">
+      <UniqueIdentifier>{a896d236-5bcb-4d25-b87b-b51eba83aab9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -25,6 +28,36 @@
     <ClCompile Include="Game.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="MapMaterial.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="MapRegionType.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityDef.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="BillBoard.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Portal.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -33,9 +66,43 @@
     <ClInclude Include="GameCommon.hpp">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="Game.hpp" />
-    <ClInclude Include="Entity.hpp" />
-    <ClInclude Include="EngineBuildPreferences.hpp" />
+    <ClInclude Include="Entity.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="World.hpp">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.hpp">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="MapMaterial.hpp">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="MapRegionType.hpp">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.hpp">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDef.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="BillBoard.hpp" />
+    <ClInclude Include="Portal.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Run\Data\Shaders\constantbuffers.hlsl">
@@ -75,6 +142,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Run\Data\Shaders\colorTone.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\CustomShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -1,2 +1,0 @@
-<ShaderState Shader ="Data/Shaders/dissovle.hlsl">
-</ShaderState>

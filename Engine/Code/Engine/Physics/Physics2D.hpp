@@ -49,8 +49,7 @@ public:
 	void SetFixedStepTime( double newDt );
 
 public:
-	// add members you may need to store these
-	// storage for all rigid bodies
+	
 	std::vector<Rigidbody2D*>	m_rigidBodies2D;
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;

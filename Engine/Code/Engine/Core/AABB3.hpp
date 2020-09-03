@@ -19,4 +19,5 @@ public:
 
 
 	bool IsPointInside( const Vec2& point )const;
+	void Translate( Vec3 translation );
 };
