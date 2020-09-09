@@ -1,5 +1,6 @@
 #include "Game/Tile.hpp"
 #include "Game/GameCommon.hpp"
+#include "Engine/Core/AABB2.hpp"
 
 Tile::Tile( int tileX, int tileY, TileType tileType )
 {

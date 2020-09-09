@@ -1,6 +1,7 @@
 #include "Game/AirStrikePlane.hpp"
 #include "Game/Game.hpp"
 #include "Game/Map.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 AirStrikePlane::AirStrikePlane( Game* game, Vec2 position ):Entity(game,position)
 {

@@ -34,4 +34,5 @@ void AppendArrow( std::vector<Vertex_PCU>& arrowVerts , Vec3 start , Vec3 end ,f
 void AppendPolygon2(std::vector<Vertex_PCU>& verts,const Polygon2D* poly);
 void AppendCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< unsigned int >& cubeIndices , const AABB3 box , const Rgba8& tint );
 void TransformVertexArray( std::vector<Vertex_PCU>& vertices , float scale , float rotationDegrees , const Vec2& translation );
+void TransformVertexArray( int numVertices , Vertex_PCU* vertices , float scale , float rotationDegrees , const Vec2& translation );
 void AppendCuboidV2(std::vector<Vertex_PCU>& verts,std::vector<unsigned int>& indices, const AABB3 box, const Rgba8& tint);

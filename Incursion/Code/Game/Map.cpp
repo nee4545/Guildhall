@@ -10,6 +10,8 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Game/TileDefinition.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h> // must #include Windows.h before #including Xinput.h

@@ -61,6 +61,7 @@
     <ClCompile Include="Math\SmoothNoise.cpp" />
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
+    <ClCompile Include="Network\NetworkSystem.cpp" />
     <ClCompile Include="Platform\Window.cpp" />
     <ClCompile Include="Physics\Collider2D.cpp" />
     <ClCompile Include="Physics\DiscCollider2D.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Network\NetworkSystem.hpp" />
     <ClInclude Include="Platform\Window.hpp" />
     <ClInclude Include="Physics\Collider2D.hpp" />
     <ClInclude Include="Physics\Collision2D.hpp" />

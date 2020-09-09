@@ -3,6 +3,8 @@
 #include "Game/Game.hpp"
 #include "Game/World.hpp"
 #include "Game/Map.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 Player::Player( Game* game, Vec2 position ):Entity(game,position)
 {

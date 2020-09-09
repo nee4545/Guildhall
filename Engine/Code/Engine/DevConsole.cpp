@@ -14,6 +14,7 @@ extern BitmapFont* g_theBitMapFont;
 extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
 
+
 DevConsole::DevConsole()
 {
 

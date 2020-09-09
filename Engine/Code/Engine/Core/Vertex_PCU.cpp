@@ -398,6 +398,14 @@ m_uvTexCoords=uvTexCoords;
 	 }
  }
 
+ void TransformVertexArray( int numVertices , Vertex_PCU* vertices , float scale , float rotationDegrees , const Vec2& translation )
+ {
+	 for ( int index = 0; index < numVertices; index++ )
+	 {
+		 vertices[ index ].m_position = TransformPosition3DXY( vertices[ index ].m_position , scale , rotationDegrees , translation );
+	 }
+ }
+
  void AppendCuboidV2( std::vector<Vertex_PCU>& verts, std::vector<unsigned int>& indices , const AABB3 box , const Rgba8& tint )
  {
 	 Vertex_PCU cuboidVerts[ 24 ] = {

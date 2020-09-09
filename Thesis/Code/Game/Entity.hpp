@@ -3,6 +3,16 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include <string>
 
+enum PlayerStates
+{
+	IDLE_MELEE ,
+	MOVING_MELEE ,
+	ATTACKING_MELEE ,
+	IDLE_GUN,
+	MOVING_GUN,
+	ATTACKING_GUN,
+};
+
 
 class Entity
 {

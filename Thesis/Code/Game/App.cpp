@@ -12,21 +12,29 @@
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/JobSystem.hpp"
+#include "Engine/Network/NetworkSystem.hpp"
+#pragma comment(lib,"Ws2_32.lib")
 
 RenderContext* g_theRenderer = nullptr;
 AudioSystem* g_theAudio = nullptr;
 Game* thegame = nullptr;
 JobSystem* g_theJobSystem = nullptr;
-
+NetworkSystem* g_theNetwork = nullptr;
 
 void App:: Startup()
 {
 	g_theRenderer = new RenderContext();
 	g_theRenderer->Startup(g_theWindow);
-	g_theRenderer->BeginFrame();
+	//g_theRenderer->BeginFrame();
+
 	g_theJobSystem = new JobSystem();
 	g_theJobSystem->StartUp();
+
 	g_theWindow->SetInputSysten( g_theInput );
+
+	g_theNetwork = new NetworkSystem();
+	g_theNetwork->StartUp();
+
 	if ( g_theAudio == nullptr )
 	{
 		g_theAudio = new AudioSystem();

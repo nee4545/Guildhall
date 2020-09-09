@@ -18,18 +18,6 @@
     <ClCompile Include="Physics\DiscCollider2D.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Input\AnalogJoystick.cpp">
-      <Filter>EventSystem\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\XboxController.cpp">
-      <Filter>EventSystem\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\KeyButtonState.cpp">
-      <Filter>EventSystem\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\InputSystem.cpp">
-      <Filter>EventSystem\Input</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Clock.cpp">
       <Filter>ClockAndTime</Filter>
     </ClCompile>
@@ -195,9 +183,6 @@
     <ClCompile Include="Renderer\ObjFileLoader.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Platform\Window.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
     <ClCompile Include="Core\EventSystem.cpp">
       <Filter>EventSystem</Filter>
     </ClCompile>
@@ -206,6 +191,24 @@
     </ClCompile>
     <ClCompile Include="Math\Mat44.cpp">
       <Filter>Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\XboxController.cpp">
+      <Filter>InutSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\AnalogJoystick.cpp">
+      <Filter>InutSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\KeyButtonState.cpp">
+      <Filter>InutSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputSystem.cpp">
+      <Filter>InutSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Window.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\NetworkSystem.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -507,10 +510,6 @@
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="DevConsole.hpp" />
-    <ClInclude Include="Input\AnalogJoyStick.hpp" />
-    <ClInclude Include="Input\InputSystem.hpp" />
-    <ClInclude Include="Input\KeyButtonState.hpp" />
-    <ClInclude Include="Input\XboxController.hpp" />
     <ClInclude Include="Physics\Physics2D.hpp">
       <Filter>Physics</Filter>
     </ClInclude>
@@ -525,18 +524,6 @@
     </ClInclude>
     <ClInclude Include="Physics\DiscCollider2D.hpp">
       <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\AnalogJoyStick.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\XboxController.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\KeyButtonState.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\InputSystem.hpp">
-      <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Manifold2.hpp">
       <Filter>Physics</Filter>
@@ -703,72 +690,6 @@
     <ClInclude Include="Renderer\ObjFileLoader.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod.hpp">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_common.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_codec.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_dsp.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_errors.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_output.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\Camera.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteDefinition.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteAnimSet.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteAnimDefinition.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\RenderContext.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\Window.hpp">
-      <Filter>Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\BitmapFont.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RandomNumberGenerator.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteSheet.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\tinyxml2.h">
-      <Filter>XML</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vec3.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vec2.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vec4.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RawNoise.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\EventSystem.hpp">
       <Filter>EventSystem</Filter>
     </ClInclude>
@@ -777,6 +698,99 @@
     </ClInclude>
     <ClInclude Include="Math\Mat44.hpp">
       <Filter>Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\XboxController.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputSystem.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\AnalogJoyStick.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\KeyButtonState.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_output.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_errors.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_dsp.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_common.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_codec.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\XboxController.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\AnalogJoyStick.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\KeyButtonState.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputSystem.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Camera.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SpriteAnimSet.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SpriteDefinition.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SpriteSheet.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderContext.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SpriteAnimDefinition.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\BitmapFont.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\tinyxml2.h">
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vec4.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vec3.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vec2.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RawNoise.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RandomNumberGenerator.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\NetworkSystem.hpp">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1027,11 +1041,17 @@
     <Filter Include="DebugRender">
       <UniqueIdentifier>{6c58666e-a7ca-4f93-b34f-eea115a7af4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EventSystem\Input">
+      <UniqueIdentifier>{35500f1c-bfad-4998-9e06-ef4059ffa078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InutSystem">
+      <UniqueIdentifier>{0dee6aa2-908b-4622-82fc-bc356e92e760}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{3773b0fb-c43e-4788-b6a3-8114448dc54d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EventSystem\Input">
-      <UniqueIdentifier>{35500f1c-bfad-4998-9e06-ef4059ffa078}</UniqueIdentifier>
+    <Filter Include="Network">
+      <UniqueIdentifier>{ac737fe4-c50f-4c9d-b0ad-d0748578b6a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

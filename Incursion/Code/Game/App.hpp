@@ -4,7 +4,6 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 
-class Audio;
 class Game;
 
 class App
@@ -12,9 +11,9 @@ class App
 public:
 	App()
 	{
-		
+
 	};
-	~App(){};
+	~App();
 
 	void Startup();
 	void Shutdown();
@@ -28,20 +27,14 @@ public:
 	void BeginFrame();
 	void Update( float deltaSeconds );
 	void Render() const;
-
 	void EndFrame();
 
 	bool HandleQuitRequested();
-
 	void ResetGame();
+	int GetFPS();
 
-	
 private:
 
-	bool m_isQuitting=false;
-	
-	Game* thegame=nullptr;
+	bool m_isQuitting = false;
 
-
-	
 };

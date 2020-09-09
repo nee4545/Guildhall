@@ -1,28 +1,34 @@
 #pragma once
 #include "Engine/Renderer/RenderContext.hpp"
+#pragma once
+//#include "Engine/Renderer/RenderContext.hpp"
 #include "Game/App.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
-#define UNUSED(x) (void)(x);
+//#include "Engine/Input/InputSystem.hpp"
+//#include "Engine/Audio/AudioSystem.hpp"
 
-constexpr float CLIENT_ASPECT = 16.f/9.f; 
+class Window;
+class RenderContext;
+class InputSystem;
+class AudioSystem;
+class Game;
+
+constexpr float CLIENT_ASPECT = 2.f / 1.f;
 extern RenderContext* render;
 extern App* g_theapp;
+extern Window* g_theWindow;
 extern InputSystem* input;
 extern AudioSystem* audio;
+extern Game* thegame;
 
-//constexpr int NUM_STARTING_ASTEROIDS = 6;
-//constexpr int MAX_ASTEROIDS = 12;
-//constexpr int MAX_BULLETS = 20;
-//constexpr float ASTEROID_SPEED = 10.f;
-//constexpr float ASTEROID_PHYSICS_RADIUS = 1.6f;
-//constexpr float ASTEROID_COSMETIC_RADIUS = 2.0f;
-//constexpr float BULLET_LIFETIME_SECONDS = 2.0f;
-//constexpr float PLAYER_SHIP_ACCELERATION = 30.f;
-//constexpr float PLAYER_SHIP_TURN_SPEED = 300.f;
-//constexpr float PLAYER_SHIP_PHYSICS_RADIUS = 1.75f;
-//constexpr float PLAYER_SHIP_COSMETIC_RADIUS = 2.25f;
-//constexpr int MAX_BUGS=100; 
+enum eBillBoardType
+{
+	CAMERA_FACING_XY ,
+	CAMERA_OPPOSED_XY ,
+	CAMERA_OPPOSED_XYZ ,	// Screen Aligned.
+	CAMERA_FACING_XYZ ,
+};
+
+
 
 constexpr int WORLD_SIZE_X = 20;
 constexpr int WORLD_SIZE_Y = 30;

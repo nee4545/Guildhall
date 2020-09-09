@@ -8,6 +8,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{b75875a6-c29a-4a57-a32b-d1307a7be7c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{8ce05e28-3e8e-4cc6-ac62-db117fb5c9f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -21,6 +24,15 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SupportPlayer.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -38,6 +50,15 @@
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="SupportPlayer.hpp">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

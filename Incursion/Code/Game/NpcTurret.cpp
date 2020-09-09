@@ -3,6 +3,7 @@
 #include "Game/Game.hpp"
 #include "Game/Map.hpp"
 #include "Game/World.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 NpcTurret::NpcTurret( Game* game, Vec2 position ):Entity(game,position)
 {

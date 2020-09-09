@@ -9,14 +9,16 @@ class RenderContext;
 class InputSystem;
 class AudioSystem;
 class Game;
+class NetworkSystem;
 
-constexpr float CLIENT_ASPECT = 2.f/1.f; 
+constexpr float CLIENT_ASPECT = 16.f/9.f; 
 extern RenderContext* g_theRenderer;
 extern App* g_theapp;
 extern Window* g_theWindow;
 extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
 extern Game* thegame;
+extern NetworkSystem* g_theNetwork;
 
 enum eBillBoardType
 {
@@ -26,3 +28,4 @@ enum eBillBoardType
 	CAMERA_FACING_XYZ ,
 };
 
+constexpr float PLAYER_SPEED = 5.f;
