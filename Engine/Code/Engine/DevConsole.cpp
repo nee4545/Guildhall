@@ -526,6 +526,13 @@ void DevConsole::InitializeCommands()
 	m_commands.push_back( "light_set_ambient_color" );
 	m_commands.push_back( "maps" );
 	m_commands.push_back( "map" );
+	m_commands.push_back( "StartServer" );
+	m_commands.push_back( "Connect" );
+
+	m_commands.push_back( "SendServerMessage" );
+	m_commands.push_back( "SendClientMessage" );
+	m_commands.push_back( "StopServer" );
+	m_commands.push_back( "Disconnect" );
 
 }
 

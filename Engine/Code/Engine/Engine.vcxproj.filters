@@ -192,22 +192,47 @@
     <ClCompile Include="Math\Mat44.cpp">
       <Filter>Matrix</Filter>
     </ClCompile>
+    <ClCompile Include="Network\NetworkSystem.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\ImGuiSystem.cpp" />
     <ClCompile Include="Input\XboxController.cpp">
-      <Filter>InutSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\AnalogJoystick.cpp">
-      <Filter>InutSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\KeyButtonState.cpp">
       <Filter>InutSystem</Filter>
     </ClCompile>
     <ClCompile Include="Input\InputSystem.cpp">
       <Filter>InutSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Input\KeyButtonState.cpp">
+      <Filter>InutSystem</Filter>
+    </ClCompile>
     <ClCompile Include="Platform\Window.cpp">
       <Filter>Window</Filter>
     </ClCompile>
-    <ClCompile Include="Network\NetworkSystem.cpp">
+    <ClCompile Include="Input\AnalogJoystick.cpp">
+      <Filter>InutSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\IMGUI\imgui.cpp">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\IMGUI\imgui_demo.cpp">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\IMGUI\imgui_draw.cpp">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\IMGUI\imgui_impl_dx11.cpp">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\IMGUI\imgui_impl_win32.cpp">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\IMGUI\imgui_widgets.cpp">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\TCPServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\TCPClient.cpp">
       <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
@@ -702,52 +727,32 @@
     <ClInclude Include="Input\XboxController.hpp">
       <Filter>InutSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Input\InputSystem.hpp">
-      <Filter>InutSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\AnalogJoyStick.hpp">
-      <Filter>InutSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Input\KeyButtonState.hpp">
       <Filter>InutSystem</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_output.h">
-      <Filter>Audio</Filter>
+    <ClInclude Include="Input\InputSystem.hpp">
+      <Filter>InutSystem</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_errors.h">
-      <Filter>Audio</Filter>
+    <ClInclude Include="Network\NetworkSystem.hpp">
+      <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_dsp.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_common.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod_codec.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod.hpp">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\fmod\fmod.h">
-      <Filter>Audio</Filter>
+    <ClInclude Include="ThirdParty\ImGuiSystem.hpp" />
+    <ClInclude Include="Input\AnalogJoyStick.hpp">
+      <Filter>InutSystem</Filter>
     </ClInclude>
     <ClInclude Include="Input\XboxController.hpp">
       <Filter>InutSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Input\AnalogJoyStick.hpp">
+    <ClInclude Include="Input\InputSystem.hpp">
       <Filter>InutSystem</Filter>
     </ClInclude>
     <ClInclude Include="Input\KeyButtonState.hpp">
       <Filter>InutSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Input\InputSystem.hpp">
-      <Filter>InutSystem</Filter>
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Window</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\Camera.hpp">
+    <ClInclude Include="Renderer\SpriteAnimDefinition.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\SpriteAnimSet.hpp">
@@ -759,20 +764,8 @@
     <ClInclude Include="Renderer\SpriteSheet.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\RenderContext.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\SpriteAnimDefinition.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\BitmapFont.hpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="ThirdParty\tinyxml2.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\Window.hpp">
-      <Filter>Window</Filter>
+      <Filter>XML</Filter>
     </ClInclude>
     <ClInclude Include="Math\Vec4.hpp">
       <Filter>Core</Filter>
@@ -789,7 +782,73 @@
     <ClInclude Include="Math\RandomNumberGenerator.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Network\NetworkSystem.hpp">
+    <ClInclude Include="Renderer\RenderContext.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\AnalogJoyStick.hpp">
+      <Filter>InutSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\BitmapFont.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Camera.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_codec.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_common.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_dsp.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_errors.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmod\fmod_output.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imconfig.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imgui.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imgui_impl_dx11.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imgui_impl_win32.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imgui_internal.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imstb_rectpack.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imstb_textedit.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\IMGUI\imstb_truetype.h">
+      <Filter>ThirdParty\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\TCPServer.hpp">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\TCPClient.hpp">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\NetworkDefs.hpp">
       <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1052,6 +1111,9 @@
     </Filter>
     <Filter Include="Network">
       <UniqueIdentifier>{ac737fe4-c50f-4c9d-b0ad-d0748578b6a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\Imgui">
+      <UniqueIdentifier>{78d5f00d-a9d0-417f-92e1-35804cafc344}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

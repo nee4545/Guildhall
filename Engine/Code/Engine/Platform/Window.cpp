@@ -2,14 +2,20 @@
 #include <windows.h>			// #include this (massive, platform-specific) header in very few places
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/ThirdParty/ImGuiSystem.hpp"
+#include "Engine/ThirdParty/IMGUI/imgui.h"
 
 
 static TCHAR const* WND_CLASS_NAME = L"Simple Window Class";
+
+extern ImGuiSystem* g_theGUI;
+extern LRESULT ImGui_ImplWin32_WndProcHandler( HWND windowHandle , UINT wmMessageCode , WPARAM wParam , LPARAM lParam );
 
 static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UINT wmMessageCode , WPARAM wParam , LPARAM lParam )
 {
 	Window* window = ( Window* )::GetWindowLongPtr( windowHandle , GWLP_USERDATA );
 	
+	bool handled = ImGui_ImplWin32_WndProcHandler( windowHandle , wmMessageCode , wParam , lParam );
 
 	//ip->HandleKeyPressed((unsigned char)wParam);
 	switch ( wmMessageCode )
@@ -103,6 +109,14 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	}
 
 
+	}
+	if ( g_theGUI != nullptr )
+	{
+		const ImGuiIO& IO = ImGui::GetIO();
+		if ( handled || IO.WantCaptureMouse )
+		{
+			// DO nothing
+		}
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)

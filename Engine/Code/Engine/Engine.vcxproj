@@ -61,7 +61,14 @@
     <ClCompile Include="Math\SmoothNoise.cpp" />
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
-    <ClCompile Include="Network\NetworkSystem.cpp" />
+    <ClCompile Include="Network\NetworkSystem.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Network\TCPClient.cpp" />
+    <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Platform\Window.cpp" />
     <ClCompile Include="Physics\Collider2D.cpp" />
     <ClCompile Include="Physics\DiscCollider2D.cpp" />
@@ -87,6 +94,13 @@
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
     <ClCompile Include="Renderer\SwapChain.cpp" />
     <ClCompile Include="Renderer\TextureView.cpp" />
+    <ClCompile Include="ThirdParty\ImGuiSystem.cpp" />
+    <ClCompile Include="ThirdParty\IMGUI\imgui.cpp" />
+    <ClCompile Include="ThirdParty\IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="ThirdParty\IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="ThirdParty\IMGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ThirdParty\IMGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="ThirdParty\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="ThirdParty\MikktSpace.c" />
     <ClCompile Include="ThirdParty\tinyxml2.cpp" />
     <ClCompile Include="Vec4.cpp" />
@@ -137,7 +151,15 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
-    <ClInclude Include="Network\NetworkSystem.hpp" />
+    <ClInclude Include="Network\NetworkDefs.hpp" />
+    <ClInclude Include="Network\NetworkSystem.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Network\TCPClient.hpp" />
+    <ClInclude Include="Network\TCPServer.hpp" />
     <ClInclude Include="Platform\Window.hpp" />
     <ClInclude Include="Physics\Collider2D.hpp" />
     <ClInclude Include="Physics\Collision2D.hpp" />
@@ -174,6 +196,15 @@
     <ClInclude Include="ThirdParty\fmod\fmod_dsp_effects.h" />
     <ClInclude Include="ThirdParty\fmod\fmod_errors.h" />
     <ClInclude Include="ThirdParty\fmod\fmod_output.h" />
+    <ClInclude Include="ThirdParty\ImGuiSystem.hpp" />
+    <ClInclude Include="ThirdParty\IMGUI\imconfig.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imgui.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imgui_impl_win32.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imgui_internal.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imstb_rectpack.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imstb_textedit.h" />
+    <ClInclude Include="ThirdParty\IMGUI\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\MikktSpace.h" />
     <ClInclude Include="ThirdParty\tinyxml2.h" />
   </ItemGroup>
