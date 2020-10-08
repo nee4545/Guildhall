@@ -25,6 +25,14 @@ AABB2::AABB2( const AABB2& copyFrom )
 
 
 
+AABB2::AABB2( int minX , int minY , int maxX , int maxY )
+{
+	mins.x = ( float ) minX;
+	mins.y = ( float ) minY;
+	maxs.x = ( float ) maxX;
+	maxs.y = ( float ) maxY;
+}
+
 bool AABB2::IsPointInside( const Vec2& point ) const //does not include positions on edge
 {
 	if( (point.x>mins.x && point.x<maxs.x) && (point.y>mins.y &&point.y<maxs.y) )

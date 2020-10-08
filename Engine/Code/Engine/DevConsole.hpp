@@ -4,6 +4,7 @@
 #include <map>
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include <mutex>
 
 class Camera;
 class RenderContext;
@@ -63,5 +64,6 @@ private:
 	std::vector<std::string> m_commands;
 	std::vector<std::string> m_commandHistory;
 	Camera* m_devConsoleCamera = nullptr;
+	//std::mutex m_mutex;
 
 };

@@ -9,6 +9,7 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Network/NetworkDefs.hpp"
 #include "../Core/EventSystem.hpp"
+#include "Engine/UDPListner.hpp"
 
 extern InputSystem* g_theInput;
 extern NetworkSystem* g_theNetwork;
@@ -21,11 +22,15 @@ NetworkSystem::NetworkSystem()
 	g_theEventSystem.SubscribeToEvent( "SendClientMessage" , SendClientMessage );
 	g_theEventSystem.SubscribeToEvent( "StopServer" , StopServ );
 	g_theEventSystem.SubscribeToEvent( "Disconnect" , Disconnect );
+	g_theEventSystem.SubscribeToEvent( "OpenUDPPort" , OpenUDPPort );
+	g_theEventSystem.SubscribeToEvent( "SendUDPMessage" , SendUDPMessage );
+	g_theEventSystem.SubscribeToEvent( "CloseUDPPort" , CloseUDPPort );
+	m_UDPlistner = new UDPListner();
 }
 
 NetworkSystem::~NetworkSystem()
 {
-	
+	delete m_UDPlistner;
 }
 
 void NetworkSystem::StartUp()
@@ -109,7 +114,7 @@ std::string NetworkSystem::GetAddress()
 		//error
 	}
 
-	DWORD outlen = addressStr.size();
+	DWORD outlen = (DWORD)addressStr.size();
 	iResult = WSAAddressToStringA( &clientAddr , addrSize , NULL , &addressStr[ 0 ] , &outlen );
 
 	if ( iResult == SOCKET_ERROR )
@@ -150,14 +155,14 @@ void NetworkSystem::SendMessageFromServer( std::string message )
 		std::array<char , 256> buffer;
 		MessageHeader* header = reinterpret_cast< MessageHeader* >( &buffer[ 0 ] );
 		header->m_id = 1;
-		header->m_size = message.length();
+		header->m_size = (uint16_t)message.length();
 
 		for ( int i = 0; i < message.length(); i++ )
 		{
 			buffer[ i + 4 ] = message[ i ];
 		}
 
-		m_server->Send( &buffer[0] , buffer.size() ,m_clientSocket );
+		m_server->Send( &buffer[0] , (int)buffer.size() ,m_clientSocket );
 	}
 	
 }
@@ -177,14 +182,14 @@ void NetworkSystem::SendMessageFromClient( std::string message )
 		std::array<char , 256> buffer;
 		MessageHeader* header = reinterpret_cast< MessageHeader* >( &buffer[ 0 ] );
 		header->m_id = 1;
-		header->m_size = message.length();
+		header->m_size = (uint16_t)message.length();
 
 		for ( int i = 0; i < message.length(); i++ )
 		{
 			buffer[ i + 4 ] = message[ i ];
 		}
 
-		m_client->Send( &buffer[0] ,buffer.size(), m_client->m_socket );
+		m_client->Send( &buffer[0] ,(int)buffer.size(), m_client->m_socket );
 		
 	}
 }
@@ -222,14 +227,27 @@ bool NetworkSystem::SendClientMessage( EventArgs& args )
 
 bool NetworkSystem::StopServ( EventArgs& args )
 {
+	UNUSED( args );
 	g_theNetwork->StopServer();
 	return false;
 }
 
 bool NetworkSystem::Disconnect( EventArgs& args )
 {
+	UNUSED( args );
 	g_theNetwork->StopClient();
 	return false;
+}
+
+bool NetworkSystem::OpenUDPPort( EventArgs& args )
+{
+	std::string bindPort = args.GetValue( "bindPort" , "48000" );
+	std::string sendPort = args.GetValue( "sendPort" , "48001" );
+	std::string host = args.GetValue( "host" , "127.0.0.1" );
+
+	g_theNetwork->StartUDPListner( atoi(bindPort.c_str()),  atoi(sendPort.c_str()) , host );
+	return true;
+
 }
 
 void NetworkSystem::StopServer()
@@ -268,5 +286,30 @@ void NetworkSystem::StopClient()
 		delete m_client;
 		m_client = nullptr;
 	}
+}
+
+void NetworkSystem::StartUDPListner( int bindPort , int sendPort , std::string host /*= "127.0.0.1"*/ )
+{
+	m_UDPlistner->StartSocket( bindPort , sendPort , host );
+}
+
+void NetworkSystem::SendUDPMessage( std::string message )
+{
+	m_UDPlistner->AddMessage( message );
+}
+
+bool NetworkSystem::SendUDPMessage( EventArgs& args )
+{
+	std::string msg = args.GetValue( "msg" , "" );
+	g_theNetwork->SendUDPMessage( msg );
+
+	return true;
+}
+
+bool NetworkSystem::CloseUDPPort( EventArgs& args )
+{
+	UNUSED( args );
+	g_theNetwork->m_UDPlistner->Close();
+	return true;
 }
 

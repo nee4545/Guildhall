@@ -138,9 +138,9 @@ m_uvTexCoords=uvTexCoords;
 		 }
 	 }
 
-	 for ( int hcutIndex = 0; hcutIndex < hCuts; hcutIndex++ )
+	 for ( unsigned int hcutIndex = 0; hcutIndex < hCuts; hcutIndex++ )
 	 {
-		 for ( int vCutIndex = 0; vCutIndex < vCuts; vCutIndex++ )
+		 for ( unsigned int vCutIndex = 0; vCutIndex < vCuts; vCutIndex++ )
 		 {
 			 int index0 = hcutIndex + ( ( hCuts + 1 ) * vCutIndex );
 			 int index1 = index0 + 1;

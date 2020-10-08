@@ -7,10 +7,17 @@
 #include "Engine/Core/EventSystem.hpp"
 #define UNUSED(x) (void)(x);
 
+extern DevConsole g_theConsole;
+
+#ifdef TEST_MODE
+#define LOG_ERROR(...) printf(Stringf(__VA_ARGS__) + std::string("\n"))
+#else
+#define LOG_ERROR(...) g_theConsole.PrintError(Stringf(__VA_ARGS__))
+#endif
+
 class JobSystem;
 
 extern NamedProperties g_gameConfigBlackboard; 
-extern DevConsole g_theConsole;
 extern EventSystem g_theEventSystem;
 extern HWND g_hWnd;
 extern JobSystem* g_theJobSystem;

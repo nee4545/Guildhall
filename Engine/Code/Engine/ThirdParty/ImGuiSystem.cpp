@@ -47,6 +47,7 @@ void ImGuiSystem::StartUp()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
+	UNUSED( io );
 	ImGui_ImplWin32_Init( m_window->m_hwnd );
 	ImGui_ImplDX11_Init( m_renderContext->m_device , m_renderContext->m_context );
 	ImGui::StyleColorsDark();

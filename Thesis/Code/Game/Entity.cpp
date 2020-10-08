@@ -28,7 +28,7 @@ void Entity::Die()
 
 void Entity::SetPosition( Vec2& position )
 {
-
+	m_position = position;
 }
 
 Vec2 Entity::GetPosition()

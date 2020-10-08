@@ -14,6 +14,7 @@ extern BitmapFont* g_theBitMapFont;
 extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
 
+std::mutex g_consoleMutex;
 
 DevConsole::DevConsole()
 {
@@ -68,9 +69,9 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 	ColoredLine newLine;
 	newLine.lineColor = textColor;
 	newLine.text = devConsolePrintString;
-
+	//g_consoleMutex.lock();
 	m_lines.push_back( newLine );
-
+	//g_consoleMutex.unlock();
 }
 
 void DevConsole::PrintError( const std::string& errorMessage )
@@ -533,6 +534,9 @@ void DevConsole::InitializeCommands()
 	m_commands.push_back( "SendClientMessage" );
 	m_commands.push_back( "StopServer" );
 	m_commands.push_back( "Disconnect" );
+	m_commands.push_back( "OpenUDPPort" );
+	m_commands.push_back( "SendUDPMessage" );
+	m_commands.push_back( "CloseUDPPort" );
 
 }
 

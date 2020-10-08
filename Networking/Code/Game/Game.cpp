@@ -9,6 +9,7 @@
 #include "Engine/Renderer/SpriteAnimDefinition.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Network/NetworkSystem.hpp"
+#include "Engine/UDPListner.hpp"
 //#include "Engine/ThirdParty/IMGUI/imgui.h"
 
 extern ImGuiSystem* g_theGUI;
@@ -34,6 +35,12 @@ bool Help( EventArgs& args )
 	g_theConsole.PrintString( color3 , "Usage: <StopServer>" );
 	g_theConsole.PrintString( color2 , "Disconnect" );
 	g_theConsole.PrintString( color3 , "Usage: <Disconnect>" );
+	g_theConsole.PrintString( color2 , "StartUDPPort" );
+	g_theConsole.PrintString( color3 , "Usage: <StartUDPPort>:<bindPort=number>|<sendPort=number>" );
+	g_theConsole.PrintString( color2 , "SendUDPMessage" );
+	g_theConsole.PrintString( color3 , "Usage:<SendUDPMessage>:<msg=message>" );
+	g_theConsole.PrintString( color2 , "CloseUDPPort" );
+	g_theConsole.PrintString( color3 , "Usage:<CloseUDPPort>:<portNum=number>" );
 
 	return false;
 }
@@ -99,13 +106,11 @@ Game::~Game()
 
 void Game::Update( float deltaseconds )
 {
-	ImGui::NewFrame();
-	ImGui::Begin( "Naman Madarchod" );
-	ImGui::Checkbox( "Is Debug" , &m_mainPlayerActive );
-	ImGui::End();
 
 	ToggleDevConsole();
 	UpdateMousePosition();
+
+
 
 	if ( g_theConsole.IsOpen() )
 	{
@@ -169,7 +174,7 @@ void Game::Render()
 
 	g_theRenderer->EndCamera( *m_gameCamera );
 
-	g_theGUI->Render();
+	//g_theGUI->Render();
 
 	if ( g_theConsole.IsOpen() )
 	{
@@ -362,6 +367,15 @@ bool Game::IsTileSolid( IntVec2 tileCoords )
 {
 	int index = GetTileIndexForTileCoords( tileCoords );
 	return m_tiles[ index ].m_isSolid;
+}
+
+void Game::StartListner( int bindPort , int sendPort )
+{
+	listner = new UDPListner();
+
+	listner->StartSocket( bindPort , sendPort );
+
+	g_theConsole.PrintString( Rgba8() , "Listner Started" );
 }
 
 void Game::ToggleDevConsole()

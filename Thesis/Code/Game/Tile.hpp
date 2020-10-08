@@ -38,4 +38,6 @@ public:
 	TileType m_type;
 	TileTextureType m_textureType = TILE_INVALID;
 	bool m_isSolid = false;
+	bool inPath = false;
+	int m_influenceValue = 0;
 };

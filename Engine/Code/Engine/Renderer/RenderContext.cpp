@@ -43,9 +43,10 @@ void RenderContext::DrawVertexArray( int numVertexes , const Vertex_PCU* vertexe
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& verts )
 {
-
-	DrawVertexArray( ( int ) verts.size() , &verts[ 0 ] );
-
+	if ( verts.size() > 0 )
+	{
+		DrawVertexArray( ( int ) verts.size() , &verts[ 0 ] );
+	}
 }
 
 void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
@@ -202,6 +203,35 @@ void RenderContext::DrawDisc( const Vec2 centre , float radius , Rgba8 color )
 	discVerts[ NUMBER_OF_DISC_VERTS - 1 ] = discVerts[ 1 ];
 	TransformVertexArray( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , centre );
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
+}
+
+void RenderContext::DrawSector( const Vec2 centre , const Vec2 forwardVector ,float radius, float angle , Rgba8 color )
+{
+	std::vector<Vertex_PCU> verts;
+
+
+	float deltaDegrees = 1.f;
+	float currentDegrees = -angle * 0.5f;
+
+
+
+	while ( currentDegrees < angle * 0.5f )
+	{
+		Vertex_PCU v1 = Vertex_PCU( Vec3(centre,0.f) , color , Vec2( 0.f , 0.f ) );
+		Vec2 vec1 = centre + forwardVector.GetRotatedDegrees( currentDegrees ) * radius;
+		Vec2 vec2 = centre + forwardVector.GetRotatedDegrees( currentDegrees+deltaDegrees ) * radius;
+		Vertex_PCU v2 = Vertex_PCU( Vec3( vec1 , 0.f ) , color , Vec2( 0.f , 0.f ) );
+		Vertex_PCU v3 = Vertex_PCU( Vec3( vec2 , 0.f ) , color , Vec2( 0.f , 0.f ) );
+
+		verts.push_back( v1 );
+		verts.push_back( v2 );
+		verts.push_back( v3 );
+
+		currentDegrees += deltaDegrees;
+	}
+
+	
+	DrawVertexArray( verts );
 }
 
 void RenderContext::DrawMesh( GPUMesh* mesh )

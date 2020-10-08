@@ -15,6 +15,7 @@ constexpr int F7 = 0x76;
 constexpr int F8 = 0x77;
 constexpr int SHIFT = 0x10;
 constexpr int ESC = 0x1B;
+constexpr int SPACE = 0x20;
 
 enum eMousePositionMode
 {

@@ -41,10 +41,7 @@ void App:: Startup()
 	{
 		g_theAudio = new AudioSystem();
 	}
-	if ( thegame == nullptr )
-	{
-		thegame = new Game();
-	}
+	
 	g_theConsole.Startup();
 
 	Clock::SystemStartup();
@@ -53,6 +50,11 @@ void App:: Startup()
 
 	g_theGUI = new ImGuiSystem( g_theWindow , g_theRenderer );
 	g_theGUI->StartUp();
+	
+	if ( thegame == nullptr )
+	{
+		thegame = new Game();
+	}
 }
 
 App::~App()

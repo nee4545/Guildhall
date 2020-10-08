@@ -15,6 +15,7 @@ class Player;
 class SupportPlayer;
 class SpriteAnimDefinition;
 class MonsterAI;
+class UDPListner;
 
 class Game
 {
@@ -39,6 +40,8 @@ public:
 	void PopulateTiles();
 	void HandleBlockCollissions(Entity* entity);
 	bool IsTileSolid( IntVec2 tileCoords );
+
+	void StartListner(int bindPort, int sendPort);
 
 	void ToggleDevConsole();
 
@@ -139,4 +142,6 @@ public:
 	bool m_mainPlayerActive = true;
 	
 	bool devConsoleOpen = false;
+
+	UDPListner* listner = nullptr;
 };

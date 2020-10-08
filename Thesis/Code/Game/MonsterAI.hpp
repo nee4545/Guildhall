@@ -16,6 +16,18 @@ enum AI_STATES
 	DEAD,
 };
 
+enum Moves
+{
+	MOVE_UP ,
+	MOVE_DOWN ,
+	MOVE_RIGHT ,
+	MOVE_LEFT ,
+	MOVE_TOPRIGHT ,
+	MOVE_TOPLEFT ,
+	MOVE_BOTLEFT ,
+	MOVE_BOTRIGHT ,
+};
+
 enum AI_TYPE
 {
 	TYPE_1, // use A*, not affected by influence map, potential fields, no occupancy maps
@@ -27,6 +39,43 @@ enum AI_TYPE
 	TYPE_7, // A* without influence maps and potential fields, use occupancy maps
 	TYPE_8, // Dijkstra's without influence maps and potential fields, use occupancy maps
 	
+};
+
+enum AI_Behavior
+{
+	WANDER,
+	CHASE_PLAYER,
+};
+
+
+
+struct MovingHelper
+{
+	Moves move;
+	std::vector<int> path;
+	int currentIndex = 0;
+
+	int GetNextMove()
+	{
+		if ( currentIndex <0 )
+		{
+			Reset();
+			return -1;
+		}
+		return path[ currentIndex-- ];
+	}
+
+	void Reset()
+	{
+		currentIndex = 0;
+		path.clear();
+	}
+
+	bool DoesHavePath()
+	{
+		return path.size() > 0;
+	}
+
 };
 
 
@@ -46,6 +95,11 @@ public:
 	virtual void Die() override; 
 	void SetVerticesBasedOnAspect( Vec2 aspect );
 
+	void ChangeBehavior( AI_Behavior newBehavior );
+	void CheckPlayerInSight();
+
+	void FindPathToRandomTile();
+
 public:
 
 	Vertex_PCU m_vertices[ 6 ];
@@ -63,6 +117,7 @@ public:
 
 	AI_STATES m_currentState = MOVING;
 	AI_TYPE m_currentType = TYPE_1;
+	AI_Behavior m_currentBehavior = WANDER;
 
 	SpriteAnimDefinition* m_animationAtIdle = nullptr;
 	SpriteAnimDefinition* m_animationAtWalk = nullptr;
@@ -77,4 +132,13 @@ public:
 	bool m_hasMultipleRangeAttack = false;
 
 	float m_time = 0.f;
+
+	MovingHelper* m_helper = nullptr;
+
+	Vec2 m_nextMovePosition;
+
+	Vec2 m_forwardVec = Vec2(0.f,-1.f);
+
+	int tileIndex = -1;
+	Vec2 moveVec;
 };

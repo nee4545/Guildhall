@@ -235,6 +235,12 @@
     <ClCompile Include="Network\TCPClient.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="Core\UDPSocket.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="UDPListner.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -849,6 +855,15 @@
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="Network\NetworkDefs.hpp">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UDPSocket.hpp">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\SynchronizedLockFreeQueue.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPListner.hpp">
       <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>

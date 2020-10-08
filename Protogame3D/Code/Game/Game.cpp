@@ -40,7 +40,7 @@ public:
 		for ( long i = 0; i < 1000000; i++ )
 		{
 			std::string s = std::to_string( m_jobID ) + " ";
-			//g_theConsole.PrintString( Rgba8( 100 , 100 , 100 , 255 ) , std::to_string( m_jobID ) );
+			g_theConsole.PrintString( Rgba8( 100 , 100 , 100 , 255 ) , std::to_string( m_jobID ) );
 			//DebuggerPrintf( s.c_str()  );
 		}
 
@@ -84,7 +84,7 @@ Game::Game()
 	TestJob* job11 = new TestJob();
 	TestJob* job12 = new TestJob();
 
-	/*g_theJobSystem->PostJob( job1 );
+	g_theJobSystem->PostJob( job1 );
 	g_theJobSystem->PostJob( job2 );
 	g_theJobSystem->PostJob( job3 );
 	g_theJobSystem->PostJob( job4 );
@@ -95,7 +95,7 @@ Game::Game()
 	g_theJobSystem->PostJob( job9 );
 	g_theJobSystem->PostJob( job10 );
 	g_theJobSystem->PostJob( job11 );
-	g_theJobSystem->PostJob( job12 );*/
+	g_theJobSystem->PostJob( job12 );
 
 	tinyxml2::XMLDocument gameConfig;
 	gameConfig.LoadFile( "Data/XML/gameconfig.xml" );

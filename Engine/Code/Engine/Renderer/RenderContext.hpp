@@ -218,6 +218,7 @@ public:
 	void DrawArrow2D( Vec2& start , Vec2& end , Rgba8 lineColor , Rgba8 arrowColor , float lineThickness );
 	void DrawRing( const Vec2 centre , float radius , Rgba8 color , float thickness );
 	void DrawDisc( const Vec2 centre , float radius , Rgba8 color );
+	void DrawSector( const Vec2 centre , const Vec2 forwardVector, float radius , float angle , Rgba8 color );
 	void DrawPolygonUnfilled( const Polygon2D& polygon , const Rgba8& color , float thickness );
 	void DrawPolygonFilled( const Polygon2D& polygon , const Rgba8& color );
 	void DrawMesh( GPUMesh* mesh );

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "GameCommon.hpp"
+#include "Engine/Core/AABB2.hpp"
 #include "Game/Tile.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
@@ -15,6 +16,29 @@ class Player;
 class SupportPlayer;
 class SpriteAnimDefinition;
 class MonsterAI;
+class RandomNumberGenerator;
+class StartScreen;
+class Bomb;
+class Turret;
+
+enum GameMode
+{
+	GAME,
+	PATHFINDER,
+	MAPCREATOR,
+	
+};
+
+struct PathFindingHelper
+{
+public:
+	IntVec2 coords;
+	int gCost;
+	float hCost;
+	bool isConsidered = false;
+	PathFindingHelper* parent = nullptr;
+	bool isClosed = false;
+};
 
 class Game
 {
@@ -30,20 +54,38 @@ public:
 	void LoadPlayerTextures();
 	void LoadSupportPlayerTextures();
 	void LoadAIAnimations();
+	void LoadBombAnimations();
+
+	void UpdatePathFinderMode();
+	void RefreshPathFinderMode();
+	void RenderPathFinderMode();
 
 	void UpdateCamera();
 	void ToggleCameraUpdate();
 	void UpdateMousePosition();
 	void TogglePlayers();
+	void ToggleGameModes();
 	
 	void PopulateTiles();
 	void HandleBlockCollissions(Entity* entity);
 	bool IsTileSolid( IntVec2 tileCoords );
+	
+	void GetPathUsingAStarIgnoreDiagonalMovesOneStep(Vec2 startPos, Vec2 endPos,std::vector<int>& path);
+	void GetPathUsingAstarWithDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
+	void GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
+	float GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos );
+	void CreateInfluenceMap( IntVec2 startCoords , bool isPositive , int initialValue );
+
+	void GetAllTilesWithSameFCost( std::vector<PathFindingHelper>& list , std::vector<PathFindingHelper>& outList );
+	bool IsPathFindingHelpInList( PathFindingHelper toFind , std::vector<PathFindingHelper>& list );
 
 	void ToggleDevConsole();
 
 	int GetTileIndexForTileCoords( const IntVec2& tileCoords );
 	void MapFillUsingWorms( TileTextureType type, int minWorkLength = 4, int maxWorkLength =12 , int maxWorms = 90);
+
+	GameMode m_currentMode = PATHFINDER;
+	StartScreen* m_startScreen = nullptr;
 
 	SpriteAnimDefinition* m_sample;
 
@@ -80,11 +122,21 @@ public:
 	float m_time = 0.f;
 
 	std::vector<MonsterAI*> m_enemies;
+	std::vector<Bomb*> m_bombs;
+	std::vector<Turret*> m_turrets;
+
+	bool StartLocationSet = false;
+	bool endLocationSet = false;
+	Vec2 startLocation;
+	Vec2 endLocation;
+
+	std::vector<int> pathIndices;
 
 public:
 
 	Camera* m_gameCamera;
 	Camera* m_devConsoleCamera;
+	Camera* m_hudCamera;
 	Vec2 m_mousePosition;
 
 	//Player Anims
@@ -139,4 +191,31 @@ public:
 	bool m_mainPlayerActive = true;
 	
 	bool devConsoleOpen = false;
+
+	bool m_currentAlgIs4WayAStar = true;
+	bool m_currentAlgIs8WayAstar = false;
+
+	RandomNumberGenerator* m_rng = nullptr;
+
+	std::vector<PathFindingHelper> openList1;
+	std::vector<PathFindingHelper> closedList1;
+	bool pathFound = false;
+
+	bool initDone = false;
+
+	double influnceMapTime = 0.0;
+
+	bool inStartScreen = true;
+
+	AABB2 m_hudBox;
+	AABB2 m_player1Box;
+	AABB2 m_player2Box;
+	Texture* m_player1HudTex = nullptr;
+	Texture* m_player2HudTex = nullptr;
+
+	SpriteAnimDefinition* m_bombIdleTex = nullptr;
+	SpriteAnimDefinition* m_explosion = nullptr;
+	Texture* m_turretTex = nullptr;
+
+	bool influenceMapPositive = false;
 };

@@ -37,6 +37,18 @@
     <ClCompile Include="MonsterAI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="StartScreen.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Bomb.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Turret.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -64,6 +76,21 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="MonsterAI.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="StartScreen.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapCreator.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Bomb.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Turret.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

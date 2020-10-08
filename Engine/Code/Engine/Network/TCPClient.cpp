@@ -65,7 +65,7 @@ SOCKET TCPClient::Connect( std::string host , int port )
 void TCPClient::Receive( SOCKET s )
 {
 	std::array<char , 256> buffer;
-	int iResult = ::recv( s , &buffer[ 0 ] , buffer.size() , 0 );
+	int iResult = ::recv( s , &buffer[ 0 ] , (int)buffer.size() , 0 );
 
 	if ( iResult == SOCKET_ERROR )
 	{
@@ -87,7 +87,7 @@ void TCPClient::Receive( SOCKET s )
 
 void TCPClient::Send( std::string message , SOCKET s )
 {
-	int iResult = send( s , message.c_str() , message.length() , 0 );
+	int iResult = send( s , message.c_str() , (int)message.length() , 0 );
 
 	if ( iResult == SOCKET_ERROR )
 	{

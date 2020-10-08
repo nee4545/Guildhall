@@ -1,5 +1,4 @@
 #pragma once
-
 #include "AnalogJoyStick.hpp"
 #include "KeyButtonState.hpp"
 

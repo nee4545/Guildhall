@@ -93,6 +93,14 @@ const IntVec2 IntVec2::operator-() const
 	return(IntVec2(-x,-y));
 }
 
+const IntVec2 IntVec2::operator-( const IntVec2& vecToSubtract ) const
+{
+	IntVec2 r;
+	r.x = this->x - vecToSubtract.x;
+	r.y = this->y - vecToSubtract.y;
+	return r;
+}
+
 void IntVec2::operator=( const IntVec2& copyFrom )
 {
 	x=copyFrom.x;

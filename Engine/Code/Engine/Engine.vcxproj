@@ -42,6 +42,7 @@
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Core\Transform.cpp" />
+    <ClCompile Include="Core\UDPSocket.cpp" />
     <ClCompile Include="Core\VertexLit.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="ThirdParty\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="ThirdParty\MikktSpace.c" />
     <ClCompile Include="ThirdParty\tinyxml2.cpp" />
+    <ClCompile Include="UDPListner.cpp" />
     <ClCompile Include="Vec4.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -126,10 +128,12 @@
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
+    <ClInclude Include="Core\SynchronizedLockFreeQueue.hpp" />
     <ClInclude Include="Core\Texture.hpp" />
     <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="Core\Timer.hpp" />
     <ClInclude Include="Core\Transform.hpp" />
+    <ClInclude Include="Core\UDPSocket.hpp" />
     <ClInclude Include="Core\VertexCommon.hpp" />
     <ClInclude Include="Core\VertexLit.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
@@ -207,6 +211,7 @@
     <ClInclude Include="ThirdParty\IMGUI\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\MikktSpace.h" />
     <ClInclude Include="ThirdParty\tinyxml2.h" />
+    <ClInclude Include="UDPListner.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

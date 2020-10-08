@@ -192,24 +192,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Bomb.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="MonsterAI.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="StartScreen.cpp" />
     <ClCompile Include="SupportPlayer.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="Turret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="Bomb.hpp" />
+    <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
+    <ClInclude Include="MapCreator.hpp" />
     <ClInclude Include="MonsterAI.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="StartScreen.hpp" />
     <ClInclude Include="SupportPlayer.hpp" />
     <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="Turret.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Run\Data\Shaders\bitangents.hlsl">

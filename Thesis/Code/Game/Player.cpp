@@ -27,11 +27,11 @@ Player::Player( Game* game )
 
 	m_aspectAtIdle = Vec2( 0.325f , 0.328f )*0.35f;
 	m_aspectAtAttack = Vec2(0.438f,0.342f)*0.35f;
-	m_aspectAtWalk = Vec2(0.608,0.481)*0.35f;
+	m_aspectAtWalk = Vec2(0.608f,0.481f)*0.35f;
 
-	m_aspectAtIdleGun = Vec2(0.285,0.353)*0.35f;
-	m_aspectAtAttackGun = Vec2(0.334,0.579)*0.35f;
-	m_aspectAtWalkGun = Vec2( 0.271 , 0.351 )*0.35f;
+	m_aspectAtIdleGun = Vec2(0.285f,0.353f)*0.35f;
+	m_aspectAtAttackGun = Vec2(0.334f,0.579f)*0.35f;
+	m_aspectAtWalkGun = Vec2( 0.271f , 0.351f )*0.35f;
 
 	m_animClock = new Clock();
 	m_animTimer = new Timer();

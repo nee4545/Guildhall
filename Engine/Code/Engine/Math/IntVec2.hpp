@@ -33,6 +33,7 @@ public:
 	const IntVec2 operator-()const;
 	const IntVec2 operator*(int uniformScale) const;
 	const IntVec2 operator*(const IntVec2& vecToMultiply) const;
+	const IntVec2 operator-( const IntVec2& vecToSubtract ) const;
 
 
 	void operator+=(const IntVec2& vecToAdd);

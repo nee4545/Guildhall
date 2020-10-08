@@ -15,7 +15,7 @@ public:
 	AABB2(const AABB2& copyFrom);
 	explicit AABB2(const Vec2& mins, const Vec2& maxs);
 	explicit AABB2(float minX, float minY, float maxX, float maxY);
-
+	explicit AABB2( int minX , int minY , int maxX , int maxY );
 
 
 	bool IsPointInside(const Vec2& point)const;
