@@ -82,7 +82,9 @@ public:
 	void GetPathUsingAStarIgnoreDiagonalMovesOneStep(Vec2 startPos, Vec2 endPos,std::vector<int>& path, bool ignoreDiagonalMoves = false, bool considerInfluenceMaps = false);
 	void GetPathUsingAstarWithDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
 	void GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfuenceMap = false , bool ignoreDiagonalMoves = false );
+	void GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfluenceMap = false , bool ignoreDiagonalMoves = false );
 	float GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos );
+
 	void CreateInfluenceMap( IntVec2 startCoords , bool isPositive , int initialValue );
 
 	void GetAllTilesWithSameFCost( std::vector<PathFindingHelper>& list , std::vector<PathFindingHelper>& outList );
@@ -90,7 +92,7 @@ public:
 
 	void ToggleDevConsole();
 
-	int GetTileIndexForTileCoords( const IntVec2& tileCoords );
+	int GetTileIndexForTileCoords( const IntVec2& tileCoords, bool usingMainMap = false );
 	int GetTileIndexForTileCoordsForMainMap( const IntVec2& tileCoords );
 	void MapFillUsingWorms( TileTextureType type, int minWorkLength = 4, int maxWorkLength =12 , int maxWorms = 90);
 

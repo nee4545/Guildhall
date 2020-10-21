@@ -6,7 +6,9 @@
 #include "Engine/Renderer/SpriteAnimDefTex.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/Timer.hpp"
 #include "Game/PotentialFields.hpp"
+
 
 
 GreenBeret::GreenBeret(Game* game)
@@ -38,6 +40,8 @@ void GreenBeret::Update( float deltaseconds )
 	{
 		m_nextMovePosition = m_game->m_mousePosition;
 		m_moveSet = true;
+
+		m_game->m_greenBeretHUDTimer->Reset();
 	}
 
 	if ( m_moveSet )

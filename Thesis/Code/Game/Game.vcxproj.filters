@@ -64,6 +64,9 @@
     <ClCompile Include="PotentialFields.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="InfluenceMap.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -115,6 +118,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="PotentialFieldCreator.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="InfluenceMap.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

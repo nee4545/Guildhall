@@ -127,6 +127,8 @@ void MapCreator::Render()
 
 	g_theRenderer->DrawVertexArray( solidVerts );
 
+	//g_theRenderer->DrawDisc( Vec2( 39 , 62 ) ,2.f, Rgba8( 255 , 255 , 255 , 255 ) );
+
 	g_theGUI->Render();
 	g_theRenderer->EndCamera( *m_camera );
 }

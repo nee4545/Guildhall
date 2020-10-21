@@ -529,6 +529,11 @@ void Game::Render()
 			m_turrets[ i ]->Render();
 		}
 
+	
+		g_theRenderer->BindTexture( m_mapTex1 );
+		g_theRenderer->DrawAABB2D( m_mapPart1 , Rgba8() );
+	
+
 		for ( int i = 0; i < m_enemies.size(); i++ )
 		{
 			if ( m_enemies[ i ] == nullptr )
@@ -538,9 +543,6 @@ void Game::Render()
 			m_enemies[ i ]->Render();
 		}
 
-		g_theRenderer->BindTexture( m_mapTex1 );
-		g_theRenderer->DrawAABB2D( m_mapPart1 , Rgba8() );
-	
 		/*std::vector<Vertex_PCU> verts;
 		for ( int i = 0; i < m_tiles.size(); i++ )
 		{
@@ -600,8 +602,8 @@ void Game::Render()
 		g_theRenderer->BindTexture( m_player1HudTex );
 		//g_theRenderer->DrawVertexArray( verts );
 
-		m_player->Render();
-		m_supportPlayer->Render();
+		//m_player->Render();
+		//m_supportPlayer->Render();
 		m_greenBeret->Render();
 	}
 
@@ -2761,6 +2763,635 @@ void Game::GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , s
 	}
 }
 
+void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfluenceMap /*= false */ , bool ignoreDiagonalMoves /*= false */ )
+{
+	IntVec2 sPos = IntVec2( RoundDownToInt( startPos.x ) , RoundDownToInt( startPos.y ) );
+	IntVec2 ePos = IntVec2( RoundDownToInt( endPos.x ) , RoundDownToInt( endPos.y ) );
+
+	if ( sPos == ePos )
+	{
+		return;
+	}
+
+	std::vector<PathFindingHelper*> openList;
+	std::vector<PathFindingHelper*> closedList;
+
+	openList.reserve( 20000 );
+	closedList.reserve( 20000 );
+
+	bool pathFound2 = false;
+
+	IntVec2 currentTile = sPos;
+
+	PathFindingHelper* base = new PathFindingHelper();
+	base->coords = sPos;
+
+	PathFindingHelper* p1 = new PathFindingHelper();
+	PathFindingHelper* p2 = new PathFindingHelper();
+	PathFindingHelper* p3 = new PathFindingHelper();
+	PathFindingHelper* p4 = new PathFindingHelper();
+	PathFindingHelper* p5 = new PathFindingHelper();
+	PathFindingHelper* p6 = new PathFindingHelper();
+	PathFindingHelper* p7 = new PathFindingHelper();
+	PathFindingHelper* p8 = new PathFindingHelper();
+
+
+
+	if ( currentTile.x - 1 > 0 )
+	{
+		p1->coords = IntVec2( currentTile.x - 1 , currentTile.y );
+		p1->gCost = 1;
+		p1->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p1->coords , ePos );
+		if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p1->coords, true ) ].m_isSolid )
+		{
+			p1->isConsidered = true;
+		}
+		p1->parent = base;
+	}
+
+	if ( currentTile.x + 1 < m_mainMapSize.x )
+	{
+		p2->coords = IntVec2( currentTile.x + 1 , currentTile.y );
+		p2->gCost = 1;
+		p2->hCost = /*( p2->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p2->coords , ePos );
+		if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p2->coords, true ) ].m_isSolid )
+		{
+			p2->isConsidered = true;
+		}
+
+		p2->parent = base;
+	}
+
+	if ( currentTile.y - 1 > 0 )
+	{
+		p3->coords = IntVec2( currentTile.x , currentTile.y - 1 );
+		p3->gCost = 1;
+		p3->hCost = /*( p3->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p3->coords , ePos );
+		if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p3->coords, true ) ].m_isSolid )
+		{
+			p3->isConsidered = true;
+		}
+
+		p3->parent = base;
+
+	}
+
+	if ( currentTile.y + 1 < m_mainMapSize.y )
+	{
+		p4->coords = IntVec2( currentTile.x , currentTile.y + 1 );
+		p4->gCost = 1;
+		p4->hCost = /*( p4->coords , ePos ).GetLengthSquared()*/GetManhattanDistance( p4->coords , ePos );
+		if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p4->coords, true ) ].m_isSolid )
+		{
+			p4->isConsidered = true;
+		}
+
+		p4->parent = base;
+	}
+
+	if ( !ignoreDiagonalMoves )
+	{
+		if ( currentTile.x - 1 > 0 && currentTile.y - 1 > 0 )
+		{
+			p5->coords = IntVec2( currentTile.x - 1 , currentTile.y - 1 );
+			p5->gCost = 1.4f;
+			p5->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p5->coords , ePos );
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p5->coords, true ) ].m_isSolid )
+			{
+				p5->isConsidered = true;
+			}
+			p5->parent = base;
+		}
+
+		if ( currentTile.x - 1 > 0 && currentTile.y + 1 < m_mainMapSize.y )
+		{
+			p6->coords = IntVec2( currentTile.x - 1 , currentTile.y + 1 );
+			p6->gCost = 1.4f;
+			p6->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p6->coords , ePos );
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p6->coords, true ) ].m_isSolid )
+			{
+				p6->isConsidered = true;
+			}
+			p6->parent = base;
+		}
+
+		if ( currentTile.x + 1 < m_mainMapSize.x && currentTile.y - 1 > 0 )
+		{
+			p7->coords = IntVec2( currentTile.x + 1 , currentTile.y - 1 );
+			p7->gCost = 1.4f;
+			p7->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p7->coords , ePos );
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p7->coords, true ) ].m_isSolid )
+			{
+				p7->isConsidered = true;
+			}
+			p7->parent = base;
+		}
+
+		if ( currentTile.x + 1 < m_mainMapSize.x && currentTile.y + 1 < m_mainMapSize.y )
+		{
+			p8->coords = IntVec2( currentTile.x + 1 , currentTile.y + 1 );
+			p8->gCost = 1.4f;
+			p8->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p8->coords , ePos );
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( p8->coords, true ) ].m_isSolid )
+			{
+				p8->isConsidered = true;
+			}
+			p8->parent = base;
+		}
+	}
+
+	if ( p1->isConsidered )
+	{
+		openList.push_back( p1 );
+	}
+
+	if ( p2->isConsidered )
+	{
+		openList.push_back( p2 );
+	}
+
+	if ( p3->isConsidered )
+	{
+		openList.push_back( p3 );
+	}
+
+	if ( p4->isConsidered )
+	{
+		openList.push_back( p4 );
+	}
+
+	if ( !ignoreDiagonalMoves )
+	{
+		if ( p5->isConsidered )
+		{
+			openList.push_back( p5 );
+		}
+
+		if ( p6->isConsidered )
+		{
+			openList.push_back( p6 );
+		}
+
+		if ( p7->isConsidered )
+		{
+			openList.push_back( p7 );
+		}
+
+		if ( p8->isConsidered )
+		{
+			openList.push_back( p8 );
+		}
+	}
+
+
+	PathFindingHelper* tileToExpand = new PathFindingHelper();
+
+	int a = 39;
+	int b = 62;
+
+	IntVec2 v1 = IntVec2( a - 1 , b );
+	IntVec2 v2 = IntVec2( a + 1 , b );
+	IntVec2 v3 = IntVec2( a , b - 1 );
+	IntVec2 v4 = IntVec2( a , b + 1 );
+	IntVec2 v5 = IntVec2( a - 1 , b - 1 );
+	IntVec2 v6 = IntVec2( a - 1 , b + 1 );
+	IntVec2 v7 = IntVec2( a + 1 , b - 1 );
+	IntVec2 v8 = IntVec2( a + 1 , b + 1 );
+
+	bool a1 = m_mainMapTiles[GetTileIndexForTileCoords( v1 , true )].m_isSolid;
+	bool a2 = m_mainMapTiles[GetTileIndexForTileCoords( v2 , true )].m_isSolid;
+	bool a3 = m_mainMapTiles[GetTileIndexForTileCoords( v3 , true )].m_isSolid;
+	bool a4 = m_mainMapTiles[GetTileIndexForTileCoords( v4 , true )].m_isSolid;
+	bool a5 = m_mainMapTiles[GetTileIndexForTileCoords( v5 , true )].m_isSolid;
+	bool a6 = m_mainMapTiles[GetTileIndexForTileCoords( v6 , true )].m_isSolid;
+	bool a7 = m_mainMapTiles[GetTileIndexForTileCoords( v7 , true )].m_isSolid;
+	bool a8 = m_mainMapTiles[GetTileIndexForTileCoords( v8 , true )].m_isSolid;
+
+	while ( !pathFound2 )
+	{
+
+		PathFindingHelper* x1 = new PathFindingHelper();
+		PathFindingHelper* x2 = new PathFindingHelper();
+		PathFindingHelper* x3 = new PathFindingHelper();
+		PathFindingHelper* x4 = new PathFindingHelper();
+		PathFindingHelper* x5 = new PathFindingHelper();
+		PathFindingHelper* x6 = new PathFindingHelper();
+		PathFindingHelper* x7 = new PathFindingHelper();
+		PathFindingHelper* x8 = new PathFindingHelper();
+
+		int index = 0;
+
+		for ( int i = 0; i < openList.size(); i++ )
+		{
+			if ( !openList[ i ]->isClosed )
+			{
+				tileToExpand = openList[ i ];
+				index = i;
+				break;
+			}
+		}
+
+		float min = 99999.f;
+
+		for ( int i = 0; i < openList.size(); i++ )
+		{
+			if ( openList[ i ]->isClosed || i == index )
+			{
+				continue;
+			}
+
+			float f1 = tileToExpand->gCost;
+			float f2 = openList[ i ]->gCost;
+			float h1 = tileToExpand->hCost;
+			float h2 = openList[ i ]->hCost;
+
+			f1 = f1 + h1;
+			f2 = f2 + h2;
+			float i1 = 0.f;
+			float i2 = 0.f;
+
+			if ( considerInfluenceMap )
+			{
+				i1 = m_mainMapTiles[ GetTileIndexForTileCoords( tileToExpand->coords, true ) ].m_influenceValue;
+				i2 = m_mainMapTiles[ GetTileIndexForTileCoords( openList[ i ]->coords, true ) ].m_influenceValue;
+
+				if ( !ignoreDiagonalMoves )
+				{
+					i1 *= 2.f;
+					i2 *= 2.f;
+				}
+				else
+				{
+					i1 *= 0.1f;
+					i2 *= 0.1f;
+				}
+
+				f1 += i1;
+				f2 += i2;
+			}
+
+			if ( f2 < f1 && f2 < min )
+			{
+				min = f2;
+			}
+
+			if ( f2 < f1 || i2 < i1 && f2 < min )
+			{
+				tileToExpand = openList[ i ];
+			}
+
+		}
+
+
+		if ( tileToExpand->coords == ePos )
+		{
+			pathFound2 = true;
+			closedList.push_back( tileToExpand );
+			break;
+		}
+
+		tileToExpand->isClosed = true;
+
+		closedList.push_back( tileToExpand );
+
+		if ( tileToExpand->coords.x - 1 > 0 )
+		{
+			x1->coords = IntVec2( tileToExpand->coords.x - 1 , tileToExpand->coords.y );
+			x1->gCost = tileToExpand->gCost + 1.f;
+			x1->hCost = /*( x1.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x1->coords , ePos );
+
+
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x1->coords, true ) ].m_isSolid )
+			{
+				x1->isConsidered = true;
+			}
+
+			x1->parent = tileToExpand;
+		}
+
+		if ( x1->isConsidered )
+		{
+			bool found = false;
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+
+				if ( openList[ i ]->coords == x1->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x1 );
+			}
+		}
+
+		if ( tileToExpand->coords.x + 1 < m_mainMapSize.x )
+		{
+			x2->coords = IntVec2( tileToExpand->coords.x + 1 , tileToExpand->coords.y );
+			x2->gCost = tileToExpand->gCost + 1.f;
+			x2->hCost = GetManhattanDistance( x2->coords , ePos );
+
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x2->coords, true ) ].m_isSolid )
+			{
+				x2->isConsidered = true;
+			}
+			x2->parent = tileToExpand;
+
+		}
+
+		if ( x2->isConsidered )
+		{
+			bool found = false;
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+
+				if ( openList[ i ]->coords == x2->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x2 );
+			}
+		}
+
+		if ( tileToExpand->coords.y - 1 > 0 )
+		{
+			x3->coords = IntVec2( tileToExpand->coords.x , tileToExpand->coords.y - 1 );
+			x3->gCost = tileToExpand->gCost + 1.f;
+			x3->hCost = GetManhattanDistance( x3->coords , ePos );
+
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x3->coords, true ) ].m_isSolid )
+			{
+				x3->isConsidered = true;
+			}
+			x3->parent = tileToExpand;
+		}
+
+		if ( x3->isConsidered )
+		{
+			bool found = false;
+
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+				if ( openList[ i ]->coords == x3->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x3 );
+			}
+		}
+
+		if ( tileToExpand->coords.y + 1 < m_mapSize.y )
+		{
+			x4->coords = IntVec2( tileToExpand->coords.x , tileToExpand->coords.y + 1 );
+			x4->gCost = tileToExpand->gCost + 1.f;
+			x4->hCost = GetManhattanDistance( x4->coords , ePos );
+
+			if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x4->coords, true ) ].m_isSolid )
+			{
+				x4->isConsidered = true;
+			}
+
+			x4->parent = tileToExpand;
+		}
+
+		if ( x4->isConsidered )
+		{
+			bool found = false;
+
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+				if ( openList[ i ]->coords == x4->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			/*for ( int i = 0; i < closedList.size(); i++ )
+			{
+				if ( closedList[ i ]->coords == x4->coords )
+				{
+					found = true;
+					break;
+				}
+			}*/
+
+			if ( !found )
+			{
+				openList.push_back( x4 );
+			}
+		}
+
+		if ( !ignoreDiagonalMoves )
+		{
+			if ( tileToExpand->coords.x - 1 > 0 && tileToExpand->coords.y - 1 > 0 )
+			{
+				x5->coords = IntVec2( tileToExpand->coords.x - 1 , tileToExpand->coords.y - 1 );
+				x5->gCost = tileToExpand->gCost + 1.4f;
+				x5->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x5->coords , ePos );
+
+				if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x5->coords,true ) ].m_isSolid )
+				{
+					x5->isConsidered = true;
+				}
+
+				x5->parent = tileToExpand;
+			}
+
+
+			if ( x5->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x5->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x5 );
+				}
+			}
+
+			if ( tileToExpand->coords.x - 1 > 0 && tileToExpand->coords.y + 1 < m_mapSize.y )
+			{
+				x6->coords = IntVec2( tileToExpand->coords.x - 1 , tileToExpand->coords.y + 1 );
+				x6->gCost = tileToExpand->gCost + 1.4f;
+				x6->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x6->coords , ePos );
+
+				if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x6->coords, true ) ].m_isSolid )
+				{
+					x6->isConsidered = true;
+				}
+
+				x6->parent = tileToExpand;
+			}
+
+			if ( x6->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x6->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x6 );
+				}
+			}
+
+			if ( tileToExpand->coords.x + 1 < m_mainMapSize.x && tileToExpand->coords.y - 1 > 0 )
+			{
+				x7->coords = IntVec2( tileToExpand->coords.x + 1 , tileToExpand->coords.y - 1 );
+				x7->gCost = tileToExpand->gCost + 1.4f;
+				x7->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x7->coords , ePos );
+
+				if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x7->coords, true ) ].m_isSolid )
+				{
+					x7->isConsidered = true;
+				}
+
+				x7->parent = tileToExpand;
+			}
+
+			if ( x7->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x7->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x7 );
+				}
+			}
+
+			if ( tileToExpand->coords.x + 1 < m_mainMapSize.x && tileToExpand->coords.y + 1 < m_mainMapSize.y )
+			{
+				x8->coords = IntVec2( tileToExpand->coords.x + 1 , tileToExpand->coords.y + 1 );
+				x8->gCost = tileToExpand->gCost + 1.4f;
+				x8->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x8->coords , ePos );
+
+				if ( !m_mainMapTiles[ GetTileIndexForTileCoords( x8->coords, true ) ].m_isSolid )
+				{
+					x8->isConsidered = true;
+				}
+
+				x8->parent = tileToExpand;
+			}
+
+			if ( x8->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x8->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x8 );
+				}
+			}
+		}
+	}
+
+	/*PathFindingHelper* foundPath = closedList.back();
+
+	while ( foundPath->parent != nullptr )
+	{
+		path.push_back( GetTileIndexForTileCoords( foundPath->coords ) );
+		foundPath = ( foundPath->parent );
+	}*/
+
+
+	PathFindingHelper foundPath = *closedList.back();
+	path.push_back( GetTileIndexForTileCoords( foundPath.coords, true ) );
+
+
+	PathFindingHelper currentParent = *foundPath.parent;
+	while ( currentParent.parent != nullptr )
+	{
+
+		std::vector<PathFindingHelper> currentNodesWithSameParent;
+		for ( int i = 0; i < closedList.size(); i++ )
+		{
+			if ( closedList[ i ]->parent == &currentParent )
+			{
+				currentNodesWithSameParent.push_back( *closedList[ i ] );
+			}
+		}
+
+		PathFindingHelper chosenTile;
+		if ( currentNodesWithSameParent.size() > 0 )
+		{
+			chosenTile = currentNodesWithSameParent[ 0 ];
+		}
+		if ( currentNodesWithSameParent.size() > 1 )
+		{
+			for ( int i = 1; i < currentNodesWithSameParent.size(); i++ )
+			{
+
+				if ( m_mainMapTiles[ GetTileIndexForTileCoords( currentNodesWithSameParent[ i ].coords, true ) ].m_influenceValue < m_mainMapTiles[ GetTileIndexForTileCoords( chosenTile.coords, true ) ].m_influenceValue )
+				{
+					chosenTile = currentNodesWithSameParent[ i ];
+				}
+				else if ( GetManhattanDistance( currentNodesWithSameParent[ i ].coords , ePos ) < GetManhattanDistance( chosenTile.coords , ePos ) )
+				{
+					chosenTile = currentNodesWithSameParent[ i ];
+				}
+			}
+		}
+		if ( chosenTile.isConsidered )
+		{
+			path.push_back( GetTileIndexForTileCoords( chosenTile.coords, true ) );
+			currentParent = *chosenTile.parent;
+		}
+		else
+		{
+			path.push_back( GetTileIndexForTileCoords( currentParent.coords,true ) );
+			currentParent = *currentParent.parent;
+		}
+		currentNodesWithSameParent.clear();
+	}
+}
+
 float Game::GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos )
 {
 	return( ( abs((float)finalPos.x - (float)currentPos.x) ) + ( abs((float)finalPos.y - (float)currentPos.y) )  )/**10.f*/;
@@ -3115,9 +3746,16 @@ void Game::ToggleDevConsole()
 
 }
 
-int Game::GetTileIndexForTileCoords( const IntVec2& tileCoords )
+int Game::GetTileIndexForTileCoords( const IntVec2& tileCoords, bool usingMainMap )
 {
-	return tileCoords.x + ( m_mapSize.x * tileCoords.y );
+	if ( !usingMainMap )
+	{
+		return tileCoords.x + ( m_mapSize.x * tileCoords.y );
+	}
+	else
+	{
+		return tileCoords.x + ( m_mainMapSize.x * tileCoords.y );
+	}
 }
 
 int Game::GetTileIndexForTileCoordsForMainMap( const IntVec2& tileCoords )

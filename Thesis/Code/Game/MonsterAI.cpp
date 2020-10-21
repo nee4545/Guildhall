@@ -2,6 +2,7 @@
 #include "Game/Game.hpp"
 #include "Game/Player.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/GreenBeret.hpp"
 #include "Engine/Renderer/SpriteAnimDefinition.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Engine/Input/InputSystem.hpp"
@@ -58,7 +59,7 @@ void MonsterAI::Update( float deltaseconds )
 			tileIndex = m_helper->GetNextMove();
 			if ( tileIndex > 0 )
 			{
-				m_nextMovePosition = Vec2( m_game->m_tiles[ tileIndex ].m_tileCoords.x + 0.5f , m_game->m_tiles[ tileIndex ].m_tileCoords.y + 0.5f );
+				m_nextMovePosition = Vec2( m_game->m_mainMapTiles[ tileIndex ].m_tileCoords.x + 0.5f , m_game->m_mainMapTiles[ tileIndex ].m_tileCoords.y + 0.5f );
 			}
 			//m_position = m_nextMovePosition;
 			moveVec = ( -m_position + m_nextMovePosition ).GetNormalized();
@@ -79,7 +80,7 @@ void MonsterAI::Update( float deltaseconds )
 	}
 	if ( m_currentBehavior == CHASE_PLAYER )
 	{
-		Vec2 dir = ( m_game->m_player->m_position - m_position ).GetNormalized();
+		Vec2 dir = ( m_game->m_greenBeret->m_position - m_position ).GetNormalized();
 		m_position += dir * 4.f * deltaseconds;
 		//m_orientationDegrees = dir.GetAngleDegrees();
 		m_orientationDegrees = GetTurnedToward( m_orientationDegrees , dir.GetAngleDegrees() , 90.f * deltaseconds );
@@ -126,7 +127,7 @@ void MonsterAI::Render()
 	Vertex_PCU vertCopy[ 6 ];
 	memcpy( vertCopy , m_vertices , sizeof( Vertex_PCU ) * 6 );
 
-	TransformVertexArray( 6 , vertCopy , 1.f , m_orientationDegrees+90.f , m_position );
+	TransformVertexArray( 6 , vertCopy , 3.f , m_orientationDegrees+90.f , m_position );
 
 	g_theRenderer->DrawVertexArray( 6 , vertCopy );
 
@@ -142,7 +143,7 @@ void MonsterAI::DebugRender()
 
 	for ( int i = 0; i < pathIndices.size(); i++ )
 	{
-		AABB2 aabb = AABB2( m_game->m_tiles[ pathIndices[ i ] ].m_tileCoords.x , m_game->m_tiles[ pathIndices[ i ] ].m_tileCoords.y , m_game->m_tiles[ pathIndices[ i ] ].m_tileCoords.x + 1 , m_game->m_tiles[ pathIndices[ i ] ].m_tileCoords.y + 1 );
+		AABB2 aabb = AABB2( m_game->m_mainMapTiles[ pathIndices[ i ] ].m_tileCoords.x , m_game->m_mainMapTiles[ pathIndices[ i ] ].m_tileCoords.y , m_game->m_mainMapTiles[ pathIndices[ i ] ].m_tileCoords.x + 1 , m_game->m_mainMapTiles[ pathIndices[ i ] ].m_tileCoords.y + 1 );
 		AppendAABB2( verts , aabb , Rgba8( 0 , 0 , 100 , 100 ) );
 	}
 
@@ -153,7 +154,7 @@ void MonsterAI::DebugRender()
 	}
 
 	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->DrawSector( m_position , m_forwardVec.GetRotatedDegrees( m_orientationDegrees+90.f ) , 8.f ,50.f, Rgba8( 100 , 0 , 0 , 100 ) );
+	g_theRenderer->DrawSector( m_position , m_forwardVec.GetRotatedDegrees( m_orientationDegrees+90.f ) , 20.f ,50.f, Rgba8( 100 , 0 , 0 , 100 ) );
 }
 
 void MonsterAI::Die()
@@ -185,7 +186,7 @@ void MonsterAI::ChangeBehavior( AI_Behavior newBehavior )
 
 void MonsterAI::CheckPlayerInSight()
 {
-	if ( IsPointInForwardSector2D( m_game->m_player->m_position,  m_position , m_forwardVec.GetAngleDegrees()+m_orientationDegrees+90.f , 50.f , 8.f ) )
+	if ( IsPointInForwardSector2D( m_game->m_greenBeret->m_position,  m_position , m_forwardVec.GetAngleDegrees()+m_orientationDegrees+90.f , 50.f , 20.f ) )
 	{
 		ChangeBehavior( CHASE_PLAYER );
 	}
@@ -205,12 +206,12 @@ void MonsterAI::FindPathToRandomTile()
 		x = rng.RollRandomIntInRange( 1 , m_game->m_mapSize.x - 1 );
 		y = rng.RollRandomIntInRange( 1 , m_game->m_mapSize.y - 1 );
 
-		if ( !(m_game->m_tiles[ m_game->GetTileIndexForTileCoords( IntVec2( x , y ) ) ].m_isSolid ) )
+		if ( !(m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( IntVec2( x , y ), true ) ].m_isSolid ) )
 		{
 			validRoll = true;
 		}
 	}
 
-	m_game->GetPathUsingAStarIgnoreDiagonalMoves( m_position , Vec2( x , y ) , m_helper->path );
+	m_game->GetPathInGame( m_position , Vec2( x , y ) , m_helper->path );
 	m_helper->currentIndex = (int)m_helper->path.size() - 1;
 }
