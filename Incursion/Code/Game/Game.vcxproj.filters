@@ -78,5 +78,6 @@
     <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="AirStrikePlane.hpp" />
     <ClInclude Include="AirStrike.hpp" />
+    <ClInclude Include="Server.hpp" />
   </ItemGroup>
 </Project>

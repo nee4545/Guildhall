@@ -225,6 +225,7 @@
     <ClInclude Include="NpcTank.hpp" />
     <ClInclude Include="NpcTurret.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Server.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="World.hpp" />
