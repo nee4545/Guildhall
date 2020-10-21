@@ -36,6 +36,8 @@ Player::Player( Game* game )
 	m_animClock = new Clock();
 	m_animTimer = new Timer();
 	m_animTimer->SetSeconds( m_animClock , 0.f );
+
+	m_health = 10.f;
 }
 
 Player::~Player()
@@ -99,6 +101,15 @@ void Player::Die()
 void Player::DebugRender()
 {
 	g_theRenderer->DrawRing( m_position , 0.5f , Rgba8( 100 , 0 , 0 , 255 ) , 0.1f );
+}
+
+void Player::TakeDamage( float damage )
+{
+	m_health -= damage;
+	if ( m_health <= 0.f )
+	{
+		Die();
+	}
 }
 
 void Player::MovePlayer(float deltaseconds)

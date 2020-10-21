@@ -14,23 +14,23 @@
 #include "Engine/JobSystem.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 
-RenderContext* render = nullptr;
-AudioSystem* audio = nullptr;
+RenderContext* g_theRenderer = nullptr;
+AudioSystem* g_theAudio = nullptr;
 Game* thegame = nullptr;
 JobSystem* g_theJobSystem = nullptr;
 
 
 void App::Startup()
 {
-	render = new RenderContext();
-	render->Startup( g_theWindow );
-	render->BeginFrame();
+	g_theRenderer = new RenderContext();
+	g_theRenderer->Startup( g_theWindow );
+	g_theRenderer->BeginFrame();
 	g_theJobSystem = new JobSystem();
 	g_theJobSystem->StartUp();
-	g_theWindow->SetInputSysten( input );
-	if ( audio == nullptr )
+	g_theWindow->SetInputSysten( g_theInput );
+	if ( g_theAudio == nullptr )
 	{
-		audio = new AudioSystem();
+		g_theAudio = new AudioSystem();
 	}
 	if ( thegame == nullptr )
 	{
@@ -57,7 +57,7 @@ void App::Shutdown() //Not used right now
 
 	DebugRenderSystem::sDebugRenderer->SystemShutDown();
 
-	render->Shutdown();
+	g_theRenderer->Shutdown();
 	g_theJobSystem->ShutDown();
 
 }
@@ -67,14 +67,14 @@ void App::Shutdown() //Not used right now
 void App::Update( float deltaSeconds )
 {
 
-	render->UpdateFrameTime( deltaSeconds );
+	g_theRenderer->UpdateFrameTime( deltaSeconds );
 	DebugRenderSystem::sDebugRenderer->Update();
 
-	input->UpdateMouse();
+	g_theInput->UpdateMouse();
 
-	if ( input->GetCursorMode() == MODE_RELATIVE )
+	if ( g_theInput->GetCursorMode() == MODE_RELATIVE )
 	{
-		input->UpdateRelativeMode();
+		g_theInput->UpdateRelativeMode();
 	}
 
 	thegame->Update( deltaSeconds );
@@ -88,7 +88,7 @@ void App::Update( float deltaSeconds )
 		HandleQuitRequested();
 	}
 
-	if ( input->WasKeyJustPressed( ESC ) )
+	if ( g_theInput->WasKeyJustPressed( ESC ) )
 	{
 		HandleQuitRequested();
 	}
@@ -111,8 +111,8 @@ void App::RunFrame()
 
 void App::EndFrame()
 {
-	input->EndFrame();
-	render->EndFrame();
+	g_theInput->EndFrame();
+	g_theRenderer->EndFrame();
 	g_theConsole.EndFrame();
 }
 
@@ -126,9 +126,9 @@ void App::Render() const
 
 void App::BeginFrame()
 {
-	input->BeginFrame();
-	render->BeginFrame();
-	audio->BeginFrame();
+	g_theInput->BeginFrame();
+	g_theRenderer->BeginFrame();
+	g_theAudio->BeginFrame();
 	g_theJobSystem->BeginFrame();
 	Clock::BeginFrame();
 

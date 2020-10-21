@@ -136,7 +136,7 @@ void Game::UpdateCamera()
 
 void Game::ToggleDebugCamera()
 {
-	if(input->WasKeyJustPressed(0x73) )
+	if(g_theInput->WasKeyJustPressed(0x73) )
 	{ 
 	toggleCamera=!toggleCamera;
 	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(53.3f,30.f));
@@ -145,7 +145,7 @@ void Game::ToggleDebugCamera()
 
 void Game::TogglePaused()
 {
-	if( input->WasKeyJustPressed( 'P' ) )
+	if( g_theInput->WasKeyJustPressed( 'P' ) )
 	{
 		paused=!paused;
 	}
@@ -153,7 +153,7 @@ void Game::TogglePaused()
 
 void Game::ToggleDebugging()
 {
-	if( input->WasKeyJustPressed( 0x70 ) )
+	if( g_theInput->WasKeyJustPressed( 0x70 ) )
 	{
 		isDebugging=!isDebugging;
 	}
@@ -164,40 +164,40 @@ void Game::LoadTextures()
 	//Create all the textures required for the game
 
 	Texture *texture =nullptr;
-	texture=render->CreateTextureFromFile("Data/Images/PlayerTankBase.png");
-	texture=render->CreateTextureFromFile("Data/Images/PlayerTankTop.png");
-	texture=render->CreateTextureFromFile("Data/Images/EnemyTurretBase.png");
-	texture=render->CreateTextureFromFile("Data/Images/EnemyTurretTop.png");
-	texture=render->CreateTextureFromFile("Data/Images/NemesisTankBase.png");
-	texture=render->CreateTextureFromFile("Data/Images/NemesisTankTop.png");
-	texture=render->CreateTextureFromFile("Data/Images/NemesisTankBase.png");
-	texture=render->CreateTextureFromFile("Data/Images/Extras_4x4.png");
-	texture=render->CreateTextureFromFile("Data/Images/Terrain_8x8.png");
-	texture=render->CreateTextureFromFile("Data/Images/FriendlyTank1.png");
-	texture=render->CreateTextureFromFile("Data/Images/FriendlyBullet.png");
-	texture=render->CreateTextureFromFile("Data/Images/EnemyBullet.png");
-	texture=render->CreateTextureFromFile("Data/Images/Plane.jpg");
-	texture=render->CreateTextureFromFile("Data/Images/AirStrikePlane.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/PlayerTankBase.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/PlayerTankTop.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/EnemyTurretBase.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/EnemyTurretTop.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/NemesisTankBase.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/NemesisTankTop.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/NemesisTankBase.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/Extras_4x4.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/Terrain_8x8.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/FriendlyTank1.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/FriendlyBullet.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/EnemyBullet.png");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/Plane.jpg");
+	texture=g_theRenderer->CreateTextureFromFile("Data/Images/AirStrikePlane.png");
 	
 }
 
 void Game::LoadSounds()
 {
 	SoundID sound;
-	sound = audio->CreateOrGetSound("Data/Audio/PlayerShootNormal.ogg");
-	sound = audio->CreateOrGetSound("Data/Audio/PlayerHit.wav");
-	sound = audio->CreateOrGetSound("Data/Audio/PlayerDied.wav");
-	sound = audio->CreateOrGetSound("Data/Audio/EnemyHit.wav");
-	sound = audio->CreateOrGetSound("Data/Audio/EnemyShoot.wav");
-	sound = audio->CreateOrGetSound("Data/Audio/EnemyDied.wav");
-	sound = audio->CreateOrGetSound("Data/Audio/airplanes.mp3");
-	sound = audio->CreateOrGetSound("Data/Audio/AttractMusic.mp3");
-	sound = audio->CreateOrGetSound("Data/Audio/GameplayMusic.mp3");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/PlayerShootNormal.ogg");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/PlayerHit.wav");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/PlayerDied.wav");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/EnemyHit.wav");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/EnemyShoot.wav");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/EnemyDied.wav");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/airplanes.mp3");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/AttractMusic.mp3");
+	sound = g_theAudio->CreateOrGetSound("Data/Audio/GameplayMusic.mp3");
 }
 
 void Game::LoadFonts()
 {
-	m_BitmapFont = render->CreateBitMapFontFromFile("Data/Fonts/SquirrelFixedFont");
+	m_BitmapFont = g_theRenderer->CreateBitMapFontFromFile("Data/Fonts/SquirrelFixedFont");
 }
 
 void Game::RenderUI()
@@ -230,10 +230,10 @@ void Game::RenderUI()
 			iconVertices[index].m_position=TransformPosition3DXY( iconVertices_original[index].m_position, 50.f, 0.f, Vec2( 30.f+(livesIndex*offset), UI_YMaX-30.f ) );
 		}
 
-		Texture* tex = render->GetOrCreateTextureFromFile("Data/Images/FriendlyTank1.png");
-		render->BindTexture(tex);
-		render->DrawVertexArray( 6, iconVertices );
-		render->BindTexture(nullptr);
+		Texture* tex = g_theRenderer->GetOrCreateTextureFromFile("Data/Images/FriendlyTank1.png");
+		g_theRenderer->BindTexture(tex);
+		g_theRenderer->DrawVertexArray( 6, iconVertices );
+		g_theRenderer->BindTexture(nullptr);
 	}
 
 	for( int airCharges =0; airCharges<airStrikeCharges; airCharges++ )
@@ -243,22 +243,22 @@ void Game::RenderUI()
 			iconVertices[index].m_position=TransformPosition3DXY( iconVertices_original[index].m_position, 55.f, 0.f, Vec2( 1450.f+(airCharges*offset), UI_YMaX-30.f ) );
 		}
 
-		Texture* tex = render->GetOrCreateTextureFromFile( "Data/Images/AirStrikePlane.png" );
-		render->BindTexture( tex );
-		render->DrawVertexArray( 6, iconVertices );
-		render->BindTexture( nullptr );
+		Texture* tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/AirStrikePlane.png" );
+		g_theRenderer->BindTexture( tex );
+		g_theRenderer->DrawVertexArray( 6, iconVertices );
+		g_theRenderer->BindTexture( nullptr );
 	}
 }
 
 void Game::RenderStartScreen()
 {
 	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(53.3f,30.f));
-	render->BeginCamera(*m_camera);
+	g_theRenderer->BeginCamera(*m_camera);
 	std::vector<Vertex_PCU> textVerts;
 	m_BitmapFont->AddVertsForText2D( textVerts, Vec2( 15.f, 20.f ), 2.f, "INCURSION",Rgba8(100,0,0,255) );
 	m_BitmapFont->AddVertsForText2D( textVerts, Vec2( 5.f, 18.f ), 1.5f, "Press Start or Space to Play!!",Rgba8(100,0,0,255) );
-	render->BindTexture( m_BitmapFont->GetTexture() );
-	render->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
 
 }
 
@@ -267,37 +267,37 @@ void Game::RenderGameOverScreen()
 	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(53.3f,30.f));
 	std::vector<Vertex_PCU> textVerts;
 	m_BitmapFont->AddVertsForText2D( textVerts, Vec2( 15.f, 20.f ), 2.f, "GAME OVER", Rgba8( 100, 0, 0, 255 ) );
-	render->BindTexture( m_BitmapFont->GetTexture() );
-	render->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
 }
 
 void Game::RenderWinScreen()
 {
 	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(53.3f,30.f));
-	render->BeginCamera(*m_camera);
+	g_theRenderer->BeginCamera(*m_camera);
 	std::vector<Vertex_PCU> textVerts;
 	m_BitmapFont->AddVertsForText2D( textVerts, Vec2( 10.f, 20.f ), 2.f, "YOU WIN", Rgba8( 100, 0, 0, 255 ) );
-	render->BindTexture( m_BitmapFont->GetTexture() );
-	render->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
 }
 
 
 void Game::HandleRenderScreens()
 {
-	const XboxController& controller= input->GetXboxController( 0 );
+	const XboxController& controller= g_theInput->GetXboxController( 0 );
 	const KeyButtonState& start= controller.GetButtonState( XBOX_BUTTON_ID_START );
 	const KeyButtonState& back = controller.GetButtonState(XBOX_BUTTON_ID_BACK);
 	
 
 	if( m_state == ATTRACT )
 	{
-		if( input->WasKeyJustPressed( 0x20 ) || start.WasJustPressed() )
+		if( g_theInput->WasKeyJustPressed( 0x20 ) || start.WasJustPressed() )
 		{
 			m_state = PLAYING;
 			return;
 		}
 
-		if( input->WasKeyJustPressed( 0x1B ) )
+		if( g_theInput->WasKeyJustPressed( 0x1B ) )
 		{
 			g_theapp->HandleQuitRequested();
 			return;
@@ -312,13 +312,13 @@ void Game::HandleRenderScreens()
 
 	if( m_state == PLAYING )
 	{
-		if( (input->WasKeyJustPressed( 'P' ) || start.WasJustPressed()) && world->current_map->IsPlayerAlive()  )
+		if( (g_theInput->WasKeyJustPressed( 'P' ) || start.WasJustPressed()) && world->current_map->IsPlayerAlive()  )
 		{
 			m_state = PAUSED;
 			return;
 		}
 
-		if( !world->current_map->IsPlayerAlive() && input->WasKeyJustPressed( 0x20 ) )
+		if( !world->current_map->IsPlayerAlive() && g_theInput->WasKeyJustPressed( 0x20 ) )
 		{
 			Player* p=(Player*)world->current_map->m_EntityListByType[ENTITY_TYPE_PLAYER][0];
 			p->RespawnTank();
@@ -330,7 +330,7 @@ void Game::HandleRenderScreens()
 			return;
 		}
 
-		if( back.WasJustPressed() || input->WasKeyJustPressed(0x1B) )
+		if( back.WasJustPressed() || g_theInput->WasKeyJustPressed(0x1B) )
 		{
 			m_state=ATTRACT;
 			return;
@@ -339,13 +339,13 @@ void Game::HandleRenderScreens()
 
 	if( m_state == PAUSED )
 	{
-		if( input->WasKeyJustPressed( 'P' ) || start.WasJustPressed() )
+		if( g_theInput->WasKeyJustPressed( 'P' ) || start.WasJustPressed() )
 		{
 			m_state = PLAYING;
 			return;
 		}
 
-		if( input->WasKeyJustPressed( 0x1B ) )
+		if( g_theInput->WasKeyJustPressed( 0x1B ) )
 		{
 			m_state = ATTRACT;
 			return;
@@ -359,7 +359,7 @@ void Game::HandleRenderScreens()
 
 	if( m_state == VICTORY )
 	{
-		if( input->WasKeyJustPressed( 0x20 ) || start.WasJustPressed() )
+		if( g_theInput->WasKeyJustPressed( 0x20 ) || start.WasJustPressed() )
 		{
 			world->ResetGame();
 			m_state = ATTRACT;
@@ -369,7 +369,7 @@ void Game::HandleRenderScreens()
 
 	if( m_state == GAME_OVER )
 	{
-		if( input->WasKeyJustPressed( 0x20 ) || start.WasJustPressed() )
+		if( g_theInput->WasKeyJustPressed( 0x20 ) || start.WasJustPressed() )
 		{
 			world->ResetGame();
 			m_state = ATTRACT;
@@ -383,50 +383,50 @@ void Game::HandleRenderScreens()
 void Game::RenderLoadingScreen()
 {
 	m_camera->SetOrthoView(Vec2(0.f,0.f),Vec2(53.3f,30.f));
-	render->BeginCamera(*m_camera);
-	DrawTextTriangles2D(*render,"LOADING...",Vec2(20.f,10.f),2.f,Rgba8(100,0,0,255));
+	g_theRenderer->BeginCamera(*m_camera);
+	DrawTextTriangles2D(*g_theRenderer,"LOADING...",Vec2(20.f,10.f),2.f,Rgba8(100,0,0,255));
 }
 
 void Game::RenderPausedScreen()
 {
 	RenderPlayingScreen();
 	
-	render->BeginCamera(*m_camera);
+	g_theRenderer->BeginCamera(*m_camera);
 	AABB2 aabb= AABB2(0.f,0.f,53.3f,30.f);
 	Rgba8 tint = Rgba8(0,0,0,100);
-	render->DrawAABB2D(aabb,tint);
+	g_theRenderer->DrawAABB2D(aabb,tint);
 	std::vector<Vertex_PCU> textVerts;
 	m_BitmapFont->AddVertsForText2D( textVerts, m_camera->GetOrthoBottomLeft()+Vec2( 5.f, 5.f ), 1.f, "Paused", Rgba8( 10, 0, 25, 255 ) );
 	m_BitmapFont->AddVertsForText2D( textVerts, m_camera->GetOrthoBottomLeft()+Vec2( 1.f, 4.f ), 0.5f, "Press Start or P to continue..", Rgba8( 10, 0, 25, 255 ) );
-	render->BindTexture( m_BitmapFont->GetTexture() );
-	render->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
 }
 
 void Game::RenderPlayingScreen()
 {
-	render->BeginCamera( *m_camera );
+	g_theRenderer->BeginCamera( *m_camera );
 	world->Render();
-	render->EndCamera( *m_camera );
+	g_theRenderer->EndCamera( *m_camera );
 
 
-	render->BeginCamera( *m_UICamera );
+	g_theRenderer->BeginCamera( *m_UICamera );
 	RenderUI();
-	render->EndCamera( *m_UICamera );
+	g_theRenderer->EndCamera( *m_UICamera );
 }
 
 void Game::RenderDeadScreen()
 {
 	RenderPlayingScreen();
 
-	render->BeginCamera( *m_camera );
+	g_theRenderer->BeginCamera( *m_camera );
 	AABB2 aabb= AABB2( 0.f, 0.f, 53.3f, 30.f );
 	Rgba8 tint = Rgba8( 0, 0, 0, 100 );
-	render->DrawAABB2D( aabb, tint );
+	g_theRenderer->DrawAABB2D( aabb, tint );
 	std::vector<Vertex_PCU> textVerts;
 	m_BitmapFont->AddVertsForText2D( textVerts,m_camera->GetOrthoBottomLeft()+ Vec2( 5.f, 5.f ), 1.f, "You Died", Rgba8( 10, 0, 25, 255 ) );
 	m_BitmapFont->AddVertsForText2D( textVerts, m_camera->GetOrthoBottomLeft()+Vec2( 0.f, 4.f ), 0.5f, "Press Start or Space to Respawn", Rgba8( 10, 0, 25, 255 ) );
-	render->BindTexture( m_BitmapFont->GetTexture() );
-	render->DrawVertexArray( textVerts );
+	g_theRenderer->BindTexture( m_BitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
 }
 
 

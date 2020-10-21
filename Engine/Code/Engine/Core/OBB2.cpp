@@ -147,10 +147,10 @@ void OBB2::GetCornerPositions( Vec2* out_fourPoints ) const
 	Vec2 rightVector = m_iBasis * m_halfDimensions.x;
 	Vec2 upVector = m_iBasis.GetRotated90Degrees()*m_halfDimensions.y;
 
-	out_fourPoints[ 0 ] = m_center - rightVector - upVector;
-	out_fourPoints[ 1 ] = m_center + rightVector - upVector;
-	out_fourPoints[ 2 ] = m_center + rightVector + upVector;
-	out_fourPoints[ 3 ] = m_center - rightVector + upVector;
+	out_fourPoints[ 0 ] = m_center - rightVector - upVector; //bottom left
+	out_fourPoints[ 1 ] = m_center + rightVector - upVector; //bottom right
+	out_fourPoints[ 2 ] = m_center + rightVector + upVector; //top right
+	out_fourPoints[ 3 ] = m_center - rightVector + upVector; //top left
 	
 }
 

@@ -196,9 +196,13 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GreenBeret.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
+    <ClCompile Include="MapCreator.cpp" />
     <ClCompile Include="MonsterAI.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PotentialFieldCreator.cpp" />
+    <ClCompile Include="PotentialFields.cpp" />
     <ClCompile Include="StartScreen.cpp" />
     <ClCompile Include="SupportPlayer.cpp" />
     <ClCompile Include="Tile.cpp" />
@@ -212,9 +216,12 @@
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
+    <ClInclude Include="GreenBeret.hpp" />
     <ClInclude Include="MapCreator.hpp" />
     <ClInclude Include="MonsterAI.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="PotentialFieldCreator.hpp" />
+    <ClInclude Include="PotentialFields.hpp" />
     <ClInclude Include="StartScreen.hpp" />
     <ClInclude Include="SupportPlayer.hpp" />
     <ClInclude Include="Tile.hpp" />
@@ -305,6 +312,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\GameConfig\GameData.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

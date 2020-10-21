@@ -37,7 +37,7 @@ void AirStrike::Update( float deltaSeconds )
 
 void AirStrike::Render()
 {
-	Texture* texture = render->GetOrCreateTextureFromFile( "Data/Images/Explosion_5x5.png" );
+	Texture* texture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Explosion_5x5.png" );
 	SpriteSheet* spriteSheet = new SpriteSheet( *texture, IntVec2( 5, 5 ) );
 	SpriteAnimDefinition anim = SpriteAnimDefinition( *spriteSheet, 0, 24, 1.f );
 	const SpriteDefinition& expl = anim.GetSpriteDefAtTime( timeElapsedInSeconds );
@@ -45,12 +45,12 @@ void AirStrike::Render()
 	expl.GetUVs( uvMins, uvMaxs );
 	ResetUvs();
 
-	render->TransformVertexArray( 6, m_vertices, 3.f, m_orientationDegrees, m_position );
-	render->BindTexture( texture );
-	render->SetBlendMode( BlendMode::ADDITIVE );
-	render->DrawVertexArray( 6, m_vertices );
-	render->BindTexture( nullptr );
-	render->SetBlendMode( BlendMode::ALPHA );
+	g_theRenderer->TransformVertexArray( 6, m_vertices, 3.f, m_orientationDegrees, m_position );
+	g_theRenderer->BindTexture( texture );
+	g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
+	g_theRenderer->DrawVertexArray( 6, m_vertices );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
 	
 	ResetVertices();
 

@@ -39,21 +39,21 @@ void Bullet::Render()
 
 	if( entityType == ENTITY_TYPE_GOOD_BULLET )
 	{
-		render->TransformVertexArray( 6, m_vertices, 1.f, m_orientationDegrees, m_position );
-		Texture* tex=render->GetOrCreateTextureFromFile( "Data/Images/FriendlyBullet.png" );
-		render->BindTexture( tex );
-		render->DrawVertexArray( 6, m_vertices );
-		render->BindTexture( nullptr );
+		g_theRenderer->TransformVertexArray( 6, m_vertices, 1.f, m_orientationDegrees, m_position );
+		Texture* tex=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FriendlyBullet.png" );
+		g_theRenderer->BindTexture( tex );
+		g_theRenderer->DrawVertexArray( 6, m_vertices );
+		g_theRenderer->BindTexture( nullptr );
 		ResetVertices();
 	}
 
 	if( entityType == ENTITY_TYPE_EVIL_BULLET )
 	{
-		render->TransformVertexArray( 6, m_vertices, 1.f, m_orientationDegrees, m_position );
-		Texture* tex=render->GetOrCreateTextureFromFile( "Data/Images/EnemyBullet.png" );
-		render->BindTexture( tex );
-		render->DrawVertexArray( 6, m_vertices );
-		render->BindTexture( nullptr );
+		g_theRenderer->TransformVertexArray( 6, m_vertices, 1.f, m_orientationDegrees, m_position );
+		Texture* tex=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/EnemyBullet.png" );
+		g_theRenderer->BindTexture( tex );
+		g_theRenderer->DrawVertexArray( 6, m_vertices );
+		g_theRenderer->BindTexture( nullptr );
 		ResetVertices();
 	}
 }

@@ -15,7 +15,7 @@ TileDefinition::TileDefinition( SpriteDefinition sprite, Rgba8 tint, bool solid 
 
 void TileDefinition::CreateTileDefinitions()
 {
-	Texture* texture = render->GetOrCreateTextureFromFile("Data/Images/Terrain_8x8.png");
+	Texture* texture = g_theRenderer->GetOrCreateTextureFromFile("Data/Images/Terrain_8x8.png");
 	SpriteSheet* spriteSheet = new SpriteSheet(*texture,IntVec2(8,8));
 
 	const SpriteDefinition& grass= spriteSheet->GetSpriteDefinition(48);

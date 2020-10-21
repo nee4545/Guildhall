@@ -30,4 +30,4 @@ enum eBillBoardType
 	CAMERA_FACING_XYZ ,
 };
 
-constexpr float PLAYER_SPEED = 7.f;
+constexpr float PLAYER_SPEED = 15.f;

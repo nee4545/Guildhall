@@ -8,6 +8,7 @@
 #include "Engine/Core/Transform.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 
+
 class SpriteSheet;
 class Entity;
 class SpriteAnimDefTex;
@@ -20,12 +21,18 @@ class RandomNumberGenerator;
 class StartScreen;
 class Bomb;
 class Turret;
+class GreenBeret;
+class MapCreator;
+class PotentialFieldCreator;
+class PotentialField;
+class Timer;
 
 enum GameMode
 {
 	GAME,
 	PATHFINDER,
 	MAPCREATOR,
+	POTENTIALFIELD_CREATOR,
 	
 };
 
@@ -33,7 +40,7 @@ struct PathFindingHelper
 {
 public:
 	IntVec2 coords;
-	int gCost;
+	float gCost;
 	float hCost;
 	bool isConsidered = false;
 	PathFindingHelper* parent = nullptr;
@@ -56,6 +63,8 @@ public:
 	void LoadAIAnimations();
 	void LoadBombAnimations();
 
+	void LoadPlayerHudAnimations();
+
 	void UpdatePathFinderMode();
 	void RefreshPathFinderMode();
 	void RenderPathFinderMode();
@@ -70,9 +79,9 @@ public:
 	void HandleBlockCollissions(Entity* entity);
 	bool IsTileSolid( IntVec2 tileCoords );
 	
-	void GetPathUsingAStarIgnoreDiagonalMovesOneStep(Vec2 startPos, Vec2 endPos,std::vector<int>& path);
+	void GetPathUsingAStarIgnoreDiagonalMovesOneStep(Vec2 startPos, Vec2 endPos,std::vector<int>& path, bool ignoreDiagonalMoves = false, bool considerInfluenceMaps = false);
 	void GetPathUsingAstarWithDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
-	void GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
+	void GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfuenceMap = false , bool ignoreDiagonalMoves = false );
 	float GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos );
 	void CreateInfluenceMap( IntVec2 startCoords , bool isPositive , int initialValue );
 
@@ -82,7 +91,11 @@ public:
 	void ToggleDevConsole();
 
 	int GetTileIndexForTileCoords( const IntVec2& tileCoords );
+	int GetTileIndexForTileCoordsForMainMap( const IntVec2& tileCoords );
 	void MapFillUsingWorms( TileTextureType type, int minWorkLength = 4, int maxWorkLength =12 , int maxWorms = 90);
+
+	void LoadDataFromXml();
+	void LoadPotentialFieldFromXML();
 
 	GameMode m_currentMode = PATHFINDER;
 	StartScreen* m_startScreen = nullptr;
@@ -119,6 +132,9 @@ public:
 	SpriteAnimDefinition* m_aiAnimMeleeAttack8;
 	SpriteAnimDefinition* m_aiAnimMeleeAttack9;
 
+	SpriteAnimDefTex* m_greenBeretActiveAnims = nullptr;
+	SpriteAnimDefTex* m_greenBeretDeactiveAnims = nullptr;
+
 	float m_time = 0.f;
 
 	std::vector<MonsterAI*> m_enemies;
@@ -132,12 +148,16 @@ public:
 
 	std::vector<int> pathIndices;
 
+	GreenBeret* m_greenBeret;
+
 public:
 
 	Camera* m_gameCamera;
 	Camera* m_devConsoleCamera;
 	Camera* m_hudCamera;
 	Vec2 m_mousePosition;
+
+	PotentialFieldCreator* m_potCreator = nullptr;
 
 	//Player Anims
 	SpriteAnimDefTex* m_player1IdleMeleeTex = nullptr;
@@ -157,8 +177,12 @@ public:
 	SpriteAnimDefTex* m_supportPlayerDisguiseAttack = nullptr;
 
 	Player* m_player;
+
 	SupportPlayer* m_supportPlayer;
 	std::vector<Tile> m_tiles;
+	std::vector<Tile> m_mainMapTiles;
+
+
 	IntVec2 m_mapSize = IntVec2(160,90);
 
 
@@ -194,6 +218,7 @@ public:
 
 	bool m_currentAlgIs4WayAStar = true;
 	bool m_currentAlgIs8WayAstar = false;
+	bool m_considerInfluenceMaps = false;
 
 	RandomNumberGenerator* m_rng = nullptr;
 
@@ -208,14 +233,31 @@ public:
 	bool inStartScreen = true;
 
 	AABB2 m_hudBox;
+	AABB2 m_playerBox;
 	AABB2 m_player1Box;
 	AABB2 m_player2Box;
 	Texture* m_player1HudTex = nullptr;
 	Texture* m_player2HudTex = nullptr;
+	Texture* m_HudBoxTex = nullptr;
+	Texture* m_PlayerBoxTex = nullptr;
 
 	SpriteAnimDefinition* m_bombIdleTex = nullptr;
 	SpriteAnimDefinition* m_explosion = nullptr;
 	Texture* m_turretTex = nullptr;
 
 	bool influenceMapPositive = false;
+
+
+	AABB2 m_mapPart1 = AABB2( 0.f , 0.f , 320.f , 720.f );
+	
+	Texture* m_mapTex1 = nullptr;
+
+	IntVec2 m_mainMapSize = IntVec2( 320 , 720 );
+
+	MapCreator* m_mapCretor = nullptr;
+
+	PotentialField* m_potentialField = nullptr;
+
+	Timer* m_greenBeretHUDTimer = nullptr;
+
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Renderer/RenderContext.hpp"
-#pragma once
 //#include "Engine/Renderer/RenderContext.hpp"
 #include "Game/App.hpp"
 //#include "Engine/Input/InputSystem.hpp"
@@ -13,11 +12,11 @@ class AudioSystem;
 class Game;
 
 constexpr float CLIENT_ASPECT = 2.f / 1.f;
-extern RenderContext* render;
+extern RenderContext* g_theRenderer;
 extern App* g_theapp;
 extern Window* g_theWindow;
-extern InputSystem* input;
-extern AudioSystem* audio;
+extern InputSystem* g_theInput;
+extern AudioSystem* g_theAudio;
 extern Game* thegame;
 
 enum eBillBoardType

@@ -21,7 +21,7 @@ public:
 	float m_orientationDegrees;
 	float m_cosmeticRadius;
 	float m_physicsRadius;
-	int m_health;
+	float m_health;
 	bool m_isDead;
 	bool m_isGarbage;
 	Vec2 m_position;

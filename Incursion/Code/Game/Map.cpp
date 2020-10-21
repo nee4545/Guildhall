@@ -111,7 +111,7 @@ void Map::Update( float deltaSeconds )
 	DeflectBullets();
 	DeleteGarbageEntities();
 
-	const XboxController& controller= input->GetXboxController( 0 );
+	const XboxController& controller= g_theInput->GetXboxController( 0 );
 	const KeyButtonState& start= controller.GetButtonState(XBOX_BUTTON_ID_START);
 
 	if( !controller.IsCOnnected() )
@@ -133,10 +133,10 @@ void Map::Update( float deltaSeconds )
 void Map::Render()
 {
 	
-	Texture* texture = render->GetOrCreateTextureFromFile("Data/Images/Terrain_8x8.png");
-	render->BindTexture(texture);
-	render->DrawVertexArray(tileVertices);
-	render->BindTexture(nullptr);
+	Texture* texture = g_theRenderer->GetOrCreateTextureFromFile("Data/Images/Terrain_8x8.png");
+	g_theRenderer->BindTexture(texture);
+	g_theRenderer->DrawVertexArray(tileVertices);
+	g_theRenderer->BindTexture(nullptr);
 
 	EntityList& playerList= m_EntityListByType[ENTITY_TYPE_PLAYER];
 	playerList[0]->Render();
@@ -312,7 +312,7 @@ void Map::PopulateTiles()
 
 void Map::ToggleNoClip()
 {
-	if( input->WasKeyJustPressed( 0x72 ) )
+	if( g_theInput->WasKeyJustPressed( 0x72 ) )
 	{
 		noClip=!noClip;
 	}
@@ -815,10 +815,10 @@ void Map::HandleBulletEntityCollissions()
 							m_EntityListByType[ENTITY_TYPE_NPC_TANK][TankIndex]->m_health--;
 							m_EntityListByType[ENTITY_TYPE_GOOD_BULLET][index]->Die();
 							CreateExplosions(0.4f,0.4f,m_EntityListByType[ENTITY_TYPE_GOOD_BULLET][index]->GetPosition());
-							audio->PlaySound(ENEMY_HIT);
+							g_theAudio->PlaySound(ENEMY_HIT);
 							if( m_EntityListByType[ENTITY_TYPE_NPC_TANK][TankIndex]->m_health<=0 )
 							{
-								audio->PlaySound(ENEMY_DIED);
+								g_theAudio->PlaySound(ENEMY_DIED);
 								CreateExplosions(1.f,1.f,m_EntityListByType[ENTITY_TYPE_NPC_TANK][TankIndex]->GetPosition());
 								m_EntityListByType[ENTITY_TYPE_NPC_TANK][TankIndex]->Die();
 							}
@@ -846,12 +846,12 @@ void Map::HandleBulletEntityCollissions()
 							m_EntityListByType[ENTITY_TYPE_NPC_TURRET][TankIndex]->m_health--;
 							m_EntityListByType[ENTITY_TYPE_GOOD_BULLET][index]->Die();
 							CreateExplosions(0.4f,0.4f,m_EntityListByType[ENTITY_TYPE_GOOD_BULLET][index]->GetPosition());
-							audio->PlaySound(ENEMY_HIT);
+							g_theAudio->PlaySound(ENEMY_HIT);
 							if( m_EntityListByType[ENTITY_TYPE_NPC_TURRET][TankIndex]->m_health<=0 )
 							{
 								m_EntityListByType[ENTITY_TYPE_NPC_TURRET][TankIndex]->Die();
 								CreateExplosions(1.f,1.f,m_EntityListByType[ENTITY_TYPE_NPC_TURRET][TankIndex]->GetPosition());
-								audio->PlaySound(ENEMY_DIED);
+								g_theAudio->PlaySound(ENEMY_DIED);
 							}
 						}
 					}
@@ -880,7 +880,7 @@ void Map::HandleBulletEntityCollissions()
 								m_EntityListByType[ENTITY_TYPE_PLAYER][tankIndex]->m_health--;
 								m_EntityListByType[ENTITY_TYPE_EVIL_BULLET][index]->Die();
 								CreateExplosions( 0.4f, 0.4f, m_EntityListByType[ENTITY_TYPE_EVIL_BULLET][index]->GetPosition() );
-								audio->PlaySound( PLAYER_HIT );
+								g_theAudio->PlaySound( PLAYER_HIT );
 
 								if( !m_EntityListByType[ENTITY_TYPE_PLAYER][tankIndex]->m_isGarbage )
 								{
@@ -889,7 +889,7 @@ void Map::HandleBulletEntityCollissions()
 										m_EntityListByType[ENTITY_TYPE_PLAYER][tankIndex]->Die();
 										m_game->currentLives--;
 										CreateExplosions( 2.f, 2.f, m_EntityListByType[ENTITY_TYPE_PLAYER][tankIndex]->GetPosition() );
-										audio->PlaySound( PLAYER_DIED );
+										g_theAudio->PlaySound( PLAYER_DIED );
 									}
 								}
 							}
@@ -1311,7 +1311,7 @@ void Map::SpawnEntites( int num_NPCTurrets, int num_NPCTanks, int num_Boulders )
 
 void Map::ManagePlayerTankSpeed()
 {
-	const XboxController& controller= input->GetXboxController( 0 );
+	const XboxController& controller= g_theInput->GetXboxController( 0 );
 	Player* p = (Player*)m_EntityListByType[ENTITY_TYPE_PLAYER][0];
 	XINPUT_VIBRATION xboxviration;
 	memset( &xboxviration, 0, sizeof( xboxviration ) );
@@ -1464,6 +1464,6 @@ void Map::CreateAirStrike( Vec2 position )
 {
 	AirStrike* a = new AirStrike(m_game,position);
 	AddEntityToMap(a,ENTITY_TYPE_AIR_STRIKE);
-	audio->PlaySound( PLAYER_DIED );
+	g_theAudio->PlaySound( PLAYER_DIED );
 }
 

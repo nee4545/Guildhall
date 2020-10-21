@@ -23,6 +23,7 @@ public:
 	virtual void Render() override;
 	virtual void Die() override;
 	virtual void DebugRender() override;
+	void TakeDamage( float damage );
 
 	void MovePlayer( float deltaseconds );
 	void ToggleMeleeState();
@@ -48,4 +49,6 @@ public:
 	bool m_lockAnimState = false;
 	bool m_isActive = false;
 	bool m_isMelee = true;
+
+	
 };

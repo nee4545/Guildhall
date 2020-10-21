@@ -94,28 +94,28 @@ void Player::Render()
 		return;
 	}
 
-	render->TransformVertexArray(6,m_tank,1.f,m_orientationDegrees,m_position);
-	Texture* tankBase=render->GetOrCreateTextureFromFile("Data/Images/PlayerTankBase.png");
-	render->BindTexture(tankBase);
-	render->DrawVertexArray(6,m_tank);
-	render->BindTexture(nullptr);
+	g_theRenderer->TransformVertexArray(6,m_tank,1.f,m_orientationDegrees,m_position);
+	Texture* tankBase=g_theRenderer->GetOrCreateTextureFromFile("Data/Images/PlayerTankBase.png");
+	g_theRenderer->BindTexture(tankBase);
+	g_theRenderer->DrawVertexArray(6,m_tank);
+	g_theRenderer->BindTexture(nullptr);
 	ResetTank();
 
 	
-	render->TransformVertexArray(6,m_turret,1.f,m_turretAngle+m_orientationDegrees,m_position);
-	Texture* tankTurret=render->GetOrCreateTextureFromFile("Data/Images/PlayerTankTop.png");
-	render->BindTexture(tankTurret);
-	render->DrawVertexArray(6,m_turret);
-	render->BindTexture(nullptr);
+	g_theRenderer->TransformVertexArray(6,m_turret,1.f,m_turretAngle+m_orientationDegrees,m_position);
+	Texture* tankTurret=g_theRenderer->GetOrCreateTextureFromFile("Data/Images/PlayerTankTop.png");
+	g_theRenderer->BindTexture(tankTurret);
+	g_theRenderer->DrawVertexArray(6,m_turret);
+	g_theRenderer->BindTexture(nullptr);
 	ResetTurret();
 
-	render->TransformVertexArray( 6, m_crosshair, 0.5f, m_orientationDegrees, m_crosshairPosition );
-	Texture* crosshair=render->GetOrCreateTextureFromFile( "Data/Images/FriendlyTurretBase.png" );
-	render->BindTexture( crosshair );
-	render->SetBlendMode(BlendMode::ADDITIVE);
-	render->DrawVertexArray( 6, m_crosshair );
-	render->BindTexture( nullptr );
-	render->SetBlendMode(BlendMode::ALPHA);
+	g_theRenderer->TransformVertexArray( 6, m_crosshair, 0.5f, m_orientationDegrees, m_crosshairPosition );
+	Texture* crosshair=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FriendlyTurretBase.png" );
+	g_theRenderer->BindTexture( crosshair );
+	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
+	g_theRenderer->DrawVertexArray( 6, m_crosshair );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode(BlendMode::ALPHA);
 	ResestCrosshair();
 
 	if( m_game->isDebugging )
@@ -140,23 +140,23 @@ void Player::MoveTank( float deltaSeconds )
 
 void Player::RotateTurret( float deltaSeconds )
 {
-	if( input->IsKeyPressed( 'J' ) )
+	if( g_theInput->IsKeyPressed( 'J' ) )
 	{
 		m_turretAngle=GetTurnedToward(m_turretAngle,180.f,100.f*deltaSeconds);
 		
 	}
 
-	if( input->IsKeyPressed( 'L' ) )
+	if( g_theInput->IsKeyPressed( 'L' ) )
 	{
 		m_turretAngle=GetTurnedToward(m_turretAngle,0.f,100.f*deltaSeconds);
 	}
 
-	if( input->IsKeyPressed( 'I' ) )
+	if( g_theInput->IsKeyPressed( 'I' ) )
 	{
 		m_turretAngle=GetTurnedToward( m_turretAngle, 90.f, 100.f*deltaSeconds );
 	}
 
-	if( input->IsKeyPressed( 'K' ) )
+	if( g_theInput->IsKeyPressed( 'K' ) )
 	{
 		m_turretAngle=GetTurnedToward( m_turretAngle, 270.f, 100.f*deltaSeconds );
 	}
@@ -164,51 +164,51 @@ void Player::RotateTurret( float deltaSeconds )
 
 void Player::RotateTank( float deltaSeconds )
 {
-	if( input->IsKeyPressed( 'A' ) )
+	if( g_theInput->IsKeyPressed( 'A' ) )
 	{
 		m_orientationDegrees=GetTurnedToward(m_orientationDegrees,180.f,180.f*deltaSeconds);
 		
 	}
 
-	if( input->IsKeyPressed( 'D' ) )
+	if( g_theInput->IsKeyPressed( 'D' ) )
 	{
 		m_orientationDegrees=GetTurnedToward( m_orientationDegrees, 0.f, 180.f*deltaSeconds );
 		
 	}
 
-	if( input->IsKeyPressed( 'W' ) )
+	if( g_theInput->IsKeyPressed( 'W' ) )
 	{
 		m_orientationDegrees=GetTurnedToward( m_orientationDegrees, 90.f, 180.f*deltaSeconds );
 		
 	}
 
-	if( input->IsKeyPressed( 'S' ) )
+	if( g_theInput->IsKeyPressed( 'S' ) )
 	{
 		m_orientationDegrees=GetTurnedToward( m_orientationDegrees, 270.f, 180.f*deltaSeconds );
 		
 	}
 
-	if( input->IsKeyPressed( 'D' ) && input->IsKeyPressed( 'W' ) )
+	if( g_theInput->IsKeyPressed( 'D' ) && g_theInput->IsKeyPressed( 'W' ) )
 	{
 		m_orientationDegrees=GetTurnedToward(m_orientationDegrees,45.f,180.f*deltaSeconds);
 	}
 
-	if( input->IsKeyPressed( 'A' ) && input->IsKeyPressed( 'W' ) )
+	if( g_theInput->IsKeyPressed( 'A' ) && g_theInput->IsKeyPressed( 'W' ) )
 	{
 		m_orientationDegrees=GetTurnedToward( m_orientationDegrees, 135.f, 180.f*deltaSeconds );
 	}
 
-	if( input->IsKeyPressed( 'D' ) && input->IsKeyPressed( 'S' ) )
+	if( g_theInput->IsKeyPressed( 'D' ) && g_theInput->IsKeyPressed( 'S' ) )
 	{
 		m_orientationDegrees=GetTurnedToward( m_orientationDegrees, -45.f, 180.f*deltaSeconds );
 	}
 
-	if( input->IsKeyPressed( 'A' ) && input->IsKeyPressed( 'S' ) )
+	if( g_theInput->IsKeyPressed( 'A' ) && g_theInput->IsKeyPressed( 'S' ) )
 	{
 		m_orientationDegrees=GetTurnedToward( m_orientationDegrees, -135.f, 180.f*deltaSeconds );
 	}
 
-	if( input->IsKeyPressed( 'A' )||input->IsKeyPressed( 'W' )||input->IsKeyPressed( 'S' )||input->IsKeyPressed( 'D' ) )
+	if( g_theInput->IsKeyPressed( 'A' )||g_theInput->IsKeyPressed( 'W' )||g_theInput->IsKeyPressed( 'S' )||g_theInput->IsKeyPressed( 'D' ) )
 	{
 		MoveTank(deltaSeconds);
 	}
@@ -217,7 +217,7 @@ void Player::RotateTank( float deltaSeconds )
 
 void Player::UpdateFromJoystick( float deltaSeconds )
 {
-	const XboxController& controller= input->GetXboxController( 0 );
+	const XboxController& controller= g_theInput->GetXboxController( 0 );
 	
 	const AnalogJoyStick& leftStick = controller.GetLeftJoystick();
 	const AnalogJoyStick& rightStick = controller.GetRightJoystick();
@@ -296,14 +296,14 @@ void Player::ShootBullet()
 
 	m_game->world->current_map->SpawnBullet(bulletPosition,ENTITY_TYPE_GOOD_BULLET,m_turretAngle+m_orientationDegrees);
 	m_game->world->current_map->CreateExplosions(0.5f,0.25f,bulletPosition);
-	audio->PlaySound(PLAYER_SHOOT);
+	g_theAudio->PlaySound(PLAYER_SHOOT);
 	
 }
 
 void Player::DebugRender()
 {
-	render->DrawRing(m_position,m_cosmeticRadius,Rgba8(255,0,255,255),0.02f);
-	render->DrawRing(m_position,m_physicsRadius,Rgba8(0,255,255,255),0.02f);
+	g_theRenderer->DrawRing(m_position,m_cosmeticRadius,Rgba8(255,0,255,255),0.02f);
+	g_theRenderer->DrawRing(m_position,m_physicsRadius,Rgba8(0,255,255,255),0.02f);
 }
 
 void Player::ResetTank()

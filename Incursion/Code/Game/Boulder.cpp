@@ -6,7 +6,7 @@
 
 Boulder::Boulder( Game* game, Vec2 position ):Entity(game,position)
 {
-	Texture* texture = render->GetOrCreateTextureFromFile( "Data/Images/Extras_4x4.png" );
+	Texture* texture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Extras_4x4.png" );
 	SpriteSheet* spriteSheet = new SpriteSheet( *texture, IntVec2( 4, 4 ) );
 	const SpriteDefinition& boulder= spriteSheet->GetSpriteDefinition(3);
 	Vec2 uvMins;
@@ -46,10 +46,10 @@ void Boulder::Update( float deltaSeconds )
 
 void Boulder::Render()
 {
-	render->TransformVertexArray(6,m_vertices,1.f,m_orientationDegrees,m_position);
-	Texture *texture = render->GetOrCreateTextureFromFile("Data/Images/Extras_4x4.png");
-	render->BindTexture(texture);
-	render->DrawVertexArray(6,m_vertices);
+	g_theRenderer->TransformVertexArray(6,m_vertices,1.f,m_orientationDegrees,m_position);
+	Texture *texture = g_theRenderer->GetOrCreateTextureFromFile("Data/Images/Extras_4x4.png");
+	g_theRenderer->BindTexture(texture);
+	g_theRenderer->DrawVertexArray(6,m_vertices);
 	ResetVertices();
 }
 

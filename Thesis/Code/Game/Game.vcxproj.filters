@@ -11,6 +11,9 @@
     <Filter Include="Game">
       <UniqueIdentifier>{8ce05e28-3e8e-4cc6-ac62-db117fb5c9f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataFiles">
+      <UniqueIdentifier>{8fea2aaa-5885-4152-96cc-ace4a663b81a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -48,6 +51,18 @@
     </ClCompile>
     <ClCompile Include="Turret.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GreenBeret.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MapCreator.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="PotentialFieldCreator.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="PotentialFields.cpp">
+      <Filter>General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +106,15 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Turret.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GreenBeret.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="PotentialFields.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="PotentialFieldCreator.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
@@ -137,5 +161,10 @@
     <FxCompile Include="..\..\Run\Data\Shaders\CustomShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\GameConfig\GameData.xml">
+      <Filter>DataFiles</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

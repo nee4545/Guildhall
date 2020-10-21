@@ -29,7 +29,7 @@ AirStrikePlane::AirStrikePlane( Game* game, Vec2 position ):Entity(game,position
 	m_physicsRadius=0.3f;
 	m_cosmeticRadius=0.4f;
 
-	audio->PlaySound(PLANE_SOUND);
+	g_theAudio->PlaySound(PLANE_SOUND);
 }
 
 void AirStrikePlane::Update( float deltaSeconds )
@@ -51,11 +51,11 @@ void AirStrikePlane::Update( float deltaSeconds )
 
 void AirStrikePlane::Render()
 {
-	render->TransformVertexArray( 6, m_vertices, 2.f, m_orientationDegrees, m_position );
-	Texture* tankBase=render->GetOrCreateTextureFromFile( "Data/Images/AirStrikePlane.png" );
-	render->BindTexture( tankBase );
-	render->DrawVertexArray( 6, m_vertices );
-	render->BindTexture( nullptr );
+	g_theRenderer->TransformVertexArray( 6, m_vertices, 2.f, m_orientationDegrees, m_position );
+	Texture* tankBase=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/AirStrikePlane.png" );
+	g_theRenderer->BindTexture( tankBase );
+	g_theRenderer->DrawVertexArray( 6, m_vertices );
+	g_theRenderer->BindTexture( nullptr );
 	ResetVertices();
 }
 

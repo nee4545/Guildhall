@@ -12,7 +12,7 @@
 
 
 App* g_theapp = nullptr; //App pointer
-InputSystem* input = nullptr;
+InputSystem* g_theInput = nullptr;
 Window* g_theWindow = nullptr;
 HWND g_hWnd = nullptr;								// ...becomes WindowContext::m_windowHandle
 
@@ -31,7 +31,7 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle , _In_opt_ HINSTANC
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME , CLIENT_ASPECT , 0.90f ); // feed from blackBoard
-	input = new InputSystem();
+	g_theInput = new InputSystem();
 
 	g_theapp->Startup();
 

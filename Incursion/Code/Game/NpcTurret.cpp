@@ -134,20 +134,20 @@ void NpcTurret::Render()
 {
 	
 
-	render->TransformVertexArray(6,m_turret_base,1.f,0.f,m_position);
-	Texture* tankBase=render->GetOrCreateTextureFromFile("Data/Images/EnemyTurretBase.png");
-	render->BindTexture(tankBase);
-	render->DrawVertexArray(6,m_turret_base);
-	render->BindTexture(nullptr);
+	g_theRenderer->TransformVertexArray(6,m_turret_base,1.f,0.f,m_position);
+	Texture* tankBase=g_theRenderer->GetOrCreateTextureFromFile("Data/Images/EnemyTurretBase.png");
+	g_theRenderer->BindTexture(tankBase);
+	g_theRenderer->DrawVertexArray(6,m_turret_base);
+	g_theRenderer->BindTexture(nullptr);
 
-	render->TransformVertexArray( 6, m_turret_top, 1.f, m_orientationDegrees, m_position );
-	Texture* tankTop=render->GetOrCreateTextureFromFile( "Data/Images/EnemyTurretTop.png" );
-	render->BindTexture( tankTop );
-	render->DrawVertexArray( 6, m_turret_top );
-	render->BindTexture( nullptr );
+	g_theRenderer->TransformVertexArray( 6, m_turret_top, 1.f, m_orientationDegrees, m_position );
+	Texture* tankTop=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/EnemyTurretTop.png" );
+	g_theRenderer->BindTexture( tankTop );
+	g_theRenderer->DrawVertexArray( 6, m_turret_top );
+	g_theRenderer->BindTexture( nullptr );
 
 	Vec2 laserPosition = m_position + Vec2(0.4f*CosDegrees(m_orientationDegrees),0.4f*SinDegrees(m_orientationDegrees));
-	render->DrawLine(laserPosition,m_RayCastResult.m_impactPosition,Rgba8(100,0,0,255),0.03f);
+	g_theRenderer->DrawLine(laserPosition,m_RayCastResult.m_impactPosition,Rgba8(100,0,0,255),0.03f);
 
 	ResetVertices();
 
@@ -165,8 +165,8 @@ void NpcTurret::Die()
 
 void NpcTurret::DebugRender()
 {
-	render->DrawRing( m_position, m_cosmeticRadius, Rgba8( 255, 0, 255, 255 ), 0.02f );
-	render->DrawRing( m_position, m_physicsRadius, Rgba8( 0, 255, 255, 255 ), 0.02f );
+	g_theRenderer->DrawRing( m_position, m_cosmeticRadius, Rgba8( 255, 0, 255, 255 ), 0.02f );
+	g_theRenderer->DrawRing( m_position, m_physicsRadius, Rgba8( 0, 255, 255, 255 ), 0.02f );
 }
 
 void NpcTurret::ResetVertices()
@@ -183,7 +183,7 @@ void NpcTurret::Shoot()
 	Vec2 offSet = Vec2( 0.4f * CosDegrees( m_orientationDegrees ), 0.4f * SinDegrees( m_orientationDegrees ) );
 	Vec2 bulletPosition = m_position + offSet;
 	m_game->world->current_map->SpawnBullet(bulletPosition,ENTITY_TYPE_EVIL_BULLET,m_orientationDegrees);
-	audio->PlaySound(ENEMY_SHOOT);
+	g_theAudio->PlaySound(ENEMY_SHOOT);
 }
 
 void NpcTurret::RotateTurret(float deltaSeconds)

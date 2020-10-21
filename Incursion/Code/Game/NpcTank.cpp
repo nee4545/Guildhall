@@ -148,17 +148,17 @@ void NpcTank::Update( float deltaSeconds )
 
 void NpcTank::Render()
 {
-	render->TransformVertexArray( 6, m_tank, 1.f, m_orientationDegrees, m_position );
-	Texture* tankBase=render->GetOrCreateTextureFromFile( "Data/Images/NemesisTankBase.png" );
-	render->BindTexture( tankBase );
-	render->DrawVertexArray( 6, m_tank );
-	render->BindTexture( nullptr );
+	g_theRenderer->TransformVertexArray( 6, m_tank, 1.f, m_orientationDegrees, m_position );
+	Texture* tankBase=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/NemesisTankBase.png" );
+	g_theRenderer->BindTexture( tankBase );
+	g_theRenderer->DrawVertexArray( 6, m_tank );
+	g_theRenderer->BindTexture( nullptr );
 
-	render->TransformVertexArray( 6, m_turret, 1.f, m_turretAngle+m_orientationDegrees, m_position );
-	Texture* tankTurret=render->GetOrCreateTextureFromFile( "Data/Images/NemesisTankTop.png" );
-	render->BindTexture( tankTurret );
-	render->DrawVertexArray( 6, m_turret );
-	render->BindTexture( nullptr );
+	g_theRenderer->TransformVertexArray( 6, m_turret, 1.f, m_turretAngle+m_orientationDegrees, m_position );
+	Texture* tankTurret=g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/NemesisTankTop.png" );
+	g_theRenderer->BindTexture( tankTurret );
+	g_theRenderer->DrawVertexArray( 6, m_turret );
+	g_theRenderer->BindTexture( nullptr );
 
 	
 	
@@ -189,17 +189,17 @@ void NpcTank::ResetVertices()
 
 void NpcTank::DebugRender()
 {
-	render->DrawRing( m_position, m_cosmeticRadius, Rgba8( 255, 0, 255, 255 ), 0.02f );
-	render->DrawRing( m_position, m_physicsRadius, Rgba8( 0, 255, 255, 255 ), 0.02f );
+	g_theRenderer->DrawRing( m_position, m_cosmeticRadius, Rgba8( 255, 0, 255, 255 ), 0.02f );
+	g_theRenderer->DrawRing( m_position, m_physicsRadius, Rgba8( 0, 255, 255, 255 ), 0.02f );
 
 	if( lastSeenSet )
 	{
-		render->DrawLine( m_position, m_lastSeenPosition, Rgba8( 111, 0, 0, 255 ), 0.05f );
+		g_theRenderer->DrawLine( m_position, m_lastSeenPosition, Rgba8( 111, 0, 0, 255 ), 0.05f );
 	}
 
-	render->DrawLine( m_position, ray1.m_impactPosition, Rgba8( 0, 0, 100 ), 0.05f );
-	render->DrawLine( m_position, ray2.m_impactPosition, Rgba8( 0, 0, 100 ), 0.05f );
-	render->DrawLine( m_position, ray3.m_impactPosition, Rgba8( 0, 0, 100 ), 0.05f );
+	g_theRenderer->DrawLine( m_position, ray1.m_impactPosition, Rgba8( 0, 0, 100 ), 0.05f );
+	g_theRenderer->DrawLine( m_position, ray2.m_impactPosition, Rgba8( 0, 0, 100 ), 0.05f );
+	g_theRenderer->DrawLine( m_position, ray3.m_impactPosition, Rgba8( 0, 0, 100 ), 0.05f );
 }
 
 void NpcTank::RotateTank(float angleDegees,float deltaSeconds)
@@ -219,7 +219,7 @@ void NpcTank::Shoot()
 	Vec2 bulletPosition = m_position + offSet;
 
 	m_game->world->current_map->SpawnBullet(bulletPosition,ENTITY_TYPE_EVIL_BULLET,m_orientationDegrees);
-	audio->PlaySound(ENEMY_SHOOT);
+	g_theAudio->PlaySound(ENEMY_SHOOT);
 }
 
 
