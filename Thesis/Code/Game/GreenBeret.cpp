@@ -16,6 +16,7 @@ GreenBeret::GreenBeret(Game* game)
 	m_game = game;
 	LoadCrouchAnimations();
 	LoadWalkAnimations();
+	LoadSounds();
 
 	m_vertices[ 0 ] = Vertex_PCU( Vec3( -aspect.x , -aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , m_minUV );
 	m_vertices[ 1 ] = Vertex_PCU( Vec3( aspect.x , -aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , Vec2( m_maxUV.x , m_minUV.y ) );
@@ -38,8 +39,67 @@ void GreenBeret::Update( float deltaseconds )
 
 	if ( g_theInput->WasLeftMouseButtonJustPressed() )
 	{
-		m_nextMovePosition = m_game->m_mousePosition;
-		m_moveSet = true;
+		IntVec2 pos = IntVec2( RoundDownToInt( m_game->m_mousePosition.x ) , RoundDownToInt( m_game->m_mousePosition.y ) );
+		if ( !m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( pos , true ) ].m_isSolid )
+		{
+			int num =m_game->m_rng->RollRandomIntInRange( 1 , 5 );
+			switch ( num )
+			{
+			case 1:
+			{
+				g_theAudio->PlaySound( m_okSound1 );
+				break;
+			}
+			case 2:
+			{
+				g_theAudio->PlaySound( m_okSound2 );
+				break;
+			}
+			case 3:
+			{
+				g_theAudio->PlaySound( m_okSound3 );
+				break;
+			}
+			case 4:
+			{
+				g_theAudio->PlaySound( m_okSound4 );
+				break;
+			}
+			case 5:
+			{
+				g_theAudio->PlaySound( m_okSound5 );
+				break;
+			}
+			default:
+				break;
+			}
+			m_nextMovePosition = m_game->m_mousePosition;
+			m_moveSet = true;
+		}
+		else
+		{
+			int num = m_game->m_rng->RollRandomIntInRange( 1 , 5 );
+			switch ( num )
+			{
+			case 1:
+			{
+				g_theAudio->PlaySound( m_errorSound1 );
+				break;
+			}
+			case 2:
+			{
+				g_theAudio->PlaySound( m_errorSound2 );
+				break;
+			}
+			case 3:
+			{
+				g_theAudio->PlaySound( m_errorSound3 );
+				break;
+			}
+			default:
+				break;
+			}
+		}
 
 		m_game->m_greenBeretHUDTimer->Reset();
 	}
@@ -110,8 +170,6 @@ void GreenBeret::Render()
 	g_theRenderer->DrawVertexArray( 6, vertCopy );
 	g_theRenderer->BindTexture( nullptr );
 	
-
-
 }
 
 void GreenBeret::Die()
@@ -699,4 +757,28 @@ void GreenBeret::ResetAndFlipVertices()
 	m_vertices[ 3 ] = Vertex_PCU( Vec3( aspect.x , -aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , m_minUV );
 	m_vertices[ 4 ] = Vertex_PCU( Vec3( aspect.x , aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , Vec2(m_minUV.x,m_maxUV.y) );
 	m_vertices[ 5 ] = Vertex_PCU( Vec3( -aspect.x , aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , m_maxUV );
+}
+
+void GreenBeret::LoadSounds()
+{
+	SoundID s1 =g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbmv01.wav" );
+	SoundID s2 =g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbmv03.wav" );
+	SoundID s3 =g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbnm01.wav" );
+	SoundID s4 =g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbmv02.wav" );
+	SoundID s5 =g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbmv03.wav" );
+
+	m_okSound1 = s1;
+	m_okSound2 = s2;
+	m_okSound3 = s3;
+	m_okSound4 = s4;
+	m_okSound5 = s5;
+
+	SoundID e1 = g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbim01.wav" );
+	SoundID e2 = g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbim02.wav" );
+	SoundID e3 = g_theAudio->CreateOrGetSound( "Data/GameAssets/Commandos/GreenBeret/Sounds/gbim03.wav" );
+
+	m_errorSound1 = e1;
+	m_errorSound2 = e2;
+	m_errorSound3 = e3;
+	
 }

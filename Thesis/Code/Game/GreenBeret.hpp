@@ -37,6 +37,7 @@ public:
 	void SetTexture();
 	void ResetVertices();
 	void ResetAndFlipVertices();
+	void LoadSounds();
 
 	AnimProperties* m_crouchR = nullptr;
 	AnimProperties* m_crouchR1 = nullptr;
@@ -79,5 +80,16 @@ public:
 	bool potentialFieldQueryDone = false;
 	bool shoudlGetFlippedPotentialFieldValues = false;
 	bool shoudCachePosition = false;
+
+	int m_okSound1;
+	int m_okSound2;
+	int m_okSound3;
+	int m_okSound4;
+	int m_okSound5;
+
+	int m_errorSound1;
+	int m_errorSound2;
+	int m_errorSound3;
+	int m_errorSound4;
 
 };
