@@ -6,6 +6,7 @@
 
 class Game;
 class PlayerClient;
+class Camera;
 
 class App
 {
@@ -41,5 +42,6 @@ public:
 	PlayerClient* m_client = nullptr;
 private:
 	bool m_isQuitting = false;
+	Camera* m_devConsoleCamera = nullptr;
 
 };

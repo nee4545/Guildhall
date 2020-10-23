@@ -51,7 +51,7 @@ void SinglePlayerGame::Update( float deltaSeconds )
 	m_mousePosition.x = RangeMapFloat( 0.f , 1.f , m_camera->GetOrthoBottomLeft().x , m_camera->GetOrthoTopRight().x , mouseNormalizedPosition.x );
 	m_mousePosition.y = RangeMapFloat( 0.f , 1.f , m_camera->GetOrthoBottomLeft().y , m_camera->GetOrthoTopRight().y , mouseNormalizedPosition.y );
 
-	ToggleDevConsole();
+	//ToggleDevConsole();
 	if ( devConsoleOpen )
 	{
 		return;
@@ -137,11 +137,7 @@ void SinglePlayerGame::Render( )
 
 	g_theRenderer->EndCamera( *m_camera );
 
-	if ( devConsoleOpen )
-	{
-		g_theRenderer->BeginCamera( *m_devConsoleCamera );
-		g_theConsole.Render(*g_theRenderer,*m_devConsoleCamera,2.f,1.f);
-	}
+	
 }
 
 void SinglePlayerGame::SpawnBullet( Vec2 position , Vec2 forwardVector , Faction faction )

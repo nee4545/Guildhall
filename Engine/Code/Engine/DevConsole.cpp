@@ -18,7 +18,10 @@ std::mutex g_consoleMutex;
 
 DevConsole::DevConsole()
 {
+	m_devConsoleCamera = new Camera();
+	m_devConsoleCamera->SetOrthoView( Vec2(0.f,0.f) , Vec2( 160.f , 90.f ) );
 
+	m_devConsoleCamera->SetClearMode( 0 , Rgba8( 0 , 0 , 0 , 255 ) );
 }
 
 void DevConsole::Startup()

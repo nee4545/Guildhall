@@ -123,6 +123,10 @@ void App::Update( float deltaSeconds )
 		g_theAutoratitiveServer->Update( deltaSeconds );
 	}
 
+	if ( g_theInput->WasKeyJustPressed( 0xC0 ) )
+	{
+		g_theConsole.SetIsOpen( !g_theConsole.IsOpen() );
+	}
 	
 	if ( g_theWindow->m_quitRequested == true )
 	{
@@ -134,6 +138,7 @@ void App::Update( float deltaSeconds )
 	{
 		HandleQuitRequested();
 	}
+
 
 	
 
@@ -173,6 +178,11 @@ void App::Render() const
 	if ( m_client != nullptr )
 	{
 		m_client->Render();
+	}
+
+	if ( g_theConsole.IsOpen() )
+	{
+		g_theConsole.Render( *g_theRenderer , *g_theConsole.m_devConsoleCamera , 2.f , 1.f );
 	}
 	//DebugRenderSystem::sDebugRenderer->Render();
 }

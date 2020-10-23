@@ -56,6 +56,7 @@ public:
 	inline void SetTextSize( float size ) { m_textSize = size; }
 
 	AABB2* m_selectedText;
+	Camera* m_devConsoleCamera = nullptr;
 
 private:
 	bool isConsoleOpen = false;
@@ -63,7 +64,6 @@ private:
 	std::string m_input = "";
 	std::vector<std::string> m_commands;
 	std::vector<std::string> m_commandHistory;
-	Camera* m_devConsoleCamera = nullptr;
 	//std::mutex m_mutex;
 
 };
