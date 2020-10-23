@@ -3,6 +3,7 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 
 class Camera;
+class InputSystem;
 
 class Game
 {
@@ -10,9 +11,10 @@ public:
 	Game();
 	~Game();
 
-	Camera* m_camera=nullptr;
-	Camera* m_UICamera= nullptr;
+	virtual void StartUp();
+	virtual void Update(float deltaseconds);
+	virtual void Render();
+	InputSystem* GetInputSystem();
 
-	void Update(float deltaseconds);
-	void Render();
+	InputSystem* m_InputSystem = nullptr;
 };

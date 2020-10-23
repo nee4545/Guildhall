@@ -10,6 +10,7 @@ class RenderContext;
 class InputSystem;
 class AudioSystem;
 class Game;
+class AuthoritativeServer;
 
 constexpr float CLIENT_ASPECT = 2.f / 1.f;
 extern RenderContext* g_theRenderer;
@@ -18,6 +19,7 @@ extern Window* g_theWindow;
 extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
 extern Game* thegame;
+extern AuthoritativeServer* g_theAutoratitiveServer;
 
 enum eBillBoardType
 {
@@ -26,6 +28,7 @@ enum eBillBoardType
 	CAMERA_OPPOSED_XYZ ,	// Screen Aligned.
 	CAMERA_FACING_XYZ ,
 };
+
 
 
 

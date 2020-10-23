@@ -537,6 +537,8 @@ void DevConsole::InitializeCommands()
 	m_commands.push_back( "OpenUDPPort" );
 	m_commands.push_back( "SendUDPMessage" );
 	m_commands.push_back( "CloseUDPPort" );
+	m_commands.push_back( "StartMultiplayerPort" );
+	m_commands.push_back( "ConnectToMultiplayerServer" );
 
 }
 

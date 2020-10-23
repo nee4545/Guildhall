@@ -24,6 +24,11 @@ Game::~Game()
 
 }
 
+void Game::StartUp()
+{
+
+}
+
 void Game::Update( float deltaseconds )
 {
 
@@ -35,6 +40,17 @@ void Game::Render()
 
 }
 
+InputSystem* Game::GetInputSystem()
+{
+	if ( m_InputSystem != nullptr )
+	{
+		return m_InputSystem;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
 
 
 

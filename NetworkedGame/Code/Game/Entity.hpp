@@ -4,12 +4,6 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include <vector>
 
-enum EntityFaction
-{
-	FACTION_GOOD=0,
-	FACTION_EVIL,
-	FACTION_NEUTRAL
-};
 
 class Entity
 {
@@ -24,7 +18,6 @@ public:
 	bool m_isDead;
 	bool m_isGarbage;
 	Game* m_game;
-	EntityFaction entityFaction;
 
 	//Physics Flags
 	bool m_isPushedByWalls=false;
@@ -37,7 +30,8 @@ public:
     virtual void Render();
     virtual void Die();
 
-	Entity(Game* theGame, Vec2 position);
+	
+	Entity(Game* game, Vec2 position);
 
 	void SetPosition(Vec2& position);
 	Vec2 GetPosition();

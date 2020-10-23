@@ -25,6 +25,24 @@
     <ClCompile Include="Entity.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthoritativeServer.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="SinglePlayerGame.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerClient.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="AI.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -43,6 +61,20 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="MultiplayerGame.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthoritativeServer.hpp" />
+    <ClInclude Include="RemoteServer.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerClient.hpp" />
+    <ClInclude Include="RemoteClient.hpp" />
+    <ClInclude Include="Client.hpp" />
+    <ClInclude Include="AI.hpp" />
+    <ClInclude Include="EntityCommon.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

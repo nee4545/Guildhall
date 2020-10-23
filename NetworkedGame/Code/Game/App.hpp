@@ -5,6 +5,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 
 class Game;
+class PlayerClient;
 
 class App
 {
@@ -29,12 +30,16 @@ public:
 	void Render() const;
 	void EndFrame();
 
+	
 	bool HandleQuitRequested();
 	void ResetGame();
 	int GetFPS();
 
-private:
+	static void StartMultiplayerServer( int port );
+	static void ConnectToMultiplayerServer( std::string address );
 
+	PlayerClient* m_client = nullptr;
+private:
 	bool m_isQuitting = false;
 
 };

@@ -15,9 +15,11 @@ void Entity::Die()
 	m_isGarbage = true;
 }
 
-Entity::Entity( Game* theGame , Vec2 position )
+
+
+Entity::Entity( Game* game , Vec2 position )
 {
-	m_game = thegame;
+	m_game = game;
 	m_position = position;
 }
 
