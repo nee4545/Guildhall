@@ -14,6 +14,7 @@ public:
 	virtual void Update( float deltaseconds ) override;
 	virtual void Render() override;
 	virtual void Die() override;
+	void SetSpriteBasedOnFaction();
 
 	Vertex_PCU m_vertices[ 6 ];
 	AiType m_type = TYPE_1;
@@ -22,5 +23,5 @@ public:
 	Vec2 m_nextMovePosition;
 
 	Texture* m_sprite = nullptr;
-
+	Faction m_faction = FACTION_GOOD;
 };

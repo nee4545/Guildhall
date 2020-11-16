@@ -27,6 +27,7 @@ public:
 	virtual void Die() override;
 	void LoadTextures();
 	void CreateSpriteBasedOnFaction();
+	void SetSpriteBasedOnID();
 
 	int m_health = 10;
 

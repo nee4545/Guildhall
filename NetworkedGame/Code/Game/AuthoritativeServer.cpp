@@ -14,7 +14,7 @@ AuthoritativeServer::AuthoritativeServer(  )
 {
 	rng = new RandomNumberGenerator();
 	m_timer = new Timer();
-	m_timer->SetSeconds( 0.05 );
+	m_timer->SetSeconds( 0.032 );
 }
 
 AuthoritativeServer::~AuthoritativeServer()
@@ -25,7 +25,7 @@ AuthoritativeServer::~AuthoritativeServer()
 		m_singlePlayerGame = nullptr;
 	}
 
-	
+	writerThread->join();
 }
 
 void AuthoritativeServer::StartUp()
@@ -97,6 +97,49 @@ void AuthoritativeServer::BeginFrame()
 				messages.push_back( msg1 );
 				messages.push_back( msg2 );
 
+				for ( int i = 0; i < m_multiplayerGame->m_bullets.size(); i++ )
+				{
+					if ( m_multiplayerGame->m_bullets[ i ] != nullptr )
+					{
+						std::string msg = "ID =";
+						msg += std::to_string( m_multiplayerGame->m_bullets[ i ]->m_ID ) + "|";
+						msg += "EntityType=Bullet|";
+						if ( m_multiplayerGame->m_bullets[ i ]->m_faction == FACTION_GOOD )
+						{
+							msg += "Faction=Good|";
+						}
+						else
+						{
+							msg += "Faction=Bad|";
+						}
+						msg += "PositionX =" + std::to_string( m_multiplayerGame->m_bullets[ i ]->m_position.x ) + "|" ;
+						msg += "PositionY =" + std::to_string( m_multiplayerGame->m_bullets[ i ]->m_position.y ) + "|";
+						messages.push_back( msg );
+					}
+					
+				}
+
+				for ( int i = 0; i < m_multiplayerGame->m_ais.size(); i++ )
+				{
+					if ( m_multiplayerGame->m_ais[ i ] != nullptr )
+					{
+						std::string msg = "ID=";
+						msg += std::to_string( m_multiplayerGame->m_ais[ i ]->m_ID ) + "|";
+						msg += "EntityType=AI|";
+						if ( m_multiplayerGame->m_ais[ i ]->m_faction == FACTION_GOOD )
+						{
+							msg += "Faction=Good|";
+						}
+						else
+						{
+							msg += "Faction=Bad|";
+						}
+						msg += "PositionX =" + std::to_string( m_multiplayerGame->m_ais[ i ]->m_position.x ) + "|";
+						msg += "PositionY =" + std::to_string( m_multiplayerGame->m_ais[ i ]->m_position.y ) + "|";
+						messages.push_back( msg );
+					}
+				}
+
 				for ( int i = 0; i < messages.size(); i++ )
 				{
 					m_wirteArray.push( messages[ i ] );
@@ -125,7 +168,7 @@ void AuthoritativeServer::StartMultiplayerGame( int portNum )
 {
 	m_multiplayerGame = new MultiplayerGame();
 	m_multiplayerGame->CreatePlayer();
-	m_multiplayerGame->CreateSecondPlayer();
+	//m_multiplayerGame->CreateSecondPlayer();
 	m_multiplayerGame->AssignInputSystemForPlayer1( g_theInput );
 	m_gameState = MULTIPLAYER_GAME;
 	m_server = new TCPServer(portNum);
@@ -149,6 +192,7 @@ bool AuthoritativeServer::EstablishRemoteConnection()
 
 	m_UDPSocket = new UDPSocket( "127.1.1.1" , clienSendPort);
 	m_UDPSocket->Bind( m_listenPort );
+	m_multiplayerGame->CreateSecondPlayer();
 
 	writerThread = new std::thread( &AuthoritativeServer::Writer , this , std::ref( *m_UDPSocket ) , std::ref( m_wirteArray ) );
 	return true;
@@ -163,12 +207,44 @@ void AuthoritativeServer::Writer( UDPSocket& socket , SynchronizedLockFreeQueue<
 			auto& buffer = socket.ReceiveBuffer();
 			std::string receivedMessage = buffer.data();
 
-			if ( receivedMessage == "W" )
+			Strings s = SplitStringOnDelimiter( receivedMessage , '|' );
+			if ( s[0] == "W" )
 			{
 				m_multiplayerGame->m_player2->MoveUp();
+				//writearray.push( receivedMessage );
 			}
 
-			g_theConsole.PrintString( Rgba8() , receivedMessage );
+			if ( s[ 0 ] == "S" )
+			{
+				m_multiplayerGame->m_player2->MoveDown();
+				//writearray.push( receivedMessage );
+			}
+
+			if ( s[ 0 ] == "A" )
+			{
+				m_multiplayerGame->m_player2->MoveLeft();
+				//writearray.push( receivedMessage );
+			}
+
+			if ( s[ 0 ] == "D" )
+			{
+				m_multiplayerGame->m_player2->MoveRight();
+				//writearray.push( receivedMessage );
+			}
+
+			if ( s[ 0 ] == "Shoot" )
+			{
+				Vec2 position;
+				Strings s1 = SplitStringOnDelimiter( s[ 1 ] , '=' );
+				Strings s2 = SplitStringOnDelimiter( s[ 2 ] , '=' );
+				position.x = atof( s1[ 1 ].c_str() );
+				position.y = atof( s2[ 1 ].c_str() );
+
+				Vec2 forwardVec = ( position - m_multiplayerGame->m_player2->m_position ).GetNormalized();
+				m_multiplayerGame->SpawnBullet( m_multiplayerGame->m_player2->m_position , forwardVec , FACTION_BAD );
+			}
+
+			//g_theConsole.PrintString( Rgba8() , receivedMessage );
 		}
 	}
 }

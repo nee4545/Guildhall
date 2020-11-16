@@ -5,16 +5,18 @@
 #include "Game/MultiplayerGame.hpp"
 #include "Game/GameCommon.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Core/Timer.hpp"
 #include <array>
 
 RemoteServer::RemoteServer()
 {
-
+	m_timer = new Timer();
+	m_timer->SetSeconds( 0.032 );
 }
 
 RemoteServer::~RemoteServer()
 {
-
+	writerThread->join();
 }
 
 void RemoteServer::StartUp()
@@ -32,7 +34,7 @@ void RemoteServer::ShutDown()
 
 void RemoteServer::Update( float deltaSeconds )
 {
-
+	m_multiplayerGame->Update( deltaSeconds );
 }
 
 void RemoteServer::BeginFrame()
@@ -47,14 +49,81 @@ void RemoteServer::BeginFrame()
 		}
 	}
 
-	if ( g_theInput->WasKeyJustPressed( 'W' ) )
+	if ( g_theInput->IsKeyPressed( 'W' ) )
 	{
-		std::string msg = "W";
-
-		if ( m_UDPSocket != nullptr )
+		std::string msg = "W|Pressed";
+        
+		if ( m_timer->HasElapsed() )
 		{
-			memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
-			m_UDPSocket->Send( strlen( msg.c_str() ) );
+			if ( m_UDPSocket != nullptr )
+			{
+				memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
+				m_UDPSocket->Send( strlen( msg.c_str()) );
+			}
+			m_timer->Reset();
+		}
+	}
+
+	if ( g_theInput->IsKeyPressed( 'S' ) )
+	{
+		std::string msg = "S|Pressed";
+
+		if ( m_timer->HasElapsed() )
+		{
+			if ( m_UDPSocket != nullptr )
+			{
+				memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
+				m_UDPSocket->Send( strlen( msg.c_str() ) );
+			}
+			m_timer->Reset();
+		}
+	}
+
+	if ( g_theInput->IsKeyPressed( 'A' ) )
+	{
+		std::string msg = "A|Pressed";
+
+		if ( m_timer->HasElapsed() )
+		{
+			if ( m_UDPSocket != nullptr )
+			{
+				memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
+				m_UDPSocket->Send( strlen( msg.c_str() ) );
+			}
+			m_timer->Reset();
+		}
+	}
+
+	if ( g_theInput->IsKeyPressed( 'D' ) )
+	{
+		std::string msg = "D|Pressed";
+
+		if ( m_timer->HasElapsed() )
+		{
+			if ( m_UDPSocket != nullptr )
+			{
+				memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
+				m_UDPSocket->Send( strlen( msg.c_str() ) );
+			}
+			m_timer->Reset();
+		}
+	}
+
+	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		Vec2 position = m_multiplayerGame->m_mousePosition;
+		std::string msg = "Shoot|";
+		msg += "PositionX=" + std::to_string( position.x )+"|";
+		msg += "PositionY=" + std::to_string( position.y ) + "|";
+
+		if ( m_timer->HasElapsed() )
+		{
+			if ( m_UDPSocket != nullptr )
+			{
+				memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
+				m_UDPSocket->Send( strlen( msg.c_str() ) );
+			}
+			m_timer->Reset();
 		}
 	}
 
@@ -63,59 +132,17 @@ void RemoteServer::BeginFrame()
 
 void RemoteServer::EndFrame()
 {
-	if ( m_UDPSocket != nullptr )
-	{
-		if ( m_UDPSocket->Receive() > 0 )
-		{
-			m_multiplayerGame->CreateOrUpdateEntitiesFromStr( &m_UDPSocket->ReceiveBuffer()[0] );
-		}
-		//std::string msg = m_UDPSocket->ReceiveBuffer().data();
-		//g_theConsole.PrintString( Rgba8() , m_UDPSocket->ReceiveBuffer().data() );
-	}
+	//if ( m_UDPSocket != nullptr )
+	//{
+	//	if ( m_UDPSocket->Receive() > 0 )
+	//	{
+	//		m_multiplayerGame->CreateOrUpdateEntitiesFromStr( &m_UDPSocket->ReceiveBuffer()[0] );
+	//	}
+	//	//std::string msg = m_UDPSocket->ReceiveBuffer().data();
+	//	//g_theConsole.PrintString( Rgba8() , m_UDPSocket->ReceiveBuffer().data() );
+	//}
 
-	if ( g_theInput->WasKeyJustPressed( 'W' ) )
-	{
-		std::string msg = "Wadasd";
-		
-		if ( m_UDPSocket != nullptr )
-		{
-			memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
-			m_UDPSocket->Send( strlen(msg.c_str()) );
-		}
-	}
 
-	if ( g_theInput->WasKeyJustPressed( 'S' ) )
-	{
-		std::string msg = "S";
-
-		if ( m_UDPSocket != nullptr )
-		{
-			memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
-			m_UDPSocket->Send( 1 );
-		}
-	}
-
-	if ( g_theInput->WasKeyJustPressed( 'A' ) )
-	{
-		std::string msg = "A";
-
-		if ( m_UDPSocket != nullptr )
-		{
-			memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
-			m_UDPSocket->Send( 1 );
-		}
-	}
-
-	if ( g_theInput->WasKeyJustPressed( 'D' ) )
-	{
-		std::string msg = "D";
-
-		if ( m_UDPSocket != nullptr )
-		{
-			memcpy( &( m_UDPSocket->SendBuffer()[ 0/*sizeof( messages[ i ] ) ]*/ ] ) , msg.c_str() , strlen( msg.c_str() ) );
-			m_UDPSocket->Send( 1 );
-		}
-	}
 }
 
 void RemoteServer::StartMultiplayerGame( std::string address, int portNum )
@@ -159,6 +186,7 @@ void RemoteServer::ReceiveTCPMessageFromServer()
 		m_UDPSocket = new UDPSocket( "127.1.1.1" , 48000 );
 		m_UDPSocket->Bind( m_serverSendPort );
 
+		writerThread = new std::thread( &RemoteServer::Writer , this , std::ref( *m_UDPSocket ) , std::ref( m_wirteArray ) );
 		connectionEstablished = true;
 	}
 
@@ -167,4 +195,18 @@ void RemoteServer::ReceiveTCPMessageFromServer()
 Game* RemoteServer::GetGame()
 {
 	return (Game*)m_multiplayerGame;
+}
+
+void RemoteServer::Writer( UDPSocket& socket , SynchronizedLockFreeQueue<std::string>& writearray )
+{
+	while ( socket.IsValid() )
+	{
+		if ( socket.Receive() > 0 )
+		{
+			auto& buffer = socket.ReceiveBuffer();
+			std::string receivedMessage = buffer.data();
+
+			m_multiplayerGame->CreateOrUpdateEntitiesFromStr( receivedMessage );
+		}
+	}
 }

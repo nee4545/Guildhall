@@ -45,11 +45,15 @@ void Player::Update( float deltaSeconds )
 	
 	MoveOnKeyPress( sys , deltaSeconds );
 
-	/*if ( sys->WasLeftMouseButtonJustPressed() )
+	if ( sys->WasLeftMouseButtonJustPressed() )
 	{
-		Vec2 forwardVec = ( game->m_mousePosition - m_position ).GetNormalized();
-		game->SpawnBullet( m_position , forwardVec , FACTION_GOOD );
-	}*/
+		if ( !game->isSinglePlayer )
+		{
+			MultiplayerGame* game = ( MultiplayerGame* ) m_game;
+			Vec2 forwardVec = ( game->m_mousePosition - m_position ).GetNormalized();
+			game->SpawnBullet( m_position , forwardVec , FACTION_GOOD );
+		}
+	}
 
 	m_position.x = Clamp( m_position.x , 0.f , 80.f );
 	m_position.y = Clamp( m_position.y , 0.f , 45.f );
@@ -132,5 +136,17 @@ void Player::Die()
 void Player::LoadTextures()
 {
 	
+}
+
+void Player::SetSpriteBasedOnID()
+{
+	if ( m_ID == 1 )
+	{
+		m_sprite = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/hippo.png" );
+	}
+	else
+	{
+		m_sprite = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/dog.png" );
+	}
 }
 

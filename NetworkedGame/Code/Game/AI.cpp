@@ -3,6 +3,7 @@
 #include "Engine/Core/Timer.hpp"
 #include "Game/Player.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Game/MultiplayerGame.hpp"
 
 AI::AI( Game* game , Vec2 position , AiType type ):Entity(game,position)
 {
@@ -39,39 +40,62 @@ AI::~AI()
 
 void AI::Update( float deltaseconds )
 {
-	SinglePlayerGame* game = ( SinglePlayerGame* ) m_game;
-
-	if ( m_type == TYPE_1 )
+	if ( m_game->isSinglePlayer )
 	{
-		if ( m_moveTimer->HasElapsed() )
-		{
-			float xPos = ( float ) game->m_rng->RollRandomIntInRange( 10 , 70 );
-			float yPos = ( float ) game->m_rng->RollRandomIntInRange( 10 , 40 );
+		SinglePlayerGame* game = ( SinglePlayerGame* ) m_game;
 
-			m_nextMovePosition = Vec2( xPos , yPos );
-			m_moveTimer->Reset();
+		if ( m_type == TYPE_1 )
+		{
+			if ( m_moveTimer->HasElapsed() )
+			{
+				float xPos = ( float ) game->m_rng->RollRandomIntInRange( 10 , 70 );
+				float yPos = ( float ) game->m_rng->RollRandomIntInRange( 10 , 40 );
+
+				m_nextMovePosition = Vec2( xPos , yPos );
+				m_moveTimer->Reset();
+			}
+
+			Vec2 moveVec = ( -m_position + m_nextMovePosition ).GetNormalized();
+			m_position += moveVec * 3.f * deltaseconds;
+
+			if ( m_shootTimer->HasElapsed() )
+			{
+				game->SpawnBullet( m_position , ( -m_position + game->m_player->m_position ).GetNormalized() , FACTION_BAD );
+				m_shootTimer->Reset();
+			}
 		}
 
-		Vec2 moveVec = ( -m_position + m_nextMovePosition ).GetNormalized();
-		m_position += moveVec * 3.f * deltaseconds;
-
-		if ( m_shootTimer->HasElapsed() )
+		if ( m_type == TYPE_2 )
 		{
-			game->SpawnBullet( m_position , ( -m_position + game->m_player->m_position ).GetNormalized() , FACTION_BAD );
-			m_shootTimer->Reset();
+			m_nextMovePosition = game->m_player->m_position;
+
+			Vec2 moveVec = ( -m_position + m_nextMovePosition ).GetNormalized();
+			m_position += moveVec * 3.f * deltaseconds;
+		}
+
+		m_position.x = Clamp( m_position.x , 10.f , 75.f );
+		m_position.y = Clamp( m_position.y , 10.f , 40.f );
+	}
+	else
+	{
+		MultiplayerGame* game = ( MultiplayerGame* ) m_game;
+
+		if ( m_faction == FACTION_GOOD )
+		{
+			m_nextMovePosition = game->m_player2->m_position;
+
+			Vec2 moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+			m_position += moveVec * 1.2f * deltaseconds;
+		}
+
+		if ( m_faction == FACTION_BAD )
+		{
+			m_nextMovePosition = game->m_player1->m_position;
+
+			Vec2 moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+			m_position += moveVec * 1.2f * deltaseconds;
 		}
 	}
-
-	if ( m_type == TYPE_2 )
-	{
-		m_nextMovePosition = game->m_player->m_position;
-
-		Vec2 moveVec = ( -m_position + m_nextMovePosition ).GetNormalized();
-		m_position += moveVec * 3.f * deltaseconds;
-	}
-
-	m_position.x = Clamp( m_position.x , 10.f , 75.f );
-	m_position.y = Clamp( m_position.y , 10.f , 40.f );
 
 }
 
@@ -91,4 +115,16 @@ void AI::Render()
 void AI::Die()
 {
 	m_isGarbage = true;
+}
+
+void AI::SetSpriteBasedOnFaction()
+{
+	if ( m_faction == FACTION_GOOD )
+	{
+		m_sprite = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/narwhal.png" );
+	}
+	else
+	{
+		m_sprite = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/rhino.png" );
+	}
 }

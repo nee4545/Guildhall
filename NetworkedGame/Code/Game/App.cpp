@@ -72,8 +72,7 @@ void App::Startup()
 		g_theAutoratitiveServer->CreateSinglePlayerGame();
 	}
 
-	g_theRemoteServer = new RemoteServer();
-	g_theRemoteServer->StartUp();
+	
 
 	m_client = new PlayerClient();
 	m_client->StartUp();
@@ -123,6 +122,10 @@ void App::Update( float deltaSeconds )
 		g_theInput->UpdateRelativeMode();
 	}
 
+	if ( g_theRemoteServer != nullptr )
+	{
+		g_theRemoteServer->Update( deltaSeconds );
+	}
 	//thegame->Update( deltaSeconds );
 
 	g_theConsole.Update( deltaSeconds );
@@ -273,6 +276,8 @@ void App::StartMultiplayerServer( int port )
 
 void App::ConnectToMultiplayerServer( std::string address )
 {
+	g_theRemoteServer = new RemoteServer();
+	g_theRemoteServer->StartUp();
 	g_theRemoteServer->StartMultiplayerGame("127.1.1.1",48001);
 
 	delete g_theapp->m_client;
