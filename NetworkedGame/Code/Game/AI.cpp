@@ -82,10 +82,13 @@ void AI::Update( float deltaseconds )
 
 		if ( m_faction == FACTION_GOOD )
 		{
-			m_nextMovePosition = game->m_player2->m_position;
+			if ( game->m_player2 != nullptr )
+			{
+				m_nextMovePosition = game->m_player2->m_position;
 
-			Vec2 moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
-			m_position += moveVec * 1.2f * deltaseconds;
+				Vec2 moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+				m_position += moveVec * 1.2f * deltaseconds;
+			}
 		}
 
 		if ( m_faction == FACTION_BAD )

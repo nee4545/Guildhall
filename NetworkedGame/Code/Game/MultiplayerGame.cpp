@@ -175,7 +175,7 @@ void MultiplayerGame::Update( float deltaSeconds )
 	m_mousePosition.x = RangeMapFloat( 0.f , 1.f , m_camera->GetOrthoBottomLeft().x , m_camera->GetOrthoTopRight().x , mouseNormalizedPosition.x );
 	m_mousePosition.y = RangeMapFloat( 0.f , 1.f , m_camera->GetOrthoBottomLeft().y , m_camera->GetOrthoTopRight().y , mouseNormalizedPosition.y );
 
-	if ( g_theAutoratitiveServer == nullptr )
+	if ( g_theRemoteServer != nullptr )
 	{
 		return;
 	}

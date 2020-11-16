@@ -87,15 +87,18 @@ void AuthoritativeServer::BeginFrame()
 				msg1 += "PositionX=" + std::to_string( m_multiplayerGame->m_player1->m_position.x ) + "|";
 				msg1 += "PositionY =" + std::to_string( m_multiplayerGame->m_player1->m_position.y );
 
-				std::string msg2 = "ID =";
-				msg2 += std::to_string( m_multiplayerGame->m_player2->m_ID ) + "|";
-				msg2 += "EntityType = Player|";
-				msg2 += "Faction = Bad|";
-				msg2 += "PositionX =" + std::to_string( m_multiplayerGame->m_player2->m_position.x ) + "|";
-				msg2 += "PositionY =" + std::to_string( m_multiplayerGame->m_player2->m_position.y );
+				if ( m_multiplayerGame->m_player2 != nullptr )
+				{
+					std::string msg2 = "ID =";
+					msg2 += std::to_string( m_multiplayerGame->m_player2->m_ID ) + "|";
+					msg2 += "EntityType = Player|";
+					msg2 += "Faction = Bad|";
+					msg2 += "PositionX =" + std::to_string( m_multiplayerGame->m_player2->m_position.x ) + "|";
+					msg2 += "PositionY =" + std::to_string( m_multiplayerGame->m_player2->m_position.y );
+					messages.push_back( msg2 );
+				}
 
 				messages.push_back( msg1 );
-				messages.push_back( msg2 );
 
 				for ( int i = 0; i < m_multiplayerGame->m_bullets.size(); i++ )
 				{
@@ -123,7 +126,7 @@ void AuthoritativeServer::BeginFrame()
 				{
 					if ( m_multiplayerGame->m_ais[ i ] != nullptr )
 					{
-						std::string msg = "ID=";
+						std::string msg = "ID =";
 						msg += std::to_string( m_multiplayerGame->m_ais[ i ]->m_ID ) + "|";
 						msg += "EntityType=AI|";
 						if ( m_multiplayerGame->m_ais[ i ]->m_faction == FACTION_GOOD )

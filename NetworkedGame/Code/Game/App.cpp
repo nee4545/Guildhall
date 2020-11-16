@@ -283,6 +283,9 @@ void App::ConnectToMultiplayerServer( std::string address )
 	delete g_theapp->m_client;
 	g_theapp->m_client = nullptr;
 
+	/*delete g_theAutoratitiveServer;
+	g_theAutoratitiveServer = nullptr;*/
+
 	g_theapp->m_remoteclient = new RemoteClient();
 }
 
