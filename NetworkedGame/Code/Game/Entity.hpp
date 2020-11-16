@@ -2,6 +2,7 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Game.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Game/EntityCommon.hpp"
 #include <vector>
 
 
@@ -18,6 +19,7 @@ public:
 	bool m_isDead;
 	bool m_isGarbage;
 	Game* m_game;
+	int m_ID=0;
 
 	//Physics Flags
 	bool m_isPushedByWalls=false;

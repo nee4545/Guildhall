@@ -11,6 +11,8 @@ class InputSystem;
 class AudioSystem;
 class Game;
 class AuthoritativeServer;
+class NetworkSystem;
+class RemoteServer;
 
 constexpr float CLIENT_ASPECT = 2.f / 1.f;
 extern RenderContext* g_theRenderer;
@@ -18,8 +20,10 @@ extern App* g_theapp;
 extern Window* g_theWindow;
 extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
+extern NetworkSystem* g_theNetwork;
 extern Game* thegame;
 extern AuthoritativeServer* g_theAutoratitiveServer;
+extern RemoteServer* g_theRemoteServer;
 
 enum eBillBoardType
 {

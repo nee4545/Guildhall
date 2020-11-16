@@ -10,9 +10,10 @@
 #include "Engine/Network/NetworkDefs.hpp"
 #include "../Core/EventSystem.hpp"
 #include "Engine/UDPListner.hpp"
+#include "Game/GameCommon.hpp"
 
 extern InputSystem* g_theInput;
-extern NetworkSystem* g_theNetwork;
+
 
 NetworkSystem::NetworkSystem()
 {

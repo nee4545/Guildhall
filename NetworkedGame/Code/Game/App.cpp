@@ -15,6 +15,10 @@
 #include "Engine/JobSystem.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/AuthoritativeServer.hpp"
+#include "Engine/Network/NetworkSystem.hpp"
+#include "Game/RemoteServer.hpp"
+#include "Game/RemoteClient.hpp"
+#pragma comment(lib,"Ws2_32.lib")
 
 bool StartMultiplayerServerPort( EventArgs& args )
 {
@@ -23,10 +27,10 @@ bool StartMultiplayerServerPort( EventArgs& args )
 	return false;
 }
 
-bool ConnectToMultiplayerServer( EventArgs& args )
+bool ConnectToMultiplayeServer( EventArgs& args )
 {
 	g_theConsole.PrintString( Rgba8() , "This game is going to stop" );
-	App::StartMultiplayerServer( 0 );
+	App::ConnectToMultiplayerServer( "address" );
 	return false;
 }
 
@@ -34,8 +38,9 @@ RenderContext* g_theRenderer = nullptr;
 AudioSystem* g_theAudio = nullptr;
 Game* thegame = nullptr;
 JobSystem* g_theJobSystem = nullptr;
+NetworkSystem* g_theNetwork = nullptr;
 AuthoritativeServer* g_theAutoratitiveServer = nullptr;
-
+RemoteServer* g_theRemoteServer = nullptr;
 
 void App::Startup()
 {
@@ -45,14 +50,15 @@ void App::Startup()
 	g_theJobSystem = new JobSystem();
 	g_theJobSystem->StartUp();
 	g_theWindow->SetInputSysten( g_theInput );
+
 	if ( g_theAudio == nullptr )
 	{
 		g_theAudio = new AudioSystem();
 	}
-	//if ( thegame == nullptr )
-	//{
-	//	thegame = new Game();
-	//}
+
+	g_theNetwork = new NetworkSystem();
+	g_theNetwork->StartUp();
+
 	g_theConsole.Startup();
 
 	Clock::SystemStartup();
@@ -66,13 +72,16 @@ void App::Startup()
 		g_theAutoratitiveServer->CreateSinglePlayerGame();
 	}
 
+	g_theRemoteServer = new RemoteServer();
+	g_theRemoteServer->StartUp();
+
 	m_client = new PlayerClient();
 	m_client->StartUp();
 
 	g_theAutoratitiveServer->AddPlayerClientToServer( m_client );
 	
 	g_theEventSystem.SubscribeToEvent( "StartMultiplayerPort" , &StartMultiplayerServerPort );
-	g_theEventSystem.SubscribeToEvent( "ConnectToMultiplayerServer" , &StartMultiplayerServerPort );
+	g_theEventSystem.SubscribeToEvent( "ConnectToMultiplayerServer" , &ConnectToMultiplayeServer );
 }
 
 App::~App()
@@ -125,7 +134,8 @@ void App::Update( float deltaSeconds )
 
 	if ( g_theInput->WasKeyJustPressed( 0xC0 ) )
 	{
-		g_theConsole.SetIsOpen( !g_theConsole.IsOpen() );
+		bool DevConsoleStatus = g_theConsole.IsOpen();
+		g_theConsole.SetIsOpen( !DevConsoleStatus );
 	}
 	
 	if ( g_theWindow->m_quitRequested == true )
@@ -168,6 +178,16 @@ void App::EndFrame()
 	{
 		m_client->EndFrame();
 	}
+
+	if ( m_remoteclient != nullptr )
+	{
+		m_remoteclient->EndFrame();
+	}
+
+	if ( g_theRemoteServer != nullptr )
+	{
+		g_theRemoteServer->EndFrame();
+	}
 }
 
 void App::Render() const
@@ -178,6 +198,11 @@ void App::Render() const
 	if ( m_client != nullptr )
 	{
 		m_client->Render();
+	}
+
+	if ( m_remoteclient != nullptr )
+	{
+		m_remoteclient->Render();
 	}
 
 	if ( g_theConsole.IsOpen() )
@@ -193,15 +218,27 @@ void App::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theAudio->BeginFrame();
 	g_theJobSystem->BeginFrame();
+	g_theNetwork->BeginFrame();
 	Clock::BeginFrame();
 
 	if ( g_theAutoratitiveServer != nullptr )
 	{
 		g_theAutoratitiveServer->BeginFrame();
 	}
+
+	if ( g_theRemoteServer != nullptr )
+	{
+		g_theRemoteServer->BeginFrame();
+	}
+
 	if ( m_client != nullptr )
 	{
 		m_client->BeginFrame();
+	}
+
+	if ( m_remoteclient != nullptr )
+	{
+		m_remoteclient->BeginFrame();
 	}
 }
 
@@ -228,19 +265,19 @@ int App::GetFPS()
 
 void App::StartMultiplayerServer( int port )
 {
-	delete g_theAutoratitiveServer;
-	g_theAutoratitiveServer = nullptr;
+	g_theAutoratitiveServer->StartMultiplayerGame( 48001 );
 
-	delete g_theapp->m_client;
-	g_theapp->m_client = nullptr;
+	/*delete g_theapp->m_client;
+	g_theapp->m_client = nullptr;*/
 }
 
 void App::ConnectToMultiplayerServer( std::string address )
 {
-	delete g_theAutoratitiveServer;
-	g_theAutoratitiveServer = nullptr;
+	g_theRemoteServer->StartMultiplayerGame("127.1.1.1",48001);
 
 	delete g_theapp->m_client;
 	g_theapp->m_client = nullptr;
+
+	g_theapp->m_remoteclient = new RemoteClient();
 }
 

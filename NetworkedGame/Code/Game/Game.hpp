@@ -17,4 +17,5 @@ public:
 	InputSystem* GetInputSystem();
 
 	InputSystem* m_InputSystem = nullptr;
+	bool isSinglePlayer = true;
 };

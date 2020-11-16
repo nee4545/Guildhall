@@ -43,6 +43,18 @@
     <ClCompile Include="AI.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="MultiplayerGame.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="GameUDPSocket.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteServer.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteClient.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -77,5 +89,6 @@
     <ClInclude Include="EntityCommon.hpp">
       <Filter>General</Filter>
     </ClInclude>
+    <ClInclude Include="GameUDPSocket.hpp" />
   </ItemGroup>
 </Project>

@@ -7,6 +7,7 @@
 class Game;
 class PlayerClient;
 class Camera;
+class RemoteClient;
 
 class App
 {
@@ -40,6 +41,7 @@ public:
 	static void ConnectToMultiplayerServer( std::string address );
 
 	PlayerClient* m_client = nullptr;
+	RemoteClient* m_remoteclient = nullptr;
 private:
 	bool m_isQuitting = false;
 	Camera* m_devConsoleCamera = nullptr;

@@ -204,9 +204,13 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameUDPSocket.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
+    <ClCompile Include="MultiplayerGame.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerClient.cpp" />
+    <ClCompile Include="RemoteClient.cpp" />
+    <ClCompile Include="RemoteServer.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="SinglePlayerGame.cpp" />
   </ItemGroup>
@@ -221,6 +225,7 @@
     <ClInclude Include="EntityCommon.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
+    <ClInclude Include="GameUDPSocket.hpp" />
     <ClInclude Include="MultiplayerGame.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PlayerClient.hpp" />

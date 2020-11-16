@@ -14,7 +14,7 @@ UDPSocket::UDPSocket( const std::string& host , int port ):m_socket(INVALID_SOCK
 	}
 	else
 	{
-		g_theConsole.PrintString( Rgba8() , "UDP Socket Started on " + host + " On port " + std::to_string( port ) );
+		g_theConsole.PrintString( Rgba8() , "UDP Socket Started on " + host + " Sending to port " + std::to_string( port ) );
 	}
 }
 
