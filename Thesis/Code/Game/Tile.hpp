@@ -40,4 +40,9 @@ public:
 	bool m_isSolid = false;
 	bool inPath = false;
 	int m_influenceValue = 0;
+	bool m_doesHaveDirection = false;
+	bool m_isDirectionPositive = false;
+	float m_direction = 0.f;
+	float m_directionIntensity = 0.f;
+
 };

@@ -1,10 +1,12 @@
 #pragma once
 #include "Game/Entity.hpp"
+#include "Game/InfluenceMap.hpp"
 
 class SpriteAnimDefinition;
 class Game;
 class Clock;
 class Timer;
+class OccupancyMap;
 
 enum AI_STATES
 {
@@ -43,8 +45,10 @@ enum AI_TYPE
 
 enum AI_Behavior
 {
-	WANDER,
+	PATROL,
 	CHASE_PLAYER,
+	INVETIGATE_SOUND,
+	SHOOT_PLAYER,
 };
 
 
@@ -67,7 +71,7 @@ struct MovingHelper
 
 	void Reset()
 	{
-		currentIndex = 0;
+		currentIndex = -1;
 		path.clear();
 	}
 
@@ -97,8 +101,10 @@ public:
 
 	void ChangeBehavior( AI_Behavior newBehavior );
 	void CheckPlayerInSight();
+	Vec2 GetPatrolPoint();
 
 	void FindPathToRandomTile();
+	void ChangeBehavior();
 
 public:
 
@@ -117,7 +123,8 @@ public:
 
 	AI_STATES m_currentState = MOVING;
 	AI_TYPE m_currentType = TYPE_1;
-	AI_Behavior m_currentBehavior = WANDER;
+	AI_Behavior m_currentBehavior = PATROL;
+	AI_Behavior m_previousBehavior = PATROL;
 
 	SpriteAnimDefinition* m_animationAtIdle = nullptr;
 	SpriteAnimDefinition* m_animationAtWalk = nullptr;
@@ -127,6 +134,10 @@ public:
 
 	Clock* m_animClock = nullptr;
 	Timer* m_animTimer = nullptr;
+	Timer* m_rotation1Timer = nullptr;
+	Timer* m_rotation2Timer = nullptr;
+
+	Timer* m_sectorRotationTimer = nullptr;
 
 	bool m_hasRangeAttack = false;
 	bool m_hasMultipleRangeAttack = false;
@@ -141,4 +152,24 @@ public:
 
 	int tileIndex = -1;
 	Vec2 moveVec;
+	Vec2 m_lastSeenPosition;
+	bool m_lastSeenSet = false;
+	bool clearDone = false;
+
+	bool roationTimerStarted = false;
+	bool initialClearDone = false;
+
+	InfluenceMap* m_occupancyMap = nullptr;
+	OccupancyMap* m_occMap = nullptr;
+
+	std::vector<Vec2> m_patrolPoints;
+	float m_soundRadius = 10.f;
+	float m_shootingRadius = 35.f;
+
+	int m_currentPatrolIndex = 0;
+	bool m_hasPatrolPoint = false;
+
+	bool m_moveWithoutPathfinding = false;
+	float directionMultiplier = 1.f;
+
 };

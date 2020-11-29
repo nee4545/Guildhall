@@ -8,6 +8,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Game/PotentialFields.hpp"
+#include "Game/SymmetricPotentialField.hpp"
 
 
 
@@ -133,6 +134,16 @@ void GreenBeret::Update( float deltaseconds )
 				{
 					dirVec = Vec2::MakeFromPolarDegrees( degree );
 					dirVec = dirVec.GetNormalized();
+				}
+			}
+
+			if ( m_game->m_symmetricField->GetBoudingBox().IsPointInside( m_position ) )
+			{
+				Vec2 dir;
+				float val;
+				if ( m_game->m_symmetricField->GetDirectionAndValueForCoords( m_position , dir , val ) )
+				{
+					m_position += dir * val * deltaseconds;
 				}
 			}
 
@@ -538,7 +549,7 @@ void GreenBeret::LoadWalkAnimations()
 void GreenBeret::SetTexture()
 {
 	float angleDegrees = (m_nextMovePosition - m_position).GetNormalized().GetAngleDegrees();
-	g_theConsole.PrintString( Rgba8() , std::to_string( angleDegrees ) );
+	//g_theConsole.PrintString( Rgba8() , std::to_string( angleDegrees ) );
 
 	if ( m_state == CROUCH )
 	{

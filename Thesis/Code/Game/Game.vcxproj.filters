@@ -67,6 +67,15 @@
     <ClCompile Include="InfluenceMap.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="SymmetricPotentialField.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Imap.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="OccupancyMap.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -121,6 +130,18 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="InfluenceMap.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="SymmetricPotentialField.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="IMap.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="OccupancyMap.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

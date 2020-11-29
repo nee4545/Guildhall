@@ -26,6 +26,7 @@ class MapCreator;
 class PotentialFieldCreator;
 class PotentialField;
 class Timer;
+class SymmetricPotentialField;
 
 enum GameMode
 {
@@ -47,6 +48,14 @@ public:
 	bool isClosed = false;
 };
 
+struct RayCastResult
+{
+	bool didImpact = false;
+	Vec2 startHitPoint;
+	Vec2 endHitPoint;
+	Vec2 impactNormal;
+};
+
 class Game
 {
 
@@ -54,7 +63,6 @@ public:
 
 	Game();
 	~Game();
-
 
 	void Update( float deltaseconds );
 	void Render();
@@ -89,6 +97,8 @@ public:
 
 	void GetAllTilesWithSameFCost( std::vector<PathFindingHelper>& list , std::vector<PathFindingHelper>& outList );
 	bool IsPathFindingHelpInList( PathFindingHelper toFind , std::vector<PathFindingHelper>& list );
+
+	RayCastResult RayCast( Vec2 start , Vec2 direction , float distance );
 
 	void ToggleDevConsole();
 
@@ -142,6 +152,7 @@ public:
 	std::vector<MonsterAI*> m_enemies;
 	std::vector<Bomb*> m_bombs;
 	std::vector<Turret*> m_turrets;
+	SymmetricPotentialField* m_symmetricField;
 
 	bool StartLocationSet = false;
 	bool endLocationSet = false;

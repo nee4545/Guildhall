@@ -8,6 +8,9 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Core/Timer.hpp"
+#include "Engine/Core/Time.hpp"
+#include "Game/OccupancyMap.hpp"
 
 MonsterAI::MonsterAI( Game* game , AI_TYPE type , SpriteAnimDefinition* idleAnims , SpriteAnimDefinition* walkAnims , SpriteAnimDefinition* meleeAttackAnims )
 {
@@ -22,6 +25,12 @@ MonsterAI::MonsterAI( Game* game , AI_TYPE type , SpriteAnimDefinition* idleAnim
 	SetVerticesBasedOnAspect( Vec2( 1.f , 1.f ) );
 
 	m_helper = new MovingHelper();
+
+	m_rotation1Timer = new Timer();
+	m_rotation1Timer->SetSeconds( 0.2f );
+
+	m_sectorRotationTimer = new Timer();
+	m_sectorRotationTimer->SetSeconds( 3.5f );
 
 }
 
@@ -42,51 +51,232 @@ MonsterAI::~MonsterAI()
 
 void MonsterAI::Update( float deltaseconds )
 {
-	m_time += deltaseconds;
-	CheckPlayerInSight();
 
-	if ( m_currentBehavior == WANDER )
+	//ChangeBehavior();
+
+	//if ( m_currentBehavior == PATROL )
+	//{
+	//	if ( !m_hasPatrolPoint )
+	//	{
+	//		m_nextMovePosition = GetPatrolPoint();
+	//		m_hasPatrolPoint = true;
+	//		m_currentPatrolIndex = ( m_currentPatrolIndex + 1 ) % m_patrolPoints.size();
+	//		float distanceToPoint = ( m_position - m_nextMovePosition ).GetLength();
+	//		Vec2 direction = ( m_nextMovePosition - m_position ).GetNormalized();
+
+	//		if ( !m_game->RayCast( m_position , direction , distanceToPoint ).didImpact )
+	//		{
+	//			m_moveWithoutPathfinding = true;
+	//		}
+
+	//	}
+
+	//	if ( m_moveWithoutPathfinding )
+	//	{
+	//		Vec2 moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+	//		m_orientationDegrees = moveVec.GetAngleDegrees();
+	//		m_position += moveVec * 3.f * deltaseconds;
+	//		
+	//		if ( ( m_nextMovePosition - m_position ).GetLengthSquared() <= 0.1f )
+	//		{
+	//			m_hasPatrolPoint = false;
+	//		}
+	//	}
+	//	else if ( !m_helper->DoesHavePath() )
+	//	{
+	//		m_game->GetPathInGame( m_position , m_nextMovePosition , m_helper->path );
+	//	}
+	//	else if ( ( m_nextMovePosition - m_position ).GetLengthSquared() <= 0.1f )
+	//	{
+	//		tileIndex = m_helper->GetNextMove();
+	//		if ( tileIndex > 0 )
+	//		{
+	//			m_nextMovePosition = Vec2( m_game->m_mainMapTiles[ tileIndex ].m_tileCoords.x + 0.5f , m_game->m_mainMapTiles[ tileIndex ].m_tileCoords.y + 0.5f );
+	//		}
+	//		if ( m_helper->currentIndex == 0 )
+	//		{
+	//			m_hasPatrolPoint = false;
+	//			m_helper->Reset();
+	//		}
+	//		moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+	//	}
+	//	else
+	//	{
+	//		moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+	//		m_orientationDegrees = moveVec.GetAngleDegrees();
+	//		m_position += moveVec * 3.f * deltaseconds;
+	//	}
+
+
+	//	/*m_forwardVec.RotateDegrees( deltaseconds * 20.f * directionMultiplier );
+	//	if ( m_sectorRotationTimer->HasElapsed() )
+	//	{
+	//		directionMultiplier *= -1.f;
+	//		m_sectorRotationTimer->Reset();
+	//	}*/
+
+	//}
+
+	
+
+
+	m_time += deltaseconds;
+	//CheckPlayerInSight();
+
+	//if ( m_currentBehavior == CHASE_PLAYER )
+	//{
+	//	Vec2 dir = ( m_game->m_greenBeret->m_position - m_position ).GetNormalized();
+	//	m_position += dir * 4.5f * deltaseconds;
+
+	//	IntVec2 posInInt = IntVec2( RoundDownToInt( m_position.x ) , RoundDownToInt( m_position.y ) );
+
+	//	if ( m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( posInInt , true ) ].m_doesHaveDirection && !m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( posInInt , true ) ].m_isDirectionPositive )
+	//	{
+	//		//dir+= m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( posInInt , true ) ].m_direction *
+
+	//		m_position += Vec2::MakeFromPolarDegrees( m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( posInInt , true ) ].m_direction ) * m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( posInInt , true ) ].m_directionIntensity * deltaseconds;
+	//	}
+
+	//	m_orientationDegrees = GetTurnedToward( m_orientationDegrees , dir.GetAngleDegrees() , 90.f * deltaseconds );
+	//
+	//}
+
+	//if ( m_currentBehavior == SHOOT_PLAYER )
+	//{
+	//	Vec2 dir = ( m_game->m_greenBeret->m_position - m_position ).GetNormalized();
+	//	m_orientationDegrees = GetTurnedToward( m_orientationDegrees , dir.GetAngleDegrees() , 90.f * deltaseconds );
+	//
+	//}
+
+	//return;
+	
+
+	if ( IsPointInForwardSector2D( m_game->m_greenBeret->m_position , m_position , m_forwardVec.GetAngleDegrees() + m_orientationDegrees + 90.f , 30.f , 100.f ) && !m_game->RayCast( m_position , -( m_position - m_game->m_greenBeret->m_position ).GetNormalized() , ( m_position - m_game->m_greenBeret->m_position ).GetLength() ).didImpact )
 	{
-		if ( !m_helper->DoesHavePath() )
+		m_helper->path.clear();
+		m_helper->Reset();
+		m_lastSeenPosition = m_game->m_greenBeret->m_position;
+		m_lastSeenSet = true;
+
+		if ( m_occupancyMap != nullptr )
 		{
-			FindPathToRandomTile();
-			tileIndex = -1;
+			delete m_occupancyMap;
+			m_occupancyMap = nullptr;
 		}
 
+		Vec2 dir = ( m_game->m_greenBeret->m_position - m_position ).GetNormalized();
+		m_position += dir * 4.f * deltaseconds;
+
+		m_orientationDegrees = GetTurnedToward( m_orientationDegrees , dir.GetAngleDegrees() , 90.f * deltaseconds );
+	}
+	else if ( m_lastSeenSet )
+	{
+		m_helper->path.clear();
+		m_helper->Reset();
+		Vec2 dir = ( m_lastSeenPosition - m_position ).GetNormalized();
+		m_position += dir * 4.f * deltaseconds;
+
+		m_orientationDegrees = GetTurnedToward( m_orientationDegrees , dir.GetAngleDegrees() , 90.f * deltaseconds );
+
+		if ( ( m_position - m_lastSeenPosition ).GetLengthSquared() <= 0.5f )
+		{
+			m_lastSeenSet = false;
+		}
+
+		if ( m_occMap == nullptr )
+		{
+			m_occMap = new OccupancyMap(m_game, IntVec2( ( int ) m_lastSeenPosition.x , ( int ) m_lastSeenPosition.y ) , IntVec2( 59 , 59 ) , 100.f );
+
+			for ( int i = 0; i < 5; i++ )
+			{
+				m_occMap->PropgateInfluence();
+			}
+		}
+
+		if ( m_rotation1Timer->HasElapsed() )
+		{
+			m_rotation1Timer->Reset();
+			m_occMap->PropgateInfluence();
+		}
+		
+
+		for ( int i = 0; i < m_occMap->m_nodes.size(); i++ )
+		{
+			IntVec2 coords = m_occMap->m_nodes[ i ].coords;
+			if ( IsPointInForwardSector2D( Vec2( coords.x , coords.y ) , m_position , m_forwardVec.GetAngleDegrees() + m_orientationDegrees + 90.f , 30.f , 100.f ) && !m_game->RayCast( m_position , (Vec2(coords.x,coords.y)-m_position).GetNormalized() , ( m_position - Vec2( coords.x , coords.y ) ).GetLength() ).didImpact )
+			{
+				m_occMap->SetValue( coords , 0.f );
+			}
+		}
+
+		//m_lastSeenSet = false;
+	}
+	else if(m_occMap!= nullptr )
+	{
+		if ( m_rotation1Timer->HasElapsed() )
+		{
+			m_occMap->PropgateInfluence();
+			m_rotation1Timer->Reset();
+		}
+
+		for ( int i = 0; i < m_occMap->m_nodes.size(); i++ )
+		{
+			IntVec2 coords = m_occMap->m_nodes[ i ].coords;
+			if ( IsPointInForwardSector2D( Vec2( coords.x , coords.y ) , m_position , m_forwardVec.GetAngleDegrees() + m_orientationDegrees + 90.f , 30.f , 100.f ) && !m_game->RayCast( m_position , ( Vec2( coords.x , coords.y ) - m_position ).GetNormalized() , ( m_position - Vec2( coords.x , coords.y ) ).GetLength() ).didImpact )
+			{
+				m_occMap->SetValue( coords , 0.f );
+			}
+		}
+
+		for ( int i = 0; i < m_occMap->m_nodes.size(); i++ )
+		{
+			if ( IsPointInsideDisc2D( Vec2( m_occMap->m_nodes[ i ].coords.x , m_occMap->m_nodes[ i ].coords.y ) , m_position , 30.f ) && !m_game->RayCast(m_position,(Vec2(m_occMap->m_nodes[i].coords.x,m_occMap->m_nodes[i].coords.y)-m_position).GetNormalized(),(m_position-Vec2(m_occMap->m_nodes[i].coords.x,m_occMap->m_nodes[i].coords.y)).GetLength()).didImpact)
+			{
+				m_occMap->SetValue(m_occMap->m_nodes[i].coords,0.f);
+			}
+		}
+
+		m_occMap->SetValue( IntVec2( ( int ) m_position.x , ( int ) m_position.y ) , 0.f );
+
+		if ( !m_helper->DoesHavePath() )
+		{
+			IntVec2 maxCoords = m_occMap->GetMaxValueCoords();
+			m_nextMovePosition = m_position;
+			m_game->GetPathInGame( m_position , Vec2(maxCoords.x,maxCoords.y) , m_helper->path );
+			m_helper->currentIndex = m_helper->path.size() - 1;
+		}
 		else if ( ( m_nextMovePosition - m_position ).GetLengthSquared() <= 0.1f )
 		{
-			//m_previousPosition = m_position;
 			tileIndex = m_helper->GetNextMove();
 			if ( tileIndex > 0 )
 			{
 				m_nextMovePosition = Vec2( m_game->m_mainMapTiles[ tileIndex ].m_tileCoords.x + 0.5f , m_game->m_mainMapTiles[ tileIndex ].m_tileCoords.y + 0.5f );
 			}
-			//m_position = m_nextMovePosition;
-			moveVec = ( -m_position + m_nextMovePosition ).GetNormalized();
-			m_orientationDegrees = moveVec.GetAngleDegrees();
-			//m_orientationDegrees = GetTurnedToward( m_orientationDegrees , moveVec.GetAngleDegrees() , 30.f * deltaseconds );
+
+			/*	if ( m_helper->currentIndex == 0 )
+				{
+					m_hasPatrolPoint = false;
+					m_helper->Reset();
+				}*/
+			
+			moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+
 		}
 		else
 		{
-			float deltaXmov = 0.f;
-			float deltaYmov = 0.f;
+			moveVec = ( m_nextMovePosition - m_position ).GetNormalized();
+			m_orientationDegrees = moveVec.GetAngleDegrees();
+			m_position += moveVec * 6.f * deltaseconds;
 
-			deltaXmov = moveVec.x * 5.f * deltaseconds;
-			deltaYmov = moveVec.y * 5.f * deltaseconds;
-
-			m_position.x += deltaXmov;
-			m_position.y += deltaYmov;
+			
 		}
-	}
-	if ( m_currentBehavior == CHASE_PLAYER )
-	{
-		Vec2 dir = ( m_game->m_greenBeret->m_position - m_position ).GetNormalized();
-		m_position += dir * 4.f * deltaseconds;
-		//m_orientationDegrees = dir.GetAngleDegrees();
-		m_orientationDegrees = GetTurnedToward( m_orientationDegrees , dir.GetAngleDegrees() , 90.f * deltaseconds );
+
+		
 	}
 
 
+
+	
 }
 
 void MonsterAI::Render()
@@ -147,14 +337,40 @@ void MonsterAI::DebugRender()
 		AppendAABB2( verts , aabb , Rgba8( 0 , 0 , 100 , 100 ) );
 	}
 
+	/*if ( m_occupancyMap != nullptr )
+	{
+		for ( int i = 0; i < m_occupancyMap->m_nodes.size(); i++ )
+		{
+			if ( m_occupancyMap->m_nodes[ i ].influenceValue > 0 )
+			{
+				AABB2 aabb = AABB2( m_occupancyMap->m_nodes[ i ].coords.x , m_occupancyMap->m_nodes[ i ].coords.y , m_occupancyMap->m_nodes[ i ].coords.x + 1 , m_occupancyMap->m_nodes[ i ].coords.y + 1 );
+				AppendAABB2( verts , aabb , Rgba8( 100 , 100 , 0 , 100 ) );
+			}
+		}
+	}*/
+
+	if ( m_occMap != nullptr )
+	{
+		for ( int i = 0; i < m_occMap->m_nodes.size(); i++ )
+		{
+			if ( m_occMap->m_nodes[ i ].value > 0.f )
+			{
+				AABB2 aabb = AABB2( m_occMap->m_nodes[ i ].coords.x , m_occMap->m_nodes[ i ].coords.y , m_occMap->m_nodes[ i ].coords.x + 1 , m_occMap->m_nodes[ i ].coords.y + 1 );
+				AppendAABB2( verts , aabb , Rgba8( 100 , 100 , 0 , 255 ) );
+			}
+		}
+	}
+
 	if ( verts.size() > 0 )
 	{
 		g_theRenderer->BindTexture( nullptr );
 		g_theRenderer->DrawVertexArray( verts );
 	}
 
+
 	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->DrawSector( m_position , m_forwardVec.GetRotatedDegrees( m_orientationDegrees+90.f ) , 20.f ,50.f, Rgba8( 100 , 0 , 0 , 100 ) );
+	g_theRenderer->DrawSector( m_position , m_forwardVec.GetRotatedDegrees( m_orientationDegrees+90.f ) , 100.f ,30.f, Rgba8( 100 , 0 , 0 , 100 ) );
+	g_theRenderer->DrawRing( m_position , m_shootingRadius , Rgba8( 100 , 100 , 100 , 100 ) , 0.3f );
 }
 
 void MonsterAI::Die()
@@ -184,16 +400,49 @@ void MonsterAI::ChangeBehavior( AI_Behavior newBehavior )
 	}
 }
 
-void MonsterAI::CheckPlayerInSight()
+void MonsterAI::ChangeBehavior()
 {
-	if ( IsPointInForwardSector2D( m_game->m_greenBeret->m_position,  m_position , m_forwardVec.GetAngleDegrees()+m_orientationDegrees+90.f , 50.f , 20.f ) )
+	if ( IsPointInForwardSector2D( m_game->m_greenBeret->m_position , m_position , m_forwardVec.GetAngleDegrees() + m_orientationDegrees + 90.f , 30.f , 100.f ) && !m_game->RayCast( m_position , -( m_position - m_game->m_greenBeret->m_position ).GetNormalized() , ( m_position - m_game->m_greenBeret->m_position ).GetLength() ).didImpact )
 	{
-		ChangeBehavior( CHASE_PLAYER );
+		m_currentBehavior = CHASE_PLAYER;
+
+		if ( IsPointInsideDisc2D( m_position , m_game->m_greenBeret->m_position , m_shootingRadius ) )
+		{
+			m_currentBehavior = SHOOT_PLAYER;
+		}
+
 	}
 	else
 	{
-		ChangeBehavior( WANDER );
+		m_currentBehavior = PATROL;
 	}
+}
+
+void MonsterAI::CheckPlayerInSight()
+{
+	if ( IsPointInForwardSector2D( m_game->m_greenBeret->m_position,  m_position , m_forwardVec.GetAngleDegrees()+m_orientationDegrees+90.f , 30.f , 100.f ) && !m_game->RayCast(m_position,-(m_position-m_game->m_greenBeret->m_position).GetNormalized(),(m_position-m_game->m_greenBeret->m_position).GetLength()).didImpact )
+	{
+		ChangeBehavior( CHASE_PLAYER );
+		m_lastSeenPosition = m_game->m_greenBeret->m_position;
+		m_lastSeenSet = true;
+	}
+	else if( m_lastSeenSet)
+	{
+		if( (m_position - m_lastSeenPosition ).GetLengthSquared() <= 0.1f)
+		{
+			m_lastSeenSet = false;
+		}
+		//ChangeBehavior( WANDER );
+	}
+	else
+	{
+		ChangeBehavior( PATROL );
+	}
+}
+
+Vec2 MonsterAI::GetPatrolPoint()
+{
+	return m_patrolPoints[ m_currentPatrolIndex ];
 }
 
 void MonsterAI::FindPathToRandomTile()

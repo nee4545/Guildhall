@@ -4,6 +4,8 @@
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Renderer/SpriteAnimDefinition.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Game/SymmetricPotentialField.hpp"
 
 Bomb::Bomb( Game* game , Vec2 position , SpriteAnimDefinition* idle , SpriteAnimDefinition* explode )
 {
@@ -22,6 +24,8 @@ Bomb::Bomb( Game* game , Vec2 position , SpriteAnimDefinition* idle , SpriteAnim
 	m_Idlesprite = idle;
 	m_explosion = explode;
 	m_position = position;
+
+	m_symmetricPotentialField = new SymmetricPotentialField( game , IntVec2( RoundDownToInt( m_position.x ) , RoundDownToInt( m_position.y ) ),IntVec2(10,10) , 10.f , 1.f , false );
 }
 
 Bomb::~Bomb()
@@ -61,7 +65,7 @@ void Bomb::Render()
 	Vertex_PCU vertCopy[ 6 ];
 	memcpy( vertCopy , m_vertices , sizeof( Vertex_PCU ) * 6 );
 
-	TransformVertexArray( 6 , vertCopy , 2.f , 0.f , m_position );
+	TransformVertexArray( 6 , vertCopy , 10.f , 0.f , m_position );
 
 	g_theRenderer->DrawVertexArray( 6 , vertCopy );
 

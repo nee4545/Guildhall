@@ -5,6 +5,7 @@ class Texture;
 class SpriteAnimDefinition;
 class Timer;
 class Game;
+class SymmetricPotentialField;
 
 class Bomb : public Entity
 {
@@ -18,6 +19,7 @@ public:
 	virtual void DebugRender();
 	void Explode();
 	void ResetVertices();
+	
 
 	SpriteAnimDefinition* m_Idlesprite = nullptr;
 	SpriteAnimDefinition* m_explosion = nullptr;
@@ -25,6 +27,7 @@ public:
 	float m_time = 0.f;
 	Timer* m_explosionTimer = nullptr;
 	Game* m_game;
+	SymmetricPotentialField* m_symmetricPotentialField = nullptr;
 
 	bool m_isExploding = false;
 	float m_explosionRadius = 4.f;

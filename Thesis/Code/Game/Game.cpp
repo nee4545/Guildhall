@@ -8,6 +8,8 @@
 #include "Game/PotentialFieldCreator.hpp"
 #include "Game/MapCreator.hpp"
 #include "Game/StartScreen.hpp"
+#include "Game/InfluenceMap.hpp"
+#include "Game/SymmetricPotentialField.hpp"
 #include "Game/GreenBeret.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/SpriteAnimDefTex.hpp"
@@ -99,12 +101,17 @@ Game::Game()
 	MonsterAI* m1 = new MonsterAI( this , TYPE_1 , nullptr , m_aiAnimWalk1 , m_aiAnimMeleeAttack1 );
 	m1->m_position = Vec2( 10.f , 10.f );
 	m1->m_nextMovePosition = Vec2( 10.f , 10.f );
+	m1->m_patrolPoints.push_back( Vec2( 20.f , 20.f ) );
+	m1->m_patrolPoints.push_back( Vec2( 50.f , 20.f ) );
+	m1->m_patrolPoints.push_back( Vec2( 50.f , 40.f ) );
+	m1->m_patrolPoints.push_back( Vec2( 20.f , 50.f ) );
 	m_enemies.push_back( m1 );
+
 	m_startScreen = new StartScreen(this);
 	//std::vector<int> path;
 	//GetPathUsingAStarIgnoreDiagonalMoves( Vec2( 2.2f , 2.2f ) , Vec2( 33.f , 40.f ) , path );
 
-	Bomb* b = new Bomb( this , Vec2( 20.f , 10.f ) , m_bombIdleTex , m_explosion );
+	Bomb* b = new Bomb( this , Vec2( 30.f , 30.f ) , m_bombIdleTex , m_explosion );
 	m_bombs.push_back( b );
 
 	Turret* t = new Turret( this , Vec2( 25.f , 10.f ) , m_turretTex, Vec2(-1.f,0.f) );
@@ -137,7 +144,7 @@ Game::Game()
 
 	m_greenBeret = new GreenBeret( this );
 
-	m_greenBeret->m_position = Vec2( 10.f , 10.f );
+	m_greenBeret->m_position = Vec2( 30.f , 30.f );
 
 	LoadDataFromXml();
 
@@ -153,6 +160,11 @@ Game::Game()
 	m_greenBeretHUDTimer = new Timer();
 	m_greenBeretHUDTimer->SetSeconds( 0.5f );
 
+	InfluenceMap m = InfluenceMap( this , IntVec2( 30 , 30 ) , IntVec2( 10 , 5 ) , 6 );
+	m.Create();
+
+	m_symmetricField = new SymmetricPotentialField( this , IntVec2( 30 , 30 ) , IntVec2( 10 , 10 ),10.f , 1.f , false );
+	m_symmetricField->Create();
 }
 
 void Game::LoadAIAnimations()
@@ -440,7 +452,12 @@ void Game::Update( float deltaseconds )
 			m_turrets[ i ]->Update( deltaseconds );
 		}
 
-		//HandleBlockCollissions( m_player );
+		HandleBlockCollissions( m_greenBeret );
+
+		/*for ( int i = 0; i < m_enemies.size(); i++ )
+		{
+			HandleBlockCollissions( m_enemies[ i ] );
+		}*/
 		//HandleBlockCollissions( m_supportPlayer );
 
 		if ( g_theInput->WasRightMouseButtonJustPressed() )
@@ -511,14 +528,7 @@ void Game::Render()
 	{
 	
 
-		for ( int i = 0; i < m_bombs.size(); i++ )
-		{
-			if ( m_bombs[ i ] == nullptr )
-			{
-				continue;
-			}
-			m_bombs[ i ]->Render();
-		}
+		
 
 		for ( int i = 0; i < m_turrets.size(); i++ )
 		{
@@ -532,6 +542,16 @@ void Game::Render()
 	
 		g_theRenderer->BindTexture( m_mapTex1 );
 		g_theRenderer->DrawAABB2D( m_mapPart1 , Rgba8() );
+
+
+		for ( int i = 0; i < m_bombs.size(); i++ )
+		{
+			if ( m_bombs[ i ] == nullptr )
+			{
+				continue;
+			}
+			m_bombs[ i ]->Render();
+		}
 	
 
 		for ( int i = 0; i < m_enemies.size(); i++ )
@@ -542,6 +562,8 @@ void Game::Render()
 			}
 			m_enemies[ i ]->Render();
 		}
+
+		
 
 		/*std::vector<Vertex_PCU> verts;
 		for ( int i = 0; i < m_tiles.size(); i++ )
@@ -602,6 +624,7 @@ void Game::Render()
 		g_theRenderer->BindTexture( m_player1HudTex );
 		//g_theRenderer->DrawVertexArray( verts );
 
+		m_symmetricField->DebugRender();
 		//m_player->Render();
 		//m_supportPlayer->Render();
 		m_greenBeret->Render();
@@ -878,8 +901,8 @@ void Game::HandleBlockCollissions( Entity* entity )
 
 bool Game::IsTileSolid( IntVec2 tileCoords )
 {
-	int index = GetTileIndexForTileCoords( tileCoords );
-	return m_tiles[ index ].m_isSolid;
+	int index = GetTileIndexForTileCoords( tileCoords,true );
+	return m_mainMapTiles[ index ].m_isSolid;
 }
 
 void Game::GetPathUsingAStarIgnoreDiagonalMovesOneStep( Vec2 startPos , Vec2 endPos , std::vector<int>& path, bool ignoreDiagonalMoves, bool considerInfluenceMaps )
@@ -1096,19 +1119,19 @@ void Game::GetPathUsingAStarIgnoreDiagonalMovesOneStep( Vec2 startPos , Vec2 end
 				i1 = m_tiles[ GetTileIndexForTileCoords( openList1[ i ].coords ) ].m_influenceValue;
 				i2 = m_tiles[ GetTileIndexForTileCoords( tileToExpand->coords ) ].m_influenceValue;
 
-				f1 += i1;
-				f2 += i2;
-
 				if ( ignoreDiagonalMoves )
 				{
-					i1 *= 0.1f;
-					i2 *= 0.1f;
+					i1 *= 1.1f;
+					i2 *= 1.1f;
 				}
 				else
 				{
 					i1 *= 2.f;
 					i2 *= 2.f;
 				}
+
+				f1 += i1;
+				f2 += i2;
 			}
 
 			if ( f1 < f2 && f1<min )
@@ -1501,10 +1524,10 @@ void Game::GetPathUsingAStarIgnoreDiagonalMovesOneStep( Vec2 startPos , Vec2 end
 
 		if ( pathFound )
 		{
-			PathFindingHelper foundPath = closedList1.back();
+			/*PathFindingHelper foundPath = closedList1.back();
 			path.push_back( GetTileIndexForTileCoords( foundPath.coords ) );
 
-			
+
 			PathFindingHelper currentParent = *foundPath.parent;
 			while ( currentParent.parent != nullptr )
 			{
@@ -1545,6 +1568,14 @@ void Game::GetPathUsingAStarIgnoreDiagonalMovesOneStep( Vec2 startPos , Vec2 end
 					currentParent = *currentParent.parent;
 				}
 				currentNodesWithSameParent.clear();
+			}*/
+
+			PathFindingHelper foundPath = closedList1.back();
+
+			while ( foundPath.parent != nullptr )
+			{
+				path.push_back( GetTileIndexForTileCoords( foundPath.coords ) );
+				foundPath = *( foundPath.parent );
 			}
 		}
 }
@@ -2946,26 +2977,6 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 
 	PathFindingHelper* tileToExpand = new PathFindingHelper();
 
-	int a = 39;
-	int b = 62;
-
-	IntVec2 v1 = IntVec2( a - 1 , b );
-	IntVec2 v2 = IntVec2( a + 1 , b );
-	IntVec2 v3 = IntVec2( a , b - 1 );
-	IntVec2 v4 = IntVec2( a , b + 1 );
-	IntVec2 v5 = IntVec2( a - 1 , b - 1 );
-	IntVec2 v6 = IntVec2( a - 1 , b + 1 );
-	IntVec2 v7 = IntVec2( a + 1 , b - 1 );
-	IntVec2 v8 = IntVec2( a + 1 , b + 1 );
-
-	bool a1 = m_mainMapTiles[GetTileIndexForTileCoords( v1 , true )].m_isSolid;
-	bool a2 = m_mainMapTiles[GetTileIndexForTileCoords( v2 , true )].m_isSolid;
-	bool a3 = m_mainMapTiles[GetTileIndexForTileCoords( v3 , true )].m_isSolid;
-	bool a4 = m_mainMapTiles[GetTileIndexForTileCoords( v4 , true )].m_isSolid;
-	bool a5 = m_mainMapTiles[GetTileIndexForTileCoords( v5 , true )].m_isSolid;
-	bool a6 = m_mainMapTiles[GetTileIndexForTileCoords( v6 , true )].m_isSolid;
-	bool a7 = m_mainMapTiles[GetTileIndexForTileCoords( v7 , true )].m_isSolid;
-	bool a8 = m_mainMapTiles[GetTileIndexForTileCoords( v8 , true )].m_isSolid;
 
 	while ( !pathFound2 )
 	{
@@ -3030,12 +3041,9 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 				f2 += i2;
 			}
 
-			if ( f2 < f1 && f2 < min )
-			{
-				min = f2;
-			}
+			
 
-			if ( f2 < f1 || i2 < i1 && f2 < min )
+			if ( f2 < f1 || i2 < i1  )
 			{
 				tileToExpand = openList[ i ];
 			}
@@ -3179,15 +3187,6 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 					break;
 				}
 			}
-
-			/*for ( int i = 0; i < closedList.size(); i++ )
-			{
-				if ( closedList[ i ]->coords == x4->coords )
-				{
-					found = true;
-					break;
-				}
-			}*/
 
 			if ( !found )
 			{
@@ -3336,13 +3335,13 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 
 	while ( foundPath->parent != nullptr )
 	{
-		path.push_back( GetTileIndexForTileCoords( foundPath->coords ) );
+		path.push_back( GetTileIndexForTileCoords( foundPath->coords,true ) );
 		foundPath = ( foundPath->parent );
 	}*/
 
 
 	PathFindingHelper foundPath = *closedList.back();
-	path.push_back( GetTileIndexForTileCoords( foundPath.coords, true ) );
+	path.push_back( GetTileIndexForTileCoords( foundPath.coords , true ) );
 
 
 	PathFindingHelper currentParent = *foundPath.parent;
@@ -3368,11 +3367,7 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 			for ( int i = 1; i < currentNodesWithSameParent.size(); i++ )
 			{
 
-				if ( m_mainMapTiles[ GetTileIndexForTileCoords( currentNodesWithSameParent[ i ].coords, true ) ].m_influenceValue < m_mainMapTiles[ GetTileIndexForTileCoords( chosenTile.coords, true ) ].m_influenceValue )
-				{
-					chosenTile = currentNodesWithSameParent[ i ];
-				}
-				else if ( GetManhattanDistance( currentNodesWithSameParent[ i ].coords , ePos ) < GetManhattanDistance( chosenTile.coords , ePos ) )
+				if ( m_mainMapTiles[ GetTileIndexForTileCoords( currentNodesWithSameParent[ i ].coords , true ) ].m_influenceValue < m_mainMapTiles[ GetTileIndexForTileCoords( chosenTile.coords , true ) ].m_influenceValue )
 				{
 					chosenTile = currentNodesWithSameParent[ i ];
 				}
@@ -3380,12 +3375,12 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 		}
 		if ( chosenTile.isConsidered )
 		{
-			path.push_back( GetTileIndexForTileCoords( chosenTile.coords, true ) );
+			path.push_back( GetTileIndexForTileCoords( chosenTile.coords , true ) );
 			currentParent = *chosenTile.parent;
 		}
 		else
 		{
-			path.push_back( GetTileIndexForTileCoords( currentParent.coords,true ) );
+			path.push_back( GetTileIndexForTileCoords( currentParent.coords , true ) );
 			currentParent = *currentParent.parent;
 		}
 		currentNodesWithSameParent.clear();
@@ -3734,6 +3729,103 @@ bool Game::IsPathFindingHelpInList( PathFindingHelper toFind , std::vector<PathF
 	}
 
 	return found;
+}
+
+RayCastResult Game::RayCast( Vec2 start , Vec2 direction , float distance )
+{
+	RayCastResult toReturn;
+
+	IntVec2 currentTileCoords = IntVec2( ( int ) ( floor( start.x ) ) , ( int ) ( floor( start.y ) ) );
+
+	if ( m_mainMapTiles[GetTileIndexForTileCoords( currentTileCoords, true )].m_isSolid )
+	{
+		toReturn.didImpact = true;
+		toReturn.startHitPoint = start;
+		toReturn.endHitPoint = start;
+		toReturn.impactNormal = -direction;
+		return toReturn;
+	}
+
+	Vec2 displacement = direction * distance;
+
+	float xDeltaT = 1 / abs( displacement.x );
+	int tileStepX = direction.x > 0.f ? 1 : -1;
+	int offsetToLeadingEdgeX = ( tileStepX + 1 ) / 2;
+	float firstVerticalIntersectionX = ( float ) ( currentTileCoords.x + offsetToLeadingEdgeX );
+	float tOfNextXCrossing = abs( firstVerticalIntersectionX - start.x ) * xDeltaT;
+
+	float yDeltaT = 1 / abs( displacement.y );
+	int tileStepY = direction.y > 0.f ? 1 : -1;
+	int offsetToLeadingEdgeY = ( tileStepY + 1 ) / 2;
+	float firstVerticalIntersectionY = ( float ) ( currentTileCoords.y + offsetToLeadingEdgeY );
+	float tOfNextYCrossing = abs( firstVerticalIntersectionY - start.y ) * yDeltaT;
+
+	int tileX = currentTileCoords.x;
+	int tileY = currentTileCoords.y;
+
+	while ( true )
+	{
+		if ( tOfNextXCrossing < tOfNextYCrossing )
+		{
+			if ( tOfNextXCrossing > 1.f )
+			{
+				toReturn.didImpact = false;
+				toReturn.startHitPoint = start;
+				toReturn.endHitPoint = start + direction * distance;
+				return toReturn;
+			}
+
+			tileX += tileStepX;
+
+			if ( tileX < 0 )
+			{
+				tileX = 0;
+				break;
+			}
+
+			if ( m_mainMapTiles[GetTileIndexForTileCoords( IntVec2( tileX , tileY ),true )].m_isSolid )
+			{
+				toReturn.didImpact = true;
+				toReturn.startHitPoint = start + ( displacement * tOfNextXCrossing );
+				toReturn.endHitPoint = toReturn.startHitPoint;
+				toReturn.impactNormal = Vec2( ( float ) -tileStepX , 0.f );
+				return toReturn;
+			}
+
+			tOfNextXCrossing += xDeltaT;
+		}
+		else
+		{
+			if ( tOfNextYCrossing > 1.f )
+			{
+				toReturn.didImpact = false;
+				toReturn.startHitPoint = start;
+				toReturn.endHitPoint = start + direction * distance;
+				return toReturn;
+			}
+
+			tileY += tileStepY;
+			
+			if ( tileY < 0 )
+			{
+				tileY = 0;
+				break;
+			}
+
+			if ( m_mainMapTiles[ GetTileIndexForTileCoords( IntVec2( tileX , tileY ) , true ) ].m_isSolid )
+			{
+				toReturn.didImpact = true;
+				toReturn.startHitPoint = start + ( displacement * tOfNextYCrossing );
+				toReturn.endHitPoint = toReturn.startHitPoint;
+				toReturn.impactNormal = Vec2( 0.f , ( float ) -tileStepY );
+				return toReturn;
+			}
+
+			tOfNextYCrossing += yDeltaT;
+		}
+	}
+
+	return toReturn;
 }
 
 void Game::ToggleDevConsole()

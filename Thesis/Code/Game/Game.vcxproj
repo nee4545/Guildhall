@@ -197,15 +197,18 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GreenBeret.cpp" />
+    <ClCompile Include="Imap.cpp" />
     <ClCompile Include="InfluenceMap.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="MapCreator.cpp" />
     <ClCompile Include="MonsterAI.cpp" />
+    <ClCompile Include="OccupancyMap.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PotentialFieldCreator.cpp" />
     <ClCompile Include="PotentialFields.cpp" />
     <ClCompile Include="StartScreen.cpp" />
     <ClCompile Include="SupportPlayer.cpp" />
+    <ClCompile Include="SymmetricPotentialField.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Turret.cpp" />
   </ItemGroup>
@@ -218,14 +221,18 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="GreenBeret.hpp" />
+    <ClInclude Include="IMap.hpp" />
     <ClInclude Include="InfluenceMap.hpp" />
     <ClInclude Include="MapCreator.hpp" />
     <ClInclude Include="MonsterAI.hpp" />
+    <ClInclude Include="Object.hpp" />
+    <ClInclude Include="OccupancyMap.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PotentialFieldCreator.hpp" />
     <ClInclude Include="PotentialFields.hpp" />
     <ClInclude Include="StartScreen.hpp" />
     <ClInclude Include="SupportPlayer.hpp" />
+    <ClInclude Include="SymmetricPotentialField.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="Turret.hpp" />
   </ItemGroup>
