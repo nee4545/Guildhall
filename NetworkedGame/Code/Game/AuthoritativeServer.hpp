@@ -8,6 +8,7 @@
 #include <winsock2.h>
 #include "ws2tcpip.h"
 #include <thread>
+#include <vector>
 
 class RandomNumberGenerator;
 class MultiplayerGame;
@@ -17,6 +18,17 @@ class TCPServer;
 class TCPClient;
 class UDPSocket;
 class Timer;
+
+struct RealiableSendUDPMessage
+{
+	int frameNumber;
+	std::vector<std::string> message;
+};
+
+struct ACKUDPMessage
+{
+	int frameNumber;
+};
 
 struct TCPMessage
 {
@@ -46,8 +58,11 @@ public:
 	void EndFrame();
 	void StartMultiplayerGame(int portNum);
 	bool EstablishRemoteConnection();
+	void SendReliableUDPMessages();
 
 	void Writer( UDPSocket& socket , SynchronizedLockFreeQueue<std::string>& writearray );
+	void AddRealiableUDPMessagesToArray();	
+	std::string GetAddress();
 
 	Game* GetGame();
 	void AddPlayer();
@@ -64,9 +79,12 @@ public:
 
 	int m_listenPort = 48000;
 	SynchronizedLockFreeQueue < std::string > m_wirteArray;
+	SynchronizedLockFreeQueue<RealiableSendUDPMessage> m_realiableSendUDPMessage;
+	SynchronizedLockFreeQueue<ACKUDPMessage> m_receivedAcks;
 
 	Timer* m_timer = nullptr;
 	std::thread* writerThread = nullptr;
+	int m_frameNumber = 0;
 };
 
 

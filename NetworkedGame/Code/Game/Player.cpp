@@ -5,6 +5,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/SinglePlayerGame.hpp"
 #include "Game/MultiplayerGame.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 
 Player::Player( Game* game, Vec2 position, Faction faction ):Entity(game,position)
 {
@@ -19,6 +20,8 @@ Player::Player( Game* game, Vec2 position, Faction faction ):Entity(game,positio
 
 	m_sprite = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/hippo.png" );
 	m_physicsRadius = 1.f;
+
+	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 }
 
 void Player::Update( float deltaSeconds )
@@ -123,6 +126,14 @@ void Player::Render()
 	TransformVertexArray( 6 , vertCopy , 2.5f , 0.f , m_position );
 
 	g_theRenderer->DrawVertexArray( 6 , vertCopy );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_font->GetTexture() );
+
+	AABB2 health = AABB2( m_position.x - 2.5f , m_position.y + 2.f , m_position.x + 2.5f , m_position.y + 3.5f );
+	std::vector<Vertex_PCU> verts;
+	m_font->AddVertsForTextInBox2D( verts , health , 1.f , "health:" + std::to_string( m_health ) , Rgba8() , 1.f , Vec2( 0.f , 0.f ) );
+	g_theRenderer->DrawVertexArray( verts );
 	g_theRenderer->BindTexture( nullptr );
 
 	//g_theRenderer->DrawRing( m_position , m_physicsRadius , Rgba8() , 0.1f );

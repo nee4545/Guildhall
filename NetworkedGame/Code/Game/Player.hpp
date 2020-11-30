@@ -3,6 +3,7 @@
 #include "Engine/Core/AABB2.hpp"
 
 class Texture;
+class BitmapFont;
 
 class Player:public Entity
 {
@@ -33,4 +34,5 @@ public:
 
 	bool m_hasMovedLastFrame = false;
 	bool m_hasMovedThisFrame = false;
+	BitmapFont* m_font = nullptr;
 };

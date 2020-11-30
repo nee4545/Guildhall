@@ -85,7 +85,19 @@ void AuthoritativeServer::BeginFrame()
 				msg1 += "EntityType=Player|";
 				msg1 += "Faction=Good|";
 				msg1 += "PositionX=" + std::to_string( m_multiplayerGame->m_player1->m_position.x ) + "|";
-				msg1 += "PositionY =" + std::to_string( m_multiplayerGame->m_player1->m_position.y );
+				msg1 += "PositionY =" + std::to_string( m_multiplayerGame->m_player1->m_position.y )+ "|";
+				if ( m_multiplayerGame->m_player1->m_isGarbage )
+				{
+					msg1 += "IsGarbage =true";
+					msg1 += "|";
+				}
+				else
+				{
+					msg1 += "IsGarbage =false";
+					msg1 += "|";
+				}
+
+				msg1 += "Health =" + std::to_string( m_multiplayerGame->m_player1->m_health ) + "|";
 
 				if ( m_multiplayerGame->m_player2 != nullptr )
 				{
@@ -94,7 +106,18 @@ void AuthoritativeServer::BeginFrame()
 					msg2 += "EntityType = Player|";
 					msg2 += "Faction = Bad|";
 					msg2 += "PositionX =" + std::to_string( m_multiplayerGame->m_player2->m_position.x ) + "|";
-					msg2 += "PositionY =" + std::to_string( m_multiplayerGame->m_player2->m_position.y );
+					msg2 += "PositionY =" + std::to_string( m_multiplayerGame->m_player2->m_position.y ) + "|";
+					if ( m_multiplayerGame->m_player2->m_isGarbage )
+					{
+						msg2 += "IsGarbage =true";
+						msg2 += "|";
+					}
+					else
+					{
+						msg2 += "IsGarbage =false";
+						msg2 += "|";
+					}
+					msg2 += "Health =" + std::to_string( m_multiplayerGame->m_player2->m_health ) + "|";
 					messages.push_back( msg2 );
 				}
 
@@ -117,6 +140,19 @@ void AuthoritativeServer::BeginFrame()
 						}
 						msg += "PositionX =" + std::to_string( m_multiplayerGame->m_bullets[ i ]->m_position.x ) + "|" ;
 						msg += "PositionY =" + std::to_string( m_multiplayerGame->m_bullets[ i ]->m_position.y ) + "|";
+						
+						if ( m_multiplayerGame->m_bullets[ i ]->m_isGarbage )
+						{
+							msg += "IsGarbage =true";
+							msg += "|";
+						}
+						else
+						{
+							msg += "IsGarbage =false";
+							msg += "|";
+						}
+						msg += "Health =" + std::to_string( m_multiplayerGame->m_player2->m_health ) + "|";
+
 						messages.push_back( msg );
 					}
 					
@@ -139,6 +175,17 @@ void AuthoritativeServer::BeginFrame()
 						}
 						msg += "PositionX =" + std::to_string( m_multiplayerGame->m_ais[ i ]->m_position.x ) + "|";
 						msg += "PositionY =" + std::to_string( m_multiplayerGame->m_ais[ i ]->m_position.y ) + "|";
+						if ( m_multiplayerGame->m_ais[ i ]->m_isGarbage )
+						{
+							msg += "IsGarbage =true";
+							msg += "|";
+						}
+						else
+						{
+							msg += "IsGarbage =false";
+							msg += "|";
+						}
+						msg += "Health =" + std::to_string( m_multiplayerGame->m_player2->m_health ) + "|";
 						messages.push_back( msg );
 					}
 				}
@@ -192,13 +239,50 @@ bool AuthoritativeServer::EstablishRemoteConnection()
 	c.clientId = clientID;
 	c.clientPort = clienSendPort;
 	m_connectedClients.push_back( c );
+	std::string address = GetAddress();
+	Strings s = SplitStringOnDelimiter( address , ':' );
+	if ( s[ 0 ] == "127.0.0.1" )
+	{
+		address = "127.1.1.1";
+	}
+	else
+	{
+		address = s[ 0 ];
+	}
 
-	m_UDPSocket = new UDPSocket( "127.1.1.1" , clienSendPort);
+	m_UDPSocket = new UDPSocket( address , clienSendPort);
 	m_UDPSocket->Bind( m_listenPort );
 	m_multiplayerGame->CreateSecondPlayer();
 
 	writerThread = new std::thread( &AuthoritativeServer::Writer , this , std::ref( *m_UDPSocket ) , std::ref( m_wirteArray ) );
 	return true;
+}
+
+void AuthoritativeServer::SendReliableUDPMessages()
+{
+	RealiableSendUDPMessage UDPMessage;
+	UDPMessage.frameNumber = m_frameNumber;
+
+	std::string msg1 = "ID =";
+	msg1 += std::to_string( m_multiplayerGame->m_player1->m_ID ) + "|";
+	msg1 += "EntityType=Player|";
+	msg1 += "Faction=Good|";
+	msg1 += "PositionX=" + std::to_string( m_multiplayerGame->m_player1->m_position.x ) + "|";
+	msg1 += "PositionY =" + std::to_string( m_multiplayerGame->m_player1->m_position.y );
+
+	UDPMessage.message.push_back( msg1 );
+
+	if ( m_multiplayerGame->m_player2 != nullptr )
+	{
+		std::string msg2 = "ID =";
+		msg2 += std::to_string( m_multiplayerGame->m_player2->m_ID ) + "|";
+		msg2 += "EntityType = Player|";
+		msg2 += "Faction = Bad|";
+		msg2 += "PositionX =" + std::to_string( m_multiplayerGame->m_player2->m_position.x ) + "|";
+		msg2 += "PositionY =" + std::to_string( m_multiplayerGame->m_player2->m_position.y );
+		UDPMessage.message.push_back( msg2 );
+	}
+	
 }
 
 void AuthoritativeServer::Writer( UDPSocket& socket , SynchronizedLockFreeQueue<std::string>& writearray )
@@ -250,6 +334,36 @@ void AuthoritativeServer::Writer( UDPSocket& socket , SynchronizedLockFreeQueue<
 			//g_theConsole.PrintString( Rgba8() , receivedMessage );
 		}
 	}
+}
+
+void AuthoritativeServer::AddRealiableUDPMessagesToArray()
+{
+	
+}
+
+std::string AuthoritativeServer::GetAddress()
+{
+	std::array<char , 128> addressStr;
+
+	sockaddr clientAddr;
+	int addrSize = sizeof( clientAddr );
+
+	int iResult = getpeername( m_clientSocket , &clientAddr , &addrSize );
+
+	if ( iResult == SOCKET_ERROR )
+	{
+		//error
+	}
+
+	DWORD outlen = ( DWORD ) addressStr.size();
+	iResult = WSAAddressToStringA( &clientAddr , addrSize , NULL , &addressStr[ 0 ] , &outlen );
+
+	if ( iResult == SOCKET_ERROR )
+	{
+		//error
+	}
+
+	return &addressStr[ 0 ];
 }
 
 Game* AuthoritativeServer::GetGame()

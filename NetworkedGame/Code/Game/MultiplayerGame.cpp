@@ -55,21 +55,32 @@ void MultiplayerGame::CreateOrUpdateEntitiesFromStr( std::string messageStr )
 	Strings s3 = SplitStringOnDelimiter( s[ 2 ] , '=' );
 	Strings s4 = SplitStringOnDelimiter( s[ 3 ] , '=' );
 	Strings s5 = SplitStringOnDelimiter( s[ 4 ] , '=' );
+	Strings s6 = SplitStringOnDelimiter( s[ 5 ] , '=' );
+	Strings s7 = SplitStringOnDelimiter( s[ 6 ] , '=' );
 
 	int id = atoi( s1[ 1 ].c_str() );
 	float posx = atof( s4[ 1 ].c_str() );
 	float posy = atof( s5[ 1 ].c_str() );
+	bool isGarbage = false;
+	int health = atoi( s7[ 1 ].c_str() );
+
+	if ( s6[1] == "true" )
+	{
+		isGarbage = true;
+	}
 	
 	if ( id == 1 )
 	{
 		if ( m_player1 == nullptr )
 		{
 			m_player1 = new Player(this,Vec2(posx,posy),FACTION_GOOD);
+			m_player1->m_health = health;
 			//m_player1->SetSpriteBasedOnID();
 		}
 		else
 		{
 			m_player1->m_position = Vec2( posx , posy );
+			m_player1->m_health = health;
 		}
 		return;
 	}
@@ -80,10 +91,12 @@ void MultiplayerGame::CreateOrUpdateEntitiesFromStr( std::string messageStr )
 		{
 			m_player2 = new Player( this , Vec2( posx , posy ) , FACTION_BAD );
 			m_player2->SetSpriteBasedOnID();
+			m_player2->m_health = health;
 		}
 		else
 		{
 			m_player2->m_position = Vec2( posx , posy );
+			m_player2->m_health = health;
 		}
 		return;
 	}
@@ -98,6 +111,7 @@ void MultiplayerGame::CreateOrUpdateEntitiesFromStr( std::string messageStr )
 				if ( m_bullets[ i ]->m_ID == id )
 				{
 					m_bullets[ i ]->m_position = Vec2( posx , posy );
+					m_bullets[ i ]->m_isGarbage = isGarbage;
 					idFound = true;
 				}
 			}
@@ -116,6 +130,7 @@ void MultiplayerGame::CreateOrUpdateEntitiesFromStr( std::string messageStr )
 			}
 			Bullet* bullet = new Bullet( this , Vec2( posx , posy ),Vec2(0.f,1.f) , faction );
 			bullet->m_ID = id;
+			bullet->m_isGarbage = isGarbage;
 
 			m_bullets.push_back( bullet );
 		}
@@ -132,6 +147,7 @@ void MultiplayerGame::CreateOrUpdateEntitiesFromStr( std::string messageStr )
 				{
 					m_ais[ i ]->m_position = Vec2( posx , posy );
 					idFound = true;
+					m_ais[ i ]->m_isGarbage = isGarbage;
 				}
 			}
 		}
@@ -151,7 +167,7 @@ void MultiplayerGame::CreateOrUpdateEntitiesFromStr( std::string messageStr )
 			a->m_ID = id;
 			a->m_faction = faction;
 			a->SetSpriteBasedOnFaction();
-
+			a->m_isGarbage = isGarbage;
 			m_ais.push_back( a );
 		}
 	}
@@ -208,15 +224,15 @@ void MultiplayerGame::Update( float deltaSeconds )
 
 	if ( aiSpawnTimer->HasElapsed() )
 	{
-		if ( !aiSpawnned )
-		{
+		/*	if ( !aiSpawnned )
+			{*/
 			SpawnAI();
-			aiSpawnned = true;
-		}
+			//aiSpawnned = true;
+		//}
 		aiSpawnTimer->Reset();
 	}
 
-	//DoCollissionDetection();
+	DoCollissionDetection();
 	//DoGarbageCollection();
 }
 
@@ -226,14 +242,21 @@ void MultiplayerGame::DoCollissionDetection()
 	{
 		if ( m_bullets[ i ] != nullptr )
 		{
-			for ( int j = 0; j < m_ais.size(); j++ )
+			if ( !m_bullets[ i ]->m_isGarbage )
 			{
-				if ( m_ais[ j ] != nullptr )
+				for ( int j = 0; j < m_ais.size(); j++ )
 				{
-					if ( DoDiscsOverlap( m_bullets[ i ]->m_position , 0.5f , m_ais[ j ]->m_position , 1.f ) && m_bullets[ i ]->m_faction != m_ais[ j ]->m_faction )
+					if ( m_ais[ j ] != nullptr )
 					{
-						m_bullets[ i ]->Die();
-						m_ais[ j ]->Die();
+						if ( !m_ais[ j ]->m_isGarbage )
+						{
+							if ( DoDiscsOverlap( m_bullets[ i ]->m_position , 0.5f , m_ais[ j ]->m_position , 1.f ) && m_bullets[ i ]->m_faction != m_ais[ j ]->m_faction )
+							{
+								m_bullets[ i ]->Die();
+								m_ais[ j ]->Die();
+								continue;
+							}
+						}
 					}
 				}
 			}
@@ -241,19 +264,29 @@ void MultiplayerGame::DoCollissionDetection()
 
 			if ( m_bullets[ i ]->m_faction == FACTION_GOOD )
 			{
-				if ( DoDiscsOverlap( m_bullets[ i ]->m_position , 0.5f , m_player2->m_position , 1.f ) )
+				if ( !m_bullets[ i ]->m_isGarbage )
 				{
-					m_bullets[ i ]->Die();
-					m_player2->m_health--;
+					if ( m_player2 != nullptr )
+					{
+						if ( DoDiscsOverlap( m_bullets[ i ]->m_position , 0.5f , m_player2->m_position , 1.f ) )
+						{
+							m_bullets[ i ]->Die();
+
+							m_player2->m_health--;
+						}
+					}
 				}
 			}
 
 			if ( m_bullets[ i ]->m_faction == FACTION_BAD )
 			{
-				if ( DoDiscsOverlap( m_bullets[ i ]->m_position , 0.5f , m_player1->m_position , 1.f ) )
+				if ( !m_bullets[ i ]->m_isGarbage )
 				{
-					m_bullets[ i ]->Die();
-					m_player1->m_health--;
+					if ( DoDiscsOverlap( m_bullets[ i ]->m_position , 0.5f , m_player1->m_position , 1.f ) )
+					{
+						m_bullets[ i ]->Die();
+						m_player1->m_health--;
+					}
 				}
 			}
 
@@ -270,18 +303,27 @@ void MultiplayerGame::DoCollissionDetection()
 		{
 			if ( m_ais[ i ]->m_faction == FACTION_GOOD )
 			{
-				if ( DoDiscsOverlap( m_ais[ i ]->m_position , 1.f , m_player2->m_position , 1.f ) )
+				if ( !m_ais[ i ]->m_isGarbage )
 				{
-					m_ais[ i ]->Die();
-					m_player2->m_health--;
+					if ( m_player2 != nullptr )
+					{
+						if ( DoDiscsOverlap( m_ais[ i ]->m_position , 1.f , m_player2->m_position , 1.f ) )
+						{
+							m_ais[ i ]->Die();
+							m_player2->m_health--;
+						}
+					}
 				}
 			}
 			else
 			{
-				if ( DoDiscsOverlap( m_ais[ i ]->m_position , 1.f , m_player1->m_position , 1.f ) )
+				if ( !m_ais[ i ]->m_isGarbage )
 				{
-					m_ais[ i ]->Die();
-					m_player1->m_health--;
+					if ( DoDiscsOverlap( m_ais[ i ]->m_position , 1.f , m_player1->m_position , 1.f ) )
+					{
+						m_ais[ i ]->Die();
+						m_player1->m_health--;
+					}
 				}
 			}
 		}
@@ -326,11 +368,13 @@ void MultiplayerGame::Render()
 
 	if ( m_player1 != nullptr )
 	{
+		if(!m_player1->m_isGarbage )
 		m_player1->Render();
 	}
 
 	if ( m_player2 != nullptr )
 	{
+		if(!m_player2->m_isGarbage )
 		m_player2->Render();
 	}
 
@@ -338,6 +382,7 @@ void MultiplayerGame::Render()
 	{
 		if ( m_bullets[ i ] != nullptr )
 		{
+			if(!m_bullets[i]->m_isGarbage )
 			m_bullets[ i ]->Render();
 		}
 	}
@@ -346,6 +391,7 @@ void MultiplayerGame::Render()
 	{
 		if ( m_ais[ i ] != nullptr )
 		{
+			if(!m_ais[i]->m_isGarbage )
 			m_ais[ i ]->Render();
 		}
 	}

@@ -32,8 +32,9 @@ public:
 	void EndFrame();
 	void StartMultiplayerGame( std::string address , int portNum );
 	bool EstablishRemoteConnection();
-	void ReceiveTCPMessageFromServer();
+	void ReceiveTCPMessageFromServer(std::string address);
 	Game* GetGame();
+	std::string hostAddress;
 
 	void Writer( UDPSocket& socket , SynchronizedLockFreeQueue<std::string>& writearray );
 

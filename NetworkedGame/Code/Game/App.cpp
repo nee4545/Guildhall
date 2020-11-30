@@ -30,7 +30,8 @@ bool StartMultiplayerServerPort( EventArgs& args )
 bool ConnectToMultiplayeServer( EventArgs& args )
 {
 	g_theConsole.PrintString( Rgba8() , "This game is going to stop" );
-	App::ConnectToMultiplayerServer( "address" );
+	std::string address = args.GetValue( "address" , "127.1.1.1" );
+	App::ConnectToMultiplayerServer( address );
 	return false;
 }
 
@@ -278,7 +279,7 @@ void App::ConnectToMultiplayerServer( std::string address )
 {
 	g_theRemoteServer = new RemoteServer();
 	g_theRemoteServer->StartUp();
-	g_theRemoteServer->StartMultiplayerGame("127.1.1.1",48001);
+	g_theRemoteServer->StartMultiplayerGame(address,48001);
 
 	delete g_theapp->m_client;
 	g_theapp->m_client = nullptr;

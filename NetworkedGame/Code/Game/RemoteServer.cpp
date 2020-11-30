@@ -45,7 +45,7 @@ void RemoteServer::BeginFrame()
 		{
 			//m_TCPclient->Receive( m_TCPclient->m_socket );
 			
-			ReceiveTCPMessageFromServer();
+			ReceiveTCPMessageFromServer(hostAddress);
 		}
 	}
 
@@ -150,7 +150,8 @@ void RemoteServer::StartMultiplayerGame( std::string address, int portNum )
 	m_TCPclient = new TCPClient( );
 	m_TCPclient->m_socket=m_TCPclient->Connect( address , portNum );
 	//m_TCPclient->Receive( m_TCPclient->m_socket );
-	ReceiveTCPMessageFromServer();
+	ReceiveTCPMessageFromServer(address);
+	hostAddress = address;
 
 }
 
@@ -159,7 +160,7 @@ bool RemoteServer::EstablishRemoteConnection()
 	return false;
 }
 
-void RemoteServer::ReceiveTCPMessageFromServer()
+void RemoteServer::ReceiveTCPMessageFromServer(std::string address)
 {
 	std::array<char , 256> buffer;
 
@@ -183,7 +184,7 @@ void RemoteServer::ReceiveTCPMessageFromServer()
 		//g_theConsole.PrintString( Rgba8() , std::to_string( m_Id ) );
 		//g_theConsole.PrintString( Rgba8() , std::to_string( m_serverSendPort ) );
 
-		m_UDPSocket = new UDPSocket( "127.1.1.1" , 48000 );
+		m_UDPSocket = new UDPSocket( address , 48000 );
 		m_UDPSocket->Bind( m_serverSendPort );
 
 		writerThread = new std::thread( &RemoteServer::Writer , this , std::ref( *m_UDPSocket ) , std::ref( m_wirteArray ) );
