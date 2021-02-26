@@ -36,19 +36,19 @@ void OccupancyMap::Create()
 		for ( int j = minCoords.y; j <= maxCoords.y; j++ )
 		{
 			OccupancyMapNode node;
-			node.hasInfluence = true;
+			//node.hasInfluence = true;
 			node.coords = IntVec2( i , j );
 
-			int tileIndex = m_game->GetTileIndexForTileCoords( node.coords , true );
+			/*int tileIndex = m_game->GetTileIndexForTileCoords( node.coords , true );
 			if ( tileIndex > 0 && tileIndex < m_game->m_mainMapTiles.size() && !m_game->m_mainMapTiles[tileIndex].m_isSolid )
 			{
 				m_nodes.push_back( node );
 				std::string s = std::to_string( node.coords.x ) + std::to_string( node.coords.y );
 				m_dict[ s ] = index;
 				index++;
-			}
+			}*/
 
-			/*int tileIndex = m_game->GetTileIndexForOccGame( node.coords );
+			int tileIndex = m_game->GetTileIndexForOccGame( node.coords );
 			if ( tileIndex > 0 && tileIndex < m_game->m_occMapTiles.size() )
 			{
 				if ( !m_game->m_occMapTiles[ tileIndex ].m_isSolid )
@@ -59,7 +59,7 @@ void OccupancyMap::Create()
 				std::string s = std::to_string( node.coords.x ) + std::to_string( node.coords.y );
 				m_dict[ s ] = index;
 				index++;
-			}*/
+			}
 		}
 	}
 

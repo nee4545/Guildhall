@@ -1032,8 +1032,8 @@ void Game::HandleBlockCollissions( Entity* entity )
 
 bool Game::IsTileSolid( IntVec2 tileCoords )
 {
-	int index = GetTileIndexForTileCoords(tileCoords,true);
-	return m_mainMapTiles[ index ].m_isSolid;
+	int index = GetTileIndexForOccGame(tileCoords);
+	return m_occMapTiles[ index ].m_isSolid;
 }
 
 void Game::GetPathUsingAStarIgnoreDiagonalMovesOneStep( Vec2 startPos , Vec2 endPos , std::vector<int>& path, bool ignoreDiagonalMoves, bool considerInfluenceMaps )
