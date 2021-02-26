@@ -26,6 +26,8 @@ GreenBeret::GreenBeret(Game* game)
 	m_vertices[ 3 ] = Vertex_PCU( Vec3( aspect.x , -aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , Vec2( m_maxUV.x , m_minUV.y ) );
 	m_vertices[ 4 ] = Vertex_PCU( Vec3( aspect.x , aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , m_maxUV );
 	m_vertices[ 5 ] = Vertex_PCU( Vec3( -aspect.x , aspect.y , 0.f ) , Rgba8( 255 , 255 , 255 , 255 ) , Vec2( m_minUV.x , m_maxUV.y ) );
+
+	SetTexture();
 }
 
 GreenBeret::~GreenBeret()
@@ -43,7 +45,7 @@ void GreenBeret::Update( float deltaseconds )
 		IntVec2 pos = IntVec2( RoundDownToInt( m_game->m_mousePosition.x ) , RoundDownToInt( m_game->m_mousePosition.y ) );
 		if ( !m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( pos , true ) ].m_isSolid )
 		{
-			int num =m_game->m_rng->RollRandomIntInRange( 1 , 5 );
+			/*int num = m_game->m_rng->RollRandomIntInRange( 1 , 5 );
 			switch ( num )
 			{
 			case 1:
@@ -73,13 +75,13 @@ void GreenBeret::Update( float deltaseconds )
 			}
 			default:
 				break;
-			}
+			}*/
 			m_nextMovePosition = m_game->m_mousePosition;
 			m_moveSet = true;
 		}
 		else
 		{
-			int num = m_game->m_rng->RollRandomIntInRange( 1 , 5 );
+			/*int num = m_game->m_rng->RollRandomIntInRange( 1 , 5 );
 			switch ( num )
 			{
 			case 1:
@@ -99,7 +101,7 @@ void GreenBeret::Update( float deltaseconds )
 			}
 			default:
 				break;
-			}
+			}*/
 		}
 
 		m_game->m_greenBeretHUDTimer->Reset();

@@ -27,6 +27,8 @@ class PotentialFieldCreator;
 class PotentialField;
 class Timer;
 class SymmetricPotentialField;
+class OccAI;
+class BitmapFont;
 
 enum GameMode
 {
@@ -34,6 +36,7 @@ enum GameMode
 	PATHFINDER,
 	MAPCREATOR,
 	POTENTIALFIELD_CREATOR,
+	OCCUPANCY_MAP_GAME,
 	
 };
 
@@ -91,6 +94,7 @@ public:
 	void GetPathUsingAstarWithDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
 	void GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfuenceMap = false , bool ignoreDiagonalMoves = false );
 	void GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfluenceMap = false , bool ignoreDiagonalMoves = false );
+	void GetPathInOccupancyGame(Vec2 startPos,Vec2 endPos,std::vector<int>& path, bool considerInfueneMap = false, bool ignoreDiagonalMoves = false);
 	float GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos );
 
 	void CreateInfluenceMap( IntVec2 startCoords , bool isPositive , int initialValue );
@@ -99,15 +103,20 @@ public:
 	bool IsPathFindingHelpInList( PathFindingHelper toFind , std::vector<PathFindingHelper>& list );
 
 	RayCastResult RayCast( Vec2 start , Vec2 direction , float distance );
+	RayCastResult RayCastInOccGame( Vec2 start , Vec2 direction , float distance );
 
 	void ToggleDevConsole();
 
 	int GetTileIndexForTileCoords( const IntVec2& tileCoords, bool usingMainMap = false );
+	int GetTileIndexForOccGame( const IntVec2& tileCoords );
 	int GetTileIndexForTileCoordsForMainMap( const IntVec2& tileCoords );
 	void MapFillUsingWorms( TileTextureType type, int minWorkLength = 4, int maxWorkLength =12 , int maxWorms = 90);
 
 	void LoadDataFromXml();
 	void LoadPotentialFieldFromXML();
+
+	void LoadOccpancyGameDataFromXml();
+	void SaveOccupancyGameData();
 
 	GameMode m_currentMode = PATHFINDER;
 	StartScreen* m_startScreen = nullptr;
@@ -152,12 +161,15 @@ public:
 	std::vector<MonsterAI*> m_enemies;
 	std::vector<Bomb*> m_bombs;
 	std::vector<Turret*> m_turrets;
+	std::vector<OccAI*> m_occAIs;
 	SymmetricPotentialField* m_symmetricField;
 
 	bool StartLocationSet = false;
 	bool endLocationSet = false;
 	Vec2 startLocation;
 	Vec2 endLocation;
+
+	bool m_gamePaused = false;
 
 	std::vector<int> pathIndices;
 
@@ -272,5 +284,13 @@ public:
 	PotentialField* m_potentialField = nullptr;
 
 	Timer* m_greenBeretHUDTimer = nullptr;
+
+	IntVec2 m_occMapGameSize = IntVec2( 80 , 45 );
+
+	std::vector<Tile> m_occMapTiles;
+
+	bool m_inOccCreation = true;
+
+	BitmapFont* m_font = nullptr;
 
 };

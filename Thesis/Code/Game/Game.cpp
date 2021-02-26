@@ -22,6 +22,7 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Core/Timer.hpp"
+#include "Game/OccAI.hpp"
 //#include "Engine/ThirdParty/IMGUI/imgui.h"
 
 extern ImGuiSystem* g_theGUI;
@@ -75,9 +76,12 @@ Game::Game()
 
 	m_player = new Player( this );
 	m_player->m_position.x += 10.f;
+	m_player->m_position = Vec2(5.5f , 40.f);
 	m_supportPlayer = new SupportPlayer( this );
 
 	m_rng = new RandomNumberGenerator();
+
+	m_font = g_theRenderer->GetOrCreateBitMapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 
 	PopulateTiles();
 	LoadAIAnimations();
@@ -165,6 +169,28 @@ Game::Game()
 
 	m_symmetricField = new SymmetricPotentialField( this , IntVec2( 30 , 30 ) , IntVec2( 10 , 10 ),10.f , 1.f , false );
 	m_symmetricField->Create();
+
+	OccAI* ai1 = new OccAI();
+	ai1->m_position = Vec2( 20.f , 20.f );
+	ai1->m_type = OCC_AI_SHARED_MAP;
+	ai1->m_game = this;
+
+	OccAI* ai2 = new OccAI();
+	ai2->m_position = Vec2( 30.f , 20.f );
+	ai2->m_game = this;
+	ai2->m_type = OCC_AI_SHARED_MAP;
+
+	OccAI* ai3 = new OccAI();
+	ai3->m_position = Vec2( 5.5f , 43.5f );
+	ai3->m_game = this;
+
+	m_occAIs.push_back( ai1 );
+	m_occAIs.push_back( ai2 );
+	m_occAIs.push_back( ai3 );
+
+
+
+	LoadOccpancyGameDataFromXml();
 }
 
 void Game::LoadAIAnimations()
@@ -391,6 +417,16 @@ void Game::Update( float deltaseconds )
 		return;
 	}
 
+	if ( g_theInput->WasKeyJustPressed( 'P' ) )
+	{
+		m_gamePaused = !m_gamePaused;
+	}
+
+	if ( m_gamePaused )
+	{
+		return;
+	}
+
 	ToggleDevConsole();
 	ToggleGameModes();
 	UpdateMousePosition();
@@ -419,7 +455,7 @@ void Game::Update( float deltaseconds )
 		ToggleCameraUpdate();
 		TogglePlayers();
 
-		//m_player->Update( deltaseconds );
+	
 		//m_supportPlayer->Update( deltaseconds );
 		m_greenBeret->Update( deltaseconds );
 
@@ -473,6 +509,55 @@ void Game::Update( float deltaseconds )
 	}
 	UpdateCamera();
 
+	if ( m_currentMode == OCCUPANCY_MAP_GAME )
+	{
+		m_player->Update( deltaseconds );
+
+		if ( !m_inOccCreation )
+		{
+			for ( int i = 0; i < m_occAIs.size(); i++ )
+			{
+				m_occAIs[ i ]->Update( deltaseconds );
+				if ( !m_inOccCreation )
+				{
+					HandleBlockCollissions( m_occAIs[ i ] );
+				}
+			}
+		}
+
+		if ( g_theInput->WasKeyJustPressed( 'F' ) )
+		{
+			m_inOccCreation = !m_inOccCreation;
+		}
+
+		if ( g_theInput->IsKeyPressed( 'Z' ) )
+		{
+			IntVec2 coords = IntVec2( (int)m_mousePosition.x , (int)m_mousePosition.y );
+			int index = GetTileIndexForOccGame( coords );
+
+			m_occMapTiles[ index ].m_type = TILE_TYPE_STONE;
+			m_occMapTiles[ index ].m_isSolid = true;
+		}
+
+		if ( g_theInput->IsKeyPressed( 'X' ) )
+		{
+			IntVec2 coords = IntVec2( ( int ) m_mousePosition.x , ( int ) m_mousePosition.y );
+			int index = GetTileIndexForOccGame( coords );
+
+			m_occMapTiles[ index ].m_type = TILE_TYPE_SAND;
+			m_occMapTiles[ index ].m_isSolid = false;
+		}
+
+		if ( g_theInput->WasKeyJustPressed( 'I' ) )
+		{
+			SaveOccupancyGameData();
+		}
+		if ( !m_inOccCreation )
+		{
+			HandleBlockCollissions( m_player );
+		}
+	}
+
 
 	if ( m_currentMode == PATHFINDER )
 	{
@@ -501,8 +586,6 @@ void Game::Render()
 	}
 
 	g_theRenderer->BeginCamera( *m_gameCamera );
-	
-
 	
 
 
@@ -645,6 +728,37 @@ void Game::Render()
 	{
 		m_potCreator->Render();
 	}
+
+	if ( m_currentMode == OCCUPANCY_MAP_GAME )
+	{
+
+		std::vector<Vertex_PCU> sandTiles;
+		std::vector<Vertex_PCU> blockTiles;
+
+
+		for ( int i = 0; i < m_occMapTiles.size(); i++ )
+		{
+			if ( m_occMapTiles[ i ].m_type == TILE_TYPE_SAND )
+			{
+				AABB2 aabb = AABB2( m_occMapTiles[ i ].m_tileCoords.x , m_occMapTiles[ i ].m_tileCoords.y , m_occMapTiles[ i ].m_tileCoords.x + 1 , m_occMapTiles[ i ].m_tileCoords.y + 1 );
+				AppendAABB2( sandTiles , aabb , Rgba8() );
+			}
+
+		}
+
+		g_theRenderer->BindTexture( m_sandMainTex );
+		g_theRenderer->DrawVertexArray( sandTiles );
+		g_theRenderer->BindTexture( nullptr );
+
+		for ( int i = 0; i < m_occAIs.size(); i++ )
+		{
+			m_occAIs[ i ]->Render();
+		}
+
+		m_player->Render();
+
+	
+	}
 	
 
 	if ( g_theConsole.IsOpen() )
@@ -723,10 +837,27 @@ void Game::ToggleGameModes()
 	{
 		m_currentMode = POTENTIALFIELD_CREATOR;
 	}
+
+	if ( g_theInput->WasKeyJustPressed( '5' ) )
+	{
+		m_currentMode = OCCUPANCY_MAP_GAME;
+	}
 }
 
 void Game::PopulateTiles()
 {
+	int occNumTiles = m_occMapGameSize.x * m_occMapGameSize.y;
+
+	for ( int i = 0; i < occNumTiles; i++ )
+	{
+		int tileX = i % m_occMapGameSize.x;
+		int tileY = i / m_occMapGameSize.x;
+
+		Tile newTile = Tile( tileX , tileY , TILE_TYPE_SAND );
+		m_occMapTiles.push_back( newTile );
+	}
+
+
 	int numTiles = m_mapSize.x * m_mapSize.y;
 	for ( int index = 0; index < numTiles; index++ )
 	{
@@ -901,7 +1032,7 @@ void Game::HandleBlockCollissions( Entity* entity )
 
 bool Game::IsTileSolid( IntVec2 tileCoords )
 {
-	int index = GetTileIndexForTileCoords( tileCoords,true );
+	int index = GetTileIndexForTileCoords(tileCoords,true);
 	return m_mainMapTiles[ index ].m_isSolid;
 }
 
@@ -3041,8 +3172,6 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 				f2 += i2;
 			}
 
-			
-
 			if ( f2 < f1 || i2 < i1  )
 			{
 				tileToExpand = openList[ i ];
@@ -3385,6 +3514,553 @@ void Game::GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path ,
 		}
 		currentNodesWithSameParent.clear();
 	}
+}
+
+void Game::GetPathInOccupancyGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfueneMap /*= false*/ , bool ignoreDiagonalMoves /*= false*/ )
+{
+	IntVec2 sPos = IntVec2( RoundDownToInt( startPos.x ) , RoundDownToInt( startPos.y ) );
+	IntVec2 ePos = IntVec2( RoundDownToInt( endPos.x ) , RoundDownToInt( endPos.y ) );
+
+	if ( sPos == ePos )
+	{
+		return;
+	}
+
+	std::vector<PathFindingHelper*> openList;
+	std::vector<PathFindingHelper*> closedList;
+
+	openList.reserve( 20000 );
+	closedList.reserve( 20000 );
+
+	bool pathFound2 = false;
+
+	IntVec2 currentTile = sPos;
+
+	PathFindingHelper* base = new PathFindingHelper();
+	base->coords = sPos;
+
+	PathFindingHelper* p1 = new PathFindingHelper();
+	PathFindingHelper* p2 = new PathFindingHelper();
+	PathFindingHelper* p3 = new PathFindingHelper();
+	PathFindingHelper* p4 = new PathFindingHelper();
+	PathFindingHelper* p5 = new PathFindingHelper();
+	PathFindingHelper* p6 = new PathFindingHelper();
+	PathFindingHelper* p7 = new PathFindingHelper();
+	PathFindingHelper* p8 = new PathFindingHelper();
+
+
+
+	if ( currentTile.x - 1 > 0 )
+	{
+		p1->coords = IntVec2( currentTile.x - 1 , currentTile.y );
+		p1->gCost = 1;
+		p1->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p1->coords , ePos );
+		if ( !m_occMapTiles[ GetTileIndexForOccGame( p1->coords) ].m_isSolid )
+		{
+			p1->isConsidered = true;
+		}
+		p1->parent = base;
+	}
+
+	if ( currentTile.x + 1 < m_occMapGameSize.x )
+	{
+		p2->coords = IntVec2( currentTile.x + 1 , currentTile.y );
+		p2->gCost = 1;
+		p2->hCost = /*( p2->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p2->coords , ePos );
+		if ( !m_occMapTiles[ GetTileIndexForOccGame( p2->coords) ].m_isSolid )
+		{
+			p2->isConsidered = true;
+		}
+
+		p2->parent = base;
+	}
+
+	if ( currentTile.y - 1 > 0 )
+	{
+		p3->coords = IntVec2( currentTile.x , currentTile.y - 1 );
+		p3->gCost = 1;
+		p3->hCost = /*( p3->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p3->coords , ePos );
+		if ( !m_occMapTiles[ GetTileIndexForOccGame( p3->coords) ].m_isSolid )
+		{
+			p3->isConsidered = true;
+		}
+
+		p3->parent = base;
+
+	}
+
+	if ( currentTile.y + 1 < m_occMapGameSize.y )
+	{
+		p4->coords = IntVec2( currentTile.x , currentTile.y + 1 );
+		p4->gCost = 1;
+		p4->hCost = /*( p4->coords , ePos ).GetLengthSquared()*/GetManhattanDistance( p4->coords , ePos );
+		if ( !m_occMapTiles[ GetTileIndexForOccGame( p4->coords ) ].m_isSolid )
+		{
+			p4->isConsidered = true;
+		}
+
+		p4->parent = base;
+	}
+
+	if ( !ignoreDiagonalMoves )
+	{
+		if ( currentTile.x - 1 > 0 && currentTile.y - 1 > 0 )
+		{
+			p5->coords = IntVec2( currentTile.x - 1 , currentTile.y - 1 );
+			p5->gCost = 1.4f;
+			p5->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p5->coords , ePos );
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( p5->coords) ].m_isSolid )
+			{
+				p5->isConsidered = true;
+			}
+			p5->parent = base;
+		}
+
+		if ( currentTile.x - 1 > 0 && currentTile.y + 1 < m_occMapGameSize.y )
+		{
+			p6->coords = IntVec2( currentTile.x - 1 , currentTile.y + 1 );
+			p6->gCost = 1.4f;
+			p6->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p6->coords , ePos );
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( p6->coords) ].m_isSolid )
+			{
+				p6->isConsidered = true;
+			}
+			p6->parent = base;
+		}
+
+		if ( currentTile.x + 1 < m_occMapGameSize.x && currentTile.y - 1 > 0 )
+		{
+			p7->coords = IntVec2( currentTile.x + 1 , currentTile.y - 1 );
+			p7->gCost = 1.4f;
+			p7->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p7->coords , ePos );
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( p7->coords) ].m_isSolid )
+			{
+				p7->isConsidered = true;
+			}
+			p7->parent = base;
+		}
+
+		if ( currentTile.x + 1 < m_occMapGameSize.x && currentTile.y + 1 < m_occMapGameSize.y )
+		{
+			p8->coords = IntVec2( currentTile.x + 1 , currentTile.y + 1 );
+			p8->gCost = 1.4f;
+			p8->hCost = /*( p1->coords - ePos ).GetLengthSquared()*/GetManhattanDistance( p8->coords , ePos );
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( p8->coords) ].m_isSolid )
+			{
+				p8->isConsidered = true;
+			}
+			p8->parent = base;
+		}
+	}
+
+	if ( p1->isConsidered )
+	{
+		openList.push_back( p1 );
+	}
+
+	if ( p2->isConsidered )
+	{
+		openList.push_back( p2 );
+	}
+
+	if ( p3->isConsidered )
+	{
+		openList.push_back( p3 );
+	}
+
+	if ( p4->isConsidered )
+	{
+		openList.push_back( p4 );
+	}
+
+	if ( !ignoreDiagonalMoves )
+	{
+		if ( p5->isConsidered )
+		{
+			openList.push_back( p5 );
+		}
+
+		if ( p6->isConsidered )
+		{
+			openList.push_back( p6 );
+		}
+
+		if ( p7->isConsidered )
+		{
+			openList.push_back( p7 );
+		}
+
+		if ( p8->isConsidered )
+		{
+			openList.push_back( p8 );
+		}
+	}
+
+
+	PathFindingHelper* tileToExpand = new PathFindingHelper();
+
+
+	while ( !pathFound2 )
+	{
+
+		PathFindingHelper* x1 = new PathFindingHelper();
+		PathFindingHelper* x2 = new PathFindingHelper();
+		PathFindingHelper* x3 = new PathFindingHelper();
+		PathFindingHelper* x4 = new PathFindingHelper();
+		PathFindingHelper* x5 = new PathFindingHelper();
+		PathFindingHelper* x6 = new PathFindingHelper();
+		PathFindingHelper* x7 = new PathFindingHelper();
+		PathFindingHelper* x8 = new PathFindingHelper();
+
+		int index = 0;
+
+		for ( int i = 0; i < openList.size(); i++ )
+		{
+			if ( !openList[ i ]->isClosed )
+			{
+				tileToExpand = openList[ i ];
+				index = i;
+				break;
+			}
+		}
+
+		float min = 99999.f;
+
+		for ( int i = 0; i < openList.size(); i++ )
+		{
+			if ( openList[ i ]->isClosed || i == index )
+			{
+				continue;
+			}
+
+			float f1 = tileToExpand->gCost;
+			float f2 = openList[ i ]->gCost;
+			float h1 = tileToExpand->hCost;
+			float h2 = openList[ i ]->hCost;
+
+			f1 = f1 + h1;
+			f2 = f2 + h2;
+			float i1 = 0.f;
+			float i2 = 0.f;
+
+			if ( considerInfueneMap )
+			{
+				i1 = m_occMapTiles[ GetTileIndexForTileCoords( tileToExpand->coords , true ) ].m_influenceValue;
+				i2 = m_occMapTiles[ GetTileIndexForTileCoords( openList[ i ]->coords , true ) ].m_influenceValue;
+
+				if ( !ignoreDiagonalMoves )
+				{
+					i1 *= 2.f;
+					i2 *= 2.f;
+				}
+				else
+				{
+					i1 *= 0.1f;
+					i2 *= 0.1f;
+				}
+
+				f1 += i1;
+				f2 += i2;
+			}
+
+			if ( f2 < f1 || i2 < i1 )
+			{
+				tileToExpand = openList[ i ];
+			}
+
+		}
+
+
+		if ( tileToExpand->coords == ePos )
+		{
+			pathFound2 = true;
+			closedList.push_back( tileToExpand );
+			break;
+		}
+
+		tileToExpand->isClosed = true;
+
+		closedList.push_back( tileToExpand );
+
+		if ( tileToExpand->coords.x - 1 > 0 )
+		{
+			x1->coords = IntVec2( tileToExpand->coords.x - 1 , tileToExpand->coords.y );
+			x1->gCost = tileToExpand->gCost + 1.f;
+			x1->hCost = /*( x1.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x1->coords , ePos );
+
+
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( x1->coords) ].m_isSolid )
+			{
+				x1->isConsidered = true;
+			}
+
+			x1->parent = tileToExpand;
+		}
+
+		if ( x1->isConsidered )
+		{
+			bool found = false;
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+
+				if ( openList[ i ]->coords == x1->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x1 );
+			}
+		}
+
+		if ( tileToExpand->coords.x + 1 < m_occMapGameSize.x )
+		{
+			x2->coords = IntVec2( tileToExpand->coords.x + 1 , tileToExpand->coords.y );
+			x2->gCost = tileToExpand->gCost + 1.f;
+			x2->hCost = GetManhattanDistance( x2->coords , ePos );
+
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( x2->coords) ].m_isSolid )
+			{
+				x2->isConsidered = true;
+			}
+			x2->parent = tileToExpand;
+
+		}
+
+		if ( x2->isConsidered )
+		{
+			bool found = false;
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+
+				if ( openList[ i ]->coords == x2->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x2 );
+			}
+		}
+
+		if ( tileToExpand->coords.y - 1 > 0 )
+		{
+			x3->coords = IntVec2( tileToExpand->coords.x , tileToExpand->coords.y - 1 );
+			x3->gCost = tileToExpand->gCost + 1.f;
+			x3->hCost = GetManhattanDistance( x3->coords , ePos );
+
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( x3->coords) ].m_isSolid )
+			{
+				x3->isConsidered = true;
+			}
+			x3->parent = tileToExpand;
+		}
+
+		if ( x3->isConsidered )
+		{
+			bool found = false;
+
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+				if ( openList[ i ]->coords == x3->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x3 );
+			}
+		}
+
+		if ( tileToExpand->coords.y + 1 < m_occMapGameSize.y )
+		{
+			x4->coords = IntVec2( tileToExpand->coords.x , tileToExpand->coords.y + 1 );
+			x4->gCost = tileToExpand->gCost + 1.f;
+			x4->hCost = GetManhattanDistance( x4->coords , ePos );
+
+			if ( !m_occMapTiles[ GetTileIndexForOccGame( x4->coords) ].m_isSolid )
+			{
+				x4->isConsidered = true;
+			}
+
+			x4->parent = tileToExpand;
+		}
+
+		if ( x4->isConsidered )
+		{
+			bool found = false;
+
+			for ( int i = 0; i < openList.size(); i++ )
+			{
+				if ( openList[ i ]->coords == x4->coords )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if ( !found )
+			{
+				openList.push_back( x4 );
+			}
+		}
+
+		if ( !ignoreDiagonalMoves )
+		{
+			if ( tileToExpand->coords.x - 1 > 0 && tileToExpand->coords.y - 1 > 0 )
+			{
+				x5->coords = IntVec2( tileToExpand->coords.x - 1 , tileToExpand->coords.y - 1 );
+				x5->gCost = tileToExpand->gCost + 1.4f;
+				x5->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x5->coords , ePos );
+
+				if ( !m_occMapTiles[ GetTileIndexForOccGame( x5->coords ) ].m_isSolid )
+				{
+					x5->isConsidered = true;
+				}
+
+				x5->parent = tileToExpand;
+			}
+
+
+			if ( x5->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x5->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x5 );
+				}
+			}
+
+			if ( tileToExpand->coords.x - 1 > 0 && tileToExpand->coords.y + 1 < m_occMapGameSize.y )
+			{
+				x6->coords = IntVec2( tileToExpand->coords.x - 1 , tileToExpand->coords.y + 1 );
+				x6->gCost = tileToExpand->gCost + 1.4f;
+				x6->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x6->coords , ePos );
+
+				if ( !m_occMapTiles[ GetTileIndexForOccGame( x6->coords) ].m_isSolid )
+				{
+					x6->isConsidered = true;
+				}
+
+				x6->parent = tileToExpand;
+			}
+
+			if ( x6->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x6->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x6 );
+				}
+			}
+
+			if ( tileToExpand->coords.x + 1 < m_occMapGameSize.x && tileToExpand->coords.y - 1 > 0 )
+			{
+				x7->coords = IntVec2( tileToExpand->coords.x + 1 , tileToExpand->coords.y - 1 );
+				x7->gCost = tileToExpand->gCost + 1.4f;
+				x7->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x7->coords , ePos );
+
+				if ( !m_occMapTiles[ GetTileIndexForOccGame( x7->coords) ].m_isSolid )
+				{
+					x7->isConsidered = true;
+				}
+
+				x7->parent = tileToExpand;
+			}
+
+			if ( x7->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x7->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x7 );
+				}
+			}
+
+			if ( tileToExpand->coords.x + 1 < m_occMapGameSize.x && tileToExpand->coords.y + 1 < m_occMapGameSize.y )
+			{
+				x8->coords = IntVec2( tileToExpand->coords.x + 1 , tileToExpand->coords.y + 1 );
+				x8->gCost = tileToExpand->gCost + 1.4f;
+				x8->hCost = /*( x4.coords - ePos ).GetLengthSquared()*/GetManhattanDistance( x8->coords , ePos );
+
+				if ( !m_occMapTiles[ GetTileIndexForOccGame( x8->coords) ].m_isSolid )
+				{
+					x8->isConsidered = true;
+				}
+
+				x8->parent = tileToExpand;
+			}
+
+			if ( x8->isConsidered )
+			{
+				bool found = false;
+
+				for ( int i = 0; i < openList.size(); i++ )
+				{
+					if ( openList[ i ]->coords == x8->coords )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found )
+				{
+					openList.push_back( x8 );
+				}
+			}
+		}
+	}
+
+	PathFindingHelper* foundPath = closedList.back();
+
+	while ( foundPath->parent != nullptr )
+	{
+		path.push_back( GetTileIndexForOccGame( foundPath->coords) );
+		foundPath = ( foundPath->parent );
+	}
+
+
+	
 }
 
 float Game::GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos )
@@ -3828,6 +4504,104 @@ RayCastResult Game::RayCast( Vec2 start , Vec2 direction , float distance )
 	return toReturn;
 }
 
+RayCastResult Game::RayCastInOccGame( Vec2 start , Vec2 direction , float distance )
+{
+	RayCastResult toReturn;
+
+	IntVec2 currentTileCoords = IntVec2( ( int ) ( floor( start.x ) ) , ( int ) ( floor( start.y ) ) );
+
+	if ( m_occMapTiles[ GetTileIndexForOccGame(currentTileCoords) ].m_isSolid )
+	{
+		toReturn.didImpact = true;
+		toReturn.startHitPoint = start;
+		toReturn.endHitPoint = start;
+		toReturn.impactNormal = -direction;
+		return toReturn;
+	}
+
+	Vec2 displacement = direction * distance;
+
+	float xDeltaT = 1 / abs( displacement.x );
+	int tileStepX = direction.x > 0.f ? 1 : -1;
+	int offsetToLeadingEdgeX = ( tileStepX + 1 ) / 2;
+	float firstVerticalIntersectionX = ( float ) ( currentTileCoords.x + offsetToLeadingEdgeX );
+	float tOfNextXCrossing = abs( firstVerticalIntersectionX - start.x ) * xDeltaT;
+
+	float yDeltaT = 1 / abs( displacement.y );
+	int tileStepY = direction.y > 0.f ? 1 : -1;
+	int offsetToLeadingEdgeY = ( tileStepY + 1 ) / 2;
+	float firstVerticalIntersectionY = ( float ) ( currentTileCoords.y + offsetToLeadingEdgeY );
+	float tOfNextYCrossing = abs( firstVerticalIntersectionY - start.y ) * yDeltaT;
+
+	int tileX = currentTileCoords.x;
+	int tileY = currentTileCoords.y;
+
+	while ( true )
+	{
+		if ( tOfNextXCrossing < tOfNextYCrossing )
+		{
+			if ( tOfNextXCrossing > 1.f )
+			{
+				toReturn.didImpact = false;
+				toReturn.startHitPoint = start;
+				toReturn.endHitPoint = start + direction * distance;
+				return toReturn;
+			}
+
+			tileX += tileStepX;
+
+			if ( tileX < 0 )
+			{
+				tileX = 0;
+				break;
+			}
+
+			if ( m_occMapTiles[ GetTileIndexForOccGame( IntVec2( tileX , tileY ) )].m_isSolid )
+			{
+				toReturn.didImpact = true;
+				toReturn.startHitPoint = start + ( displacement * tOfNextXCrossing );
+				toReturn.endHitPoint = toReturn.startHitPoint;
+				toReturn.impactNormal = Vec2( ( float ) -tileStepX , 0.f );
+				return toReturn;
+			}
+
+			tOfNextXCrossing += xDeltaT;
+		}
+		else
+		{
+			if ( tOfNextYCrossing > 1.f )
+			{
+				toReturn.didImpact = false;
+				toReturn.startHitPoint = start;
+				toReturn.endHitPoint = start + direction * distance;
+				return toReturn;
+			}
+
+			tileY += tileStepY;
+
+			if ( tileY < 0 )
+			{
+				tileY = 0;
+				break;
+			}
+
+			if ( m_occMapTiles[ GetTileIndexForOccGame( IntVec2( tileX , tileY ) ) ].m_isSolid )
+			{
+				toReturn.didImpact = true;
+				toReturn.startHitPoint = start + ( displacement * tOfNextYCrossing );
+				toReturn.endHitPoint = toReturn.startHitPoint;
+				toReturn.impactNormal = Vec2( 0.f , ( float ) -tileStepY );
+				return toReturn;
+			}
+
+			tOfNextYCrossing += yDeltaT;
+		}
+	}
+
+	int x = 0;
+	return toReturn;
+}
+
 void Game::ToggleDevConsole()
 {
 	if ( g_theInput->WasKeyJustPressed( 0xC0 ) )
@@ -3848,6 +4622,16 @@ int Game::GetTileIndexForTileCoords( const IntVec2& tileCoords, bool usingMainMa
 	{
 		return tileCoords.x + ( m_mainMapSize.x * tileCoords.y );
 	}
+}
+
+int Game::GetTileIndexForOccGame( const IntVec2& tileCoords )
+{
+	if ( tileCoords.x < 0 || tileCoords.y < 0 )
+	{
+		return -1;
+	}
+
+	return tileCoords.x + ( m_occMapGameSize.x * tileCoords.y );
 }
 
 int Game::GetTileIndexForTileCoordsForMainMap( const IntVec2& tileCoords )
@@ -3952,6 +4736,55 @@ void Game::LoadPotentialFieldFromXML()
 	m_potentialField->ConvertToLocalSpace();
 	m_potentialField->ResizeAndRemoveGarbageNodes();
 	//m_potentialField->Rotate( 60.f );
+}
+
+void Game::LoadOccpancyGameDataFromXml()
+{
+	tinyxml2::XMLDocument doc;
+	doc.LoadFile( "Data/GameConfig/OccupancyGameData.xml" );
+
+	tinyxml2::XMLElement* root = doc.FirstChildElement( "SolidTiles" );
+
+	if ( root == nullptr )
+	{
+		return;;
+	}
+
+	for ( tinyxml2::XMLElement* ele = root->FirstChildElement( "Tile" ); ele != nullptr; ele = ele->NextSiblingElement( "Tile" ) )
+	{
+		int index = ParseXmlAttribute( *ele , "index" , -1 );
+		if ( index != -1 )
+		{
+			m_occMapTiles[ index ].m_isSolid = true;
+			m_occMapTiles[ index ].m_type = TILE_TYPE_STONE;
+		}
+	}
+}
+
+void Game::SaveOccupancyGameData()
+{
+	tinyxml2::XMLDocument gameDoc;
+	gameDoc.LoadFile( "Data/GameConfig/OccupancyGameData.xml" );
+
+
+	gameDoc.Clear();
+
+	tinyxml2::XMLNode* tiledata = gameDoc.NewElement( "SolidTiles" );
+
+	gameDoc.InsertFirstChild( tiledata );
+
+
+	for ( int i = 0; i < m_occMapTiles.size(); i++ )
+	{
+		if ( m_occMapTiles[ i ].m_isSolid )
+		{
+			tinyxml2::XMLElement* ele = gameDoc.NewElement( "Tile" );
+			ele->SetAttribute( "index" , i );
+			tiledata->InsertEndChild( ele );
+		}
+	}
+
+	gameDoc.SaveFile( "Data/GameConfig/OccupancyGameData.xml" );
 }
 
 void Game::LoadPlayerTextures()
@@ -4250,6 +5083,10 @@ void Game::UpdateCamera()
 		m_gameCamera->m_transform.m_position.y = Clamp( m_gameCamera->m_transform.m_position.y , 0.f , 720.f * 0.881f);
 
 
+	}
+	else if ( m_currentMode == OCCUPANCY_MAP_GAME )
+	{
+		m_gameCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( ( float ) m_occMapGameSize.x , ( float ) m_occMapGameSize.y ) );
 	}
 	else
 	{

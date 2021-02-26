@@ -5,6 +5,8 @@ class Texture;
 class Game;
 class Clock;
 class Timer;
+class OccupancyMap;
+
 
 
 
@@ -17,13 +19,16 @@ public:
 
 	Clock* m_animClock = nullptr;
 	Timer* m_animTimer = nullptr;
-
+	OccupancyMap* m_aiSharedMap = nullptr;
 
 	virtual void Update( float deltaseconds ) override;
 	virtual void Render() override;
 	virtual void Die() override;
 	virtual void DebugRender() override;
 	void TakeDamage( float damage );
+
+	void CreateMap();
+	void DeleteMap();
 
 	void MovePlayer( float deltaseconds );
 	void ToggleMeleeState();
@@ -49,6 +54,8 @@ public:
 	bool m_lockAnimState = false;
 	bool m_isActive = false;
 	bool m_isMelee = true;
+
+	Timer* m_mapUpdateTimer = nullptr;
 
 	
 };

@@ -5,6 +5,9 @@
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Game/Game.hpp"
+#include "Game/OccupancyMap.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 
 Player::Player()
 {
@@ -38,6 +41,9 @@ Player::Player( Game* game )
 	m_animTimer->SetSeconds( m_animClock , 0.f );
 
 	m_health = 10.f;
+
+	m_mapUpdateTimer = new Timer();
+	m_mapUpdateTimer->SetSeconds( 0.31f );
 }
 
 Player::~Player()
@@ -58,6 +64,15 @@ void Player::Update( float deltaseconds )
 	{
 		m_currentState = IDLE_MELEE;
 		return;
+	}
+
+	if ( m_aiSharedMap != nullptr )
+	{
+		if ( m_mapUpdateTimer->HasElapsed() )
+		{
+			m_aiSharedMap->PropgateInfluence();
+			m_mapUpdateTimer->Reset();
+		}
 	}
 
 	ToggleMeleeState();
@@ -90,7 +105,7 @@ void Player::Render()
 	g_theRenderer->DrawVertexArray(6, vertCopy );
 	g_theRenderer->BindTexture( nullptr );
 
-	//DebugRender();
+	DebugRender();
 }
 
 void Player::Die()
@@ -100,7 +115,35 @@ void Player::Die()
 
 void Player::DebugRender()
 {
-	g_theRenderer->DrawRing( m_position , 0.5f , Rgba8( 100 , 0 , 0 , 255 ) , 0.1f );
+	//g_theRenderer->DrawRing( m_position , 0.5f , Rgba8( 100 , 0 , 0 , 255 ) , 0.1f );
+
+	if ( m_aiSharedMap != nullptr )
+	{
+		std::vector<Vertex_PCU> verts;
+		std::vector<Vertex_PCU> fontVerts;
+		float maxValue = m_aiSharedMap->GetMaxValue();
+
+		for ( int i = 0; i < m_aiSharedMap->m_nodes.size(); i++ )
+		{
+			if ( m_aiSharedMap->m_nodes[ i ].value > 0.f )
+			{
+				Rgba8 baseColor = Rgba8( 255 , 0 , 0 , 0 );
+				baseColor.a = RangeMapFloat( 0 , maxValue , 0 , 100 , m_aiSharedMap->m_nodes[ i ].value );
+
+				AABB2 aabb = AABB2( m_aiSharedMap->m_nodes[ i ].coords.x , m_aiSharedMap->m_nodes[ i ].coords.y , m_aiSharedMap->m_nodes[ i ].coords.x + 1 , m_aiSharedMap->m_nodes[ i ].coords.y + 1 );
+				AppendAABB2( verts , aabb , baseColor );
+
+				m_game->m_font->AddVertsForTextInBox2D( fontVerts , aabb , 0.4f , std::to_string( ( int ) m_aiSharedMap->m_nodes[ i ].value ) , Rgba8( 0 , 0 , 0 , 255 ) , 0.5f , Vec2( 0.2f , 0.2f ) );
+			}
+
+
+		}
+		g_theRenderer->DrawVertexArray( verts );
+		g_theRenderer->BindTexture( m_game->m_font->GetTexture() );
+		g_theRenderer->DrawVertexArray( fontVerts );
+		g_theRenderer->BindTexture( nullptr );
+	}
+
 }
 
 void Player::TakeDamage( float damage )
@@ -109,6 +152,23 @@ void Player::TakeDamage( float damage )
 	if ( m_health <= 0.f )
 	{
 		Die();
+	}
+}
+
+void Player::CreateMap()
+{
+	if ( m_aiSharedMap == nullptr )
+	{
+		m_aiSharedMap = new OccupancyMap( m_game , IntVec2( m_position.x , m_position.y ) , IntVec2( 50 , 30 ) , 50.f );
+	}
+}
+
+void Player::DeleteMap()
+{
+	if ( m_aiSharedMap != nullptr )
+	{
+		delete m_aiSharedMap;
+		m_aiSharedMap = nullptr;
 	}
 }
 

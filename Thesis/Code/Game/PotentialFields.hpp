@@ -32,7 +32,7 @@ public:
 	void SetPosition( Vec2 worldPosition );
 	float GetPotentialFieldForPosition( Vec2 pos, bool shouldFlipValues );
 	void ResizeAndRemoveGarbageNodes();
-	void FlipAllNonCoreRotations();
+	
 
 	void PotentialFieldQueryForEntityEndPosition( Vec2& entityEndPosition, bool& shoudGiveFlippedValues, bool& shouldCachePosition, Vec2& entityCachePosition);
 	void Rotate(float degrees);

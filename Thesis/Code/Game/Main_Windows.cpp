@@ -16,7 +16,7 @@
  Window* g_theWindow = nullptr;
  HWND g_hWnd = nullptr;								// ...becomes WindowContext::m_windowHandle
 
-const char* APP_NAME = "ProtoGame 2D";	// ...becomes ??? (Change this per project!)
+const char* APP_NAME = "Thesis Artifact";	// ...becomes ??? (Change this per project!)
 
 
 //-----------------------------------------------------------------------------------------------

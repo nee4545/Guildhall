@@ -11,51 +11,51 @@
 
 float ConvertRadiansToDegrees( float radians )
 {
-	return(radians*180.f/3.1415926f);
+	return( radians * 180.f / 3.1415926f );
 }
 
 float ConvertDegreesToRadians( float degrees )
 {
-	return (degrees*3.1415926f/180.f);
+	return ( degrees * 3.1415926f / 180.f );
 }
 
 
 float CosDegrees( float degrees )
 {
-	float radians=ConvertDegreesToRadians(degrees);
-	return cos(radians);
+	float radians = ConvertDegreesToRadians( degrees );
+	return cos( radians );
 }
 
 float SinDegrees( float degrees )
 {
-	float radians=ConvertDegreesToRadians(degrees);
-	return sin(radians);
+	float radians = ConvertDegreesToRadians( degrees );
+	return sin( radians );
 }
 
-float Atan2Degrees( float y, float x )
+float Atan2Degrees( float y , float x )
 {
-	return atan2(y,x) * 180.0f/3.1415926f;
+	return atan2( y , x ) * 180.0f / 3.1415926f;
 }
 
-float GetShortestAngularDisplacement( float fromDegrees, float toDegrees )
+float GetShortestAngularDisplacement( float fromDegrees , float toDegrees )
 {
-	fromDegrees=fmod(fromDegrees,360.f);
-	toDegrees=fmod(toDegrees,360.f);
-	float angularDisplacement=toDegrees-fromDegrees;
+	fromDegrees = fmod( fromDegrees , 360.f );
+	toDegrees = fmod( toDegrees , 360.f );
+	float angularDisplacement = toDegrees - fromDegrees;
 
-	if( abs(angularDisplacement)<=180.f )
+	if ( abs( angularDisplacement ) <= 180.f )
 	{
 		return angularDisplacement;
 	}
 	else
 	{
-		if(angularDisplacement<0 )
-		{ 
-		return 360.f+angularDisplacement;
+		if ( angularDisplacement < 0 )
+		{
+			return 360.f + angularDisplacement;
 		}
 		else
-		{ 
-			angularDisplacement=angularDisplacement-360.f;
+		{
+			angularDisplacement = angularDisplacement - 360.f;
 			return angularDisplacement;
 		}
 	}
@@ -63,63 +63,63 @@ float GetShortestAngularDisplacement( float fromDegrees, float toDegrees )
 
 }
 
-float GetTurnedToward( float currentDegrees, float goalDegrees, float maxDeltaDegrees )
+float GetTurnedToward( float currentDegrees , float goalDegrees , float maxDeltaDegrees )
 {
-	float angularDisplacement=GetShortestAngularDisplacement(currentDegrees,goalDegrees);
+	float angularDisplacement = GetShortestAngularDisplacement( currentDegrees , goalDegrees );
 
-	if( abs(angularDisplacement)<maxDeltaDegrees )
+	if ( abs( angularDisplacement ) < maxDeltaDegrees )
 	{
-		
+
 		return goalDegrees;
 	}
 	else
-	{ 
-	   angularDisplacement=Clamp(angularDisplacement,-maxDeltaDegrees,maxDeltaDegrees);
-	   return currentDegrees+angularDisplacement;
+	{
+		angularDisplacement = Clamp( angularDisplacement , -maxDeltaDegrees , maxDeltaDegrees );
+		return currentDegrees + angularDisplacement;
 	}
 }
 
-float GetDistance2D(const Vec2& positionA,const Vec2& positionB)
+float GetDistance2D( const Vec2& positionA , const Vec2& positionB )
 {
-	return(sqrt((positionB.x-positionA.x)*(positionB.x-positionA.x)+(positionB.y-positionA.y)*(positionB.y-positionA.y)));
+	return( sqrt( ( positionB.x - positionA.x ) * ( positionB.x - positionA.x ) + ( positionB.y - positionA.y ) * ( positionB.y - positionA.y ) ) );
 }
 
-float GetDistanceSquared2D( const Vec2& positionA, const Vec2& positionB )
+float GetDistanceSquared2D( const Vec2& positionA , const Vec2& positionB )
 {
-	return((positionB.x-positionA.x)*(positionB.x-positionA.x)+(positionB.y-positionA.y)*(positionB.y-positionA.y));
+	return( ( positionB.x - positionA.x ) * ( positionB.x - positionA.x ) + ( positionB.y - positionA.y ) * ( positionB.y - positionA.y ) );
 }
 
-float GetDistance3D( const Vec3& positionA, const Vec3& positionB )
+float GetDistance3D( const Vec3& positionA , const Vec3& positionB )
 {
-	return(sqrt((positionB.x-positionA.x)*(positionB.x-positionA.x)+(positionB.y-positionA.y)*(positionB.y-positionA.y)+(positionB.z-positionA.z)*(positionB.z-positionA.z)));
+	return( sqrt( ( positionB.x - positionA.x ) * ( positionB.x - positionA.x ) + ( positionB.y - positionA.y ) * ( positionB.y - positionA.y ) + ( positionB.z - positionA.z ) * ( positionB.z - positionA.z ) ) );
 }
 
-float GetDistanceSquared3D( const Vec3& positionA, const Vec3& positionB )
+float GetDistanceSquared3D( const Vec3& positionA , const Vec3& positionB )
 {
-	return((positionB.x-positionA.x)*(positionB.x-positionA.x)+(positionB.y-positionA.y)*(positionB.y-positionA.y)+(positionB.z-positionA.z)*(positionB.z-positionA.z));
+	return( ( positionB.x - positionA.x ) * ( positionB.x - positionA.x ) + ( positionB.y - positionA.y ) * ( positionB.y - positionA.y ) + ( positionB.z - positionA.z ) * ( positionB.z - positionA.z ) );
 }
 
-float GetDistanceXY3D( const Vec3& positionA, const Vec3& positionB )
+float GetDistanceXY3D( const Vec3& positionA , const Vec3& positionB )
 {
-	return(sqrt((positionB.x-positionA.x)*(positionB.x-positionA.x)+(positionB.y-positionA.y)*(positionB.y-positionA.y)));
+	return( sqrt( ( positionB.x - positionA.x ) * ( positionB.x - positionA.x ) + ( positionB.y - positionA.y ) * ( positionB.y - positionA.y ) ) );
 }
-float GetDistanceXYSquared3D( const Vec3& positionA, const Vec3& positionB )
+float GetDistanceXYSquared3D( const Vec3& positionA , const Vec3& positionB )
 {
-	return((positionB.x-positionA.x)*(positionB.x-positionA.x)+(positionB.y-positionA.y)*(positionB.y-positionA.y));
-}
-
-int GetTaxicabDistance2D( const IntVec2& positionA, const IntVec2& positionB )
-{
-	return (abs(positionB.x-positionA.x)+abs(positionB.y-positionA.y));
+	return( ( positionB.x - positionA.x ) * ( positionB.x - positionA.x ) + ( positionB.y - positionA.y ) * ( positionB.y - positionA.y ) );
 }
 
-bool DoDiscsOverlap( const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB )
+int GetTaxicabDistance2D( const IntVec2& positionA , const IntVec2& positionB )
 {
-	float dx = centerB.x-centerA.x;
-	float dy = centerB.y-centerA.y;
-    float d = sqrt((dx*dx)+(dy*dy));
+	return ( abs( positionB.x - positionA.x ) + abs( positionB.y - positionA.y ) );
+}
 
-	if( (radiusA+radiusB) >= d )
+bool DoDiscsOverlap( const Vec2& centerA , float radiusA , const Vec2& centerB , float radiusB )
+{
+	float dx = centerB.x - centerA.x;
+	float dy = centerB.y - centerA.y;
+	float d = sqrt( ( dx * dx ) + ( dy * dy ) );
+
+	if ( ( radiusA + radiusB ) >= d )
 	{
 		return true;
 	}
@@ -129,15 +129,15 @@ bool DoDiscsOverlap( const Vec2& centerA, float radiusA, const Vec2& centerB, fl
 	}
 }
 
-bool DoSpheresOverlap( const Vec3& centerA, float radiusA, const Vec3& centerB, float radiusB )
+bool DoSpheresOverlap( const Vec3& centerA , float radiusA , const Vec3& centerB , float radiusB )
 {
-	float dx= abs( centerB.x-centerA.x );
-	float dy= abs( centerB.y-centerA.y );
-	float dz= abs(centerB.z-centerA.z);
+	float dx = abs( centerB.x - centerA.x );
+	float dy = abs( centerB.y - centerA.y );
+	float dz = abs( centerB.z - centerA.z );
 
-	float d= sqrt((dx*dx)+(dy*dy)+(dz*dz));
+	float d = sqrt( ( dx * dx ) + ( dy * dy ) + ( dz * dz ) );
 
-	if( (radiusA+radiusB) >= d )
+	if ( ( radiusA + radiusB ) >= d )
 	{
 		return true;
 	}
@@ -216,73 +216,73 @@ bool DoDiscAndPolygonOverlap( const Vec2& discCenter , float discRadius , const 
 
 
 
-const Vec2 TransformPosition2D( const Vec2& position, float uniformScale, float rotationDegrees, const Vec2& translation )
+const Vec2 TransformPosition2D( const Vec2& position , float uniformScale , float rotationDegrees , const Vec2& translation )
 {
-	Vec2 transformedVec= position;
-	
-	transformedVec.x*= uniformScale;
-	transformedVec.y*= uniformScale;
+	Vec2 transformedVec = position;
 
-	transformedVec.RotateDegrees(rotationDegrees);
+	transformedVec.x *= uniformScale;
+	transformedVec.y *= uniformScale;
 
-	transformedVec.x+=translation.x;
-	transformedVec.y+=translation.y;
+	transformedVec.RotateDegrees( rotationDegrees );
+
+	transformedVec.x += translation.x;
+	transformedVec.y += translation.y;
 
 	return transformedVec;
 
 }
 
 
-const Vec2 TransformPosition2D( const Vec2& position, const Vec2& iBasis, const Vec2& jBasis, const Vec2& translation )
+const Vec2 TransformPosition2D( const Vec2& position , const Vec2& iBasis , const Vec2& jBasis , const Vec2& translation )
 {
-	Vec2 transformedVec = Vec2(0.f,0.f);
-	transformedVec.x = position.x*iBasis.x + position.y*jBasis.x + translation.x;
-	transformedVec.y = position.x*iBasis.y + position.y*jBasis.y + translation.y;
+	Vec2 transformedVec = Vec2( 0.f , 0.f );
+	transformedVec.x = position.x * iBasis.x + position.y * jBasis.x + translation.x;
+	transformedVec.y = position.x * iBasis.y + position.y * jBasis.y + translation.y;
 
 	return transformedVec;
 }
 
-const Vec3 TransformPosition3DXY( const Vec3& position, float scaleXY, float zRotationDegrees, const Vec2& translationXY )
+const Vec3 TransformPosition3DXY( const Vec3& position , float scaleXY , float zRotationDegrees , const Vec2& translationXY )
 {
 	Vec3 transformedVec = position;
 
-	transformedVec.x*= scaleXY;
-	transformedVec.y*= scaleXY;
+	transformedVec.x *= scaleXY;
+	transformedVec.y *= scaleXY;
 	//transformedVec.z*= scaleXY;
 
-	transformedVec=transformedVec.GetRotatedAboutZDegrees(zRotationDegrees);
+	transformedVec = transformedVec.GetRotatedAboutZDegrees( zRotationDegrees );
 
-	transformedVec.x+=translationXY.x;
-	transformedVec.y+=translationXY.y;
-	
+	transformedVec.x += translationXY.x;
+	transformedVec.y += translationXY.y;
+
 
 	return transformedVec;
 }
 
-const Vec3 TransformPosition3DXY( const Vec3& position, const Vec2& iBasisXY, const Vec2& jBasisXY, const Vec2& translationXY )
+const Vec3 TransformPosition3DXY( const Vec3& position , const Vec2& iBasisXY , const Vec2& jBasisXY , const Vec2& translationXY )
 {
-	Vec3 transformedVec = Vec3( 0.f, 0.f,0.f );
+	Vec3 transformedVec = Vec3( 0.f , 0.f , 0.f );
 
-	transformedVec.x = position.x*iBasisXY.x + position.y*jBasisXY.x + translationXY.x;
-	transformedVec.y = position.x*iBasisXY.y + position.y*jBasisXY.y + translationXY.y;
+	transformedVec.x = position.x * iBasisXY.x + position.y * jBasisXY.x + translationXY.x;
+	transformedVec.y = position.x * iBasisXY.y + position.y * jBasisXY.y + translationXY.y;
 	transformedVec.z = position.z;
 
 	return transformedVec;
 }
 
-float Interpolate( float a, float b, float fraction0fb )
+float Interpolate( float a , float b , float fraction0fb )
 {
-	return a + fraction0fb *(b-a);
+	return a + fraction0fb * ( b - a );
 }
 
-float RangeMapFloat( float inBegin, float inEnd, float outBegin, float outEnd, float inValue )
+float RangeMapFloat( float inBegin , float inEnd , float outBegin , float outEnd , float inValue )
 {
-	float inDisplacement= inValue-inBegin;
-	float inRange=inEnd-inBegin;
-	float fraction= inDisplacement/inRange;
-	float outRange= outEnd-outBegin;
-	float outDisplacement= fraction*outRange;
-	float outValue = outBegin+outDisplacement;
+	float inDisplacement = inValue - inBegin;
+	float inRange = inEnd - inBegin;
+	float fraction = inDisplacement / inRange;
+	float outRange = outEnd - outBegin;
+	float outDisplacement = fraction * outRange;
+	float outValue = outBegin + outDisplacement;
 
 	return outValue;
 }
@@ -290,14 +290,14 @@ float RangeMapFloat( float inBegin, float inEnd, float outBegin, float outEnd, f
 float ClampZeroToOne( float value )
 {
 	{
-		if( value<0 )
+		if ( value < 0 )
 		{
-			value=0.f;
+			value = 0.f;
 			return value;
 		}
-		if( value>1 )
+		if ( value > 1 )
 		{
-			value=1.f;
+			value = 1.f;
 			return value;
 		}
 
@@ -305,14 +305,14 @@ float ClampZeroToOne( float value )
 	}
 }
 
-float Clamp( float value, float min, float max )
+float Clamp( float value , float min , float max )
 {
-	if( value<min )
+	if ( value < min )
 	{
 		return min;
 	}
 
-	if( value>max )
+	if ( value > max )
 	{
 		return max;
 	}
@@ -322,143 +322,143 @@ float Clamp( float value, float min, float max )
 
 float Round( float value )
 {
-	if( value-RoundDownToInt( value )>=0.5f )
+	if ( value - RoundDownToInt( value ) >= 0.5f )
 	{
-		return (float)RoundDownToInt( value )+1.f;
+		return ( float ) RoundDownToInt( value ) + 1.f;
 	}
 	else
-		return (float)RoundDownToInt(value);
+		return ( float ) RoundDownToInt( value );
 }
 
 int RoundDownToInt( float value )
 {
-	if( value<0 )
+	if ( value < 0 )
 	{
-		return (int)value-1;
+		return ( int ) value - 1;
 	}
-	return (int)value;
+	return ( int ) value;
 }
 
 int RoundToNearestInt( float value )
 {
-	if( value-RoundDownToInt( value )>=0.5f )
+	if ( value - RoundDownToInt( value ) >= 0.5f )
 	{
-		return RoundDownToInt(value)+1;
+		return RoundDownToInt( value ) + 1;
 	}
 	else
-		return RoundDownToInt(value);
+		return RoundDownToInt( value );
 }
 
-void PushDiscOutOFAABB2D( Vec2& center, float discRadius,const AABB2& aabb )
+void PushDiscOutOFAABB2D( Vec2& center , float discRadius , const AABB2& aabb )
 {
-	Vec2 nearestPoint=aabb.GetNearestPoint(center);
-	PushDiscOutOfPoint2D(center,discRadius,nearestPoint);
+	Vec2 nearestPoint = aabb.GetNearestPoint( center );
+	PushDiscOutOfPoint2D( center , discRadius , nearestPoint );
 
 }
 
 
-void PushDiscOutOfPoint2D( Vec2& center, float discRadius, const Vec2& point )
+void PushDiscOutOfPoint2D( Vec2& center , float discRadius , const Vec2& point )
 {
-	if( GetDistance2D( center, point )>=discRadius )
+	if ( GetDistance2D( center , point ) >= discRadius )
 	{
 		return;
 	}
 
-	Vec2 displacement=center-point;
+	Vec2 displacement = center - point;
 
 	displacement.Normalize();
 
-	Vec2 radiusVec= displacement*discRadius;
+	Vec2 radiusVec = displacement * discRadius;
 
-	Vec2 moveOut=radiusVec-(center-point);
+	Vec2 moveOut = radiusVec - ( center - point );
 
-	center+=moveOut;
-	
+	center += moveOut;
+
 }
 
-const Vec2 GetNearstPointOnDisc2D( const Vec2& referencePos, const Vec2& discCenter, float discRadius )
+const Vec2 GetNearstPointOnDisc2D( const Vec2& referencePos , const Vec2& discCenter , float discRadius )
 {
-	if( IsPointInsideDisc2D( referencePos, discCenter, discRadius ) )
+	if ( IsPointInsideDisc2D( referencePos , discCenter , discRadius ) )
 	{
 		return referencePos;
 	}
 
 	Vec2 displacement = referencePos - discCenter;
 	Vec2 fwd = displacement.GetNormalized();
-	
-	return discCenter + fwd*discRadius;
+
+	return discCenter + fwd * discRadius;
 }
 
-void PushDIscOutOfEachOther2D( Vec2& centerDisc1, float discRadius1, Vec2& centerDisc2, float discRadius2 )
+void PushDIscOutOfEachOther2D( Vec2& centerDisc1 , float discRadius1 , Vec2& centerDisc2 , float discRadius2 )
 {
-	if( !DoDiscsOverlap( centerDisc1, discRadius1, centerDisc2, discRadius2 ) )
+	if ( !DoDiscsOverlap( centerDisc1 , discRadius1 , centerDisc2 , discRadius2 ) )
 	{
 		return;
 	}
 
-	Vec2 displacement=centerDisc2-centerDisc1;
+	Vec2 displacement = centerDisc2 - centerDisc1;
 	displacement.Normalize();
-	float overlapDistance= discRadius1+discRadius2 -(centerDisc2-centerDisc1).GetLength();
-	Vec2 correction=displacement*(overlapDistance*0.5f);
-	centerDisc2+=correction;
-	centerDisc1-=correction;
+	float overlapDistance = discRadius1 + discRadius2 - ( centerDisc2 - centerDisc1 ).GetLength();
+	Vec2 correction = displacement * ( overlapDistance * 0.5f );
+	centerDisc2 += correction;
+	centerDisc1 -= correction;
 }
 
 
 
-void PushMobileDiscOutOfFixedDisc( Vec2& mobileCenter, float mobileRadius,const Vec2& fixedCenter, float fixedRadius )
+void PushMobileDiscOutOfFixedDisc( Vec2& mobileCenter , float mobileRadius , const Vec2& fixedCenter , float fixedRadius )
 {
-	if( !DoDiscsOverlap( mobileCenter, mobileRadius, fixedCenter, fixedRadius ) )
+	if ( !DoDiscsOverlap( mobileCenter , mobileRadius , fixedCenter , fixedRadius ) )
 	{
 		return;
 	}
 
-	Vec2 displacement= mobileCenter-fixedCenter;
+	Vec2 displacement = mobileCenter - fixedCenter;
 	displacement.Normalize();
-	float overlapDistance = mobileRadius+fixedRadius -(mobileCenter-fixedCenter).GetLength();
-	Vec2 correction=displacement*overlapDistance;
-	mobileCenter+=correction;
+	float overlapDistance = mobileRadius + fixedRadius - ( mobileCenter - fixedCenter ).GetLength();
+	Vec2 correction = displacement * overlapDistance;
+	mobileCenter += correction;
 }
 
-bool IsPointInForwardSector2D( const Vec2& point, const Vec2& observerPosition, float forwardDegrees, float apertureDegrees, float maxDistance )
+bool IsPointInForwardSector2D( const Vec2& point , const Vec2& observerPosition , float forwardDegrees , float apertureDegrees , float maxDistance )
 {
-	Vec2 displacement= point-observerPosition;
+	Vec2 displacement = point - observerPosition;
 	float displacementAngle = displacement.GetAngleDegrees();
-	float distance= sqrtf( ( observerPosition.x - point.x ) * ( observerPosition.x - point.x ) + ( observerPosition.y - point.y ) * ( observerPosition.y - point.y ) );
+	float distance = sqrtf( ( observerPosition.x - point.x ) * ( observerPosition.x - point.x ) + ( observerPosition.y - point.y ) * ( observerPosition.y - point.y ) );
 
-	if( distance > maxDistance )
+	if ( distance > maxDistance )
 	{
 		return false;
 	}
 
-	if( abs(GetShortestAngularDisplacement(forwardDegrees,displacementAngle))<= apertureDegrees*0.5f )
+	if ( abs( GetShortestAngularDisplacement( forwardDegrees , displacementAngle ) ) <= apertureDegrees * 0.5f )
 	{
 		return true;
 	}
 	return false;
 }
 
-bool IsPointInsideDisc2D( const Vec2& point, const Vec2& discCenter, float discRadius )
+bool IsPointInsideDisc2D( const Vec2& point , const Vec2& discCenter , float discRadius )
 {
 	Vec2 displacement = point - discCenter;
 	float dispLength = displacement.GetLength();
-	
-	if( dispLength < discRadius )
+
+	if ( dispLength < discRadius )
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
-bool IsPointInsideOBB2D( const Vec2& point, const OBB2& box )
+bool IsPointInsideOBB2D( const Vec2& point , const OBB2& box )
 {
 	Vec2 pLocal = point - box.m_center;
 	Vec2 jBasis = box.m_iBasis.GetRotated90Degrees();
-	float pi =  DotProduct2D( pLocal, box.m_iBasis );
-	float pj =  DotProduct2D( pLocal, box.m_iBasis.GetRotated90Degrees() );
+	float pi = DotProduct2D( pLocal , box.m_iBasis );
+	float pj = DotProduct2D( pLocal , box.m_iBasis.GetRotated90Degrees() );
 
-	if( pi > box.m_halfDimensions.x|| pi < -box.m_halfDimensions.x || pj > box.m_halfDimensions.y || pj < -box.m_halfDimensions.y )
+	if ( pi > box.m_halfDimensions.x || pi < -box.m_halfDimensions.x || pj > box.m_halfDimensions.y || pj < -box.m_halfDimensions.y )
 	{
 		return false;
 	}
@@ -468,19 +468,19 @@ bool IsPointInsideOBB2D( const Vec2& point, const OBB2& box )
 	}
 }
 
-bool IsPointInsideCapsule2D( const Vec2& point, const Vec2& capsuleMidStart, const Vec2& capsuleMidEnd, float capsuleRadius )
+bool IsPointInsideCapsule2D( const Vec2& point , const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , float capsuleRadius )
 {
-	OBB2 box = OBB2((capsuleMidEnd-capsuleMidStart)*0.5f+capsuleMidStart,Vec2((capsuleMidEnd-capsuleMidStart).GetLength(),capsuleRadius*2.f),(capsuleMidEnd-capsuleMidStart).GetNormalized());
+	OBB2 box = OBB2( ( capsuleMidEnd - capsuleMidStart ) * 0.5f + capsuleMidStart , Vec2( ( capsuleMidEnd - capsuleMidStart ).GetLength() , capsuleRadius * 2.f ) , ( capsuleMidEnd - capsuleMidStart ).GetNormalized() );
 
-	if( IsPointInsideDisc2D( point, capsuleMidStart, capsuleRadius ) )
+	if ( IsPointInsideDisc2D( point , capsuleMidStart , capsuleRadius ) )
 	{
 		return true;
 	}
-	else if(IsPointInsideDisc2D(point,capsuleMidEnd,capsuleRadius) )
+	else if ( IsPointInsideDisc2D( point , capsuleMidEnd , capsuleRadius ) )
 	{
-		 return true;
+		return true;
 	}
-	else if( IsPointInsideOBB2D( point, box ) )
+	else if ( IsPointInsideOBB2D( point , box ) )
 	{
 		return true;
 	}
@@ -490,40 +490,61 @@ bool IsPointInsideCapsule2D( const Vec2& point, const Vec2& capsuleMidStart, con
 	}
 }
 
-const Vec2 GetNearstPointOnOBB2D( const Vec2& refPos, const OBB2& box )
+bool IsPointOnLineSegement2D( const Vec2 point , const Vec2 linePt1 , const Vec2 linePt2 )
+{
+	/*float slope = ( linePt1.y - linePt2.y ) / ( linePt1.x - linePt2.x );
+	float intercept = linePt1.y - ( slope * linePt1.x );*/
+
+	Vec2 v1 = linePt2 - point;
+	Vec2 v2 = linePt1 - point;
+	Vec2 line = linePt2 - linePt1;
+	v1.Normalize();
+	v2.Normalize();
+	line.Normalize();
+
+	if ( DotProduct2D( v1 , v2 ) < 0.f && DotProduct2D( line , v1 ) > 0.f )
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
+const Vec2 GetNearstPointOnOBB2D( const Vec2& refPos , const OBB2& box )
 {
 	Vec2 pLocal = refPos - box.m_center;
 	Vec2 jBasis = box.m_iBasis.GetRotated90Degrees();
-	float pi =  DotProduct2D( pLocal, box.m_iBasis );
-	float pj =  DotProduct2D( pLocal, box.m_iBasis.GetRotated90Degrees() );
+	float pi = DotProduct2D( pLocal , box.m_iBasis );
+	float pj = DotProduct2D( pLocal , box.m_iBasis.GetRotated90Degrees() );
 
-	float ni = Clamp( pi, -box.m_halfDimensions.x, box.m_halfDimensions.x );
-	float nj = Clamp( pj, -box.m_halfDimensions.y, box.m_halfDimensions.y );
+	float ni = Clamp( pi , -box.m_halfDimensions.x , box.m_halfDimensions.x );
+	float nj = Clamp( pj , -box.m_halfDimensions.y , box.m_halfDimensions.y );
 
-	Vec2 n = box.m_center + (box.m_iBasis*ni) + (jBasis*nj);
+	Vec2 n = box.m_center + ( box.m_iBasis * ni ) + ( jBasis * nj );
 
 	return n;
 }
 
-const Vec2 GetNearestPointOnCapsule2D( const Vec2& refPos, const Vec2& capsuleMidStart, const Vec2& capsuleMidEnd, float capsuleRadius )
+const Vec2 GetNearestPointOnCapsule2D( const Vec2& refPos , const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , float capsuleRadius )
 {
-	Vec2 nearestPoint = Vec2(0.f,0.f);
+	Vec2 nearestPoint = Vec2( 0.f , 0.f );
 	Vec2 displacementStartToPoint = refPos - capsuleMidStart;
 	Vec2 displacementStartToEnd = capsuleMidEnd - capsuleMidStart;
 	Vec2 displacementEndToPoint = refPos - capsuleMidEnd;
 	Vec2 direction = ( capsuleMidEnd - capsuleMidStart ).GetNormalized();
 
-	if( DotProduct2D( direction, displacementStartToPoint ) <= 0 )
+	if ( DotProduct2D( direction , displacementStartToPoint ) <= 0 )
 	{
-		return GetNearstPointOnDisc2D(refPos,capsuleMidStart,capsuleRadius);
+		return GetNearstPointOnDisc2D( refPos , capsuleMidStart , capsuleRadius );
 	}
-	else if( DotProduct2D( -direction, displacementEndToPoint ) <= 0 )
+	else if ( DotProduct2D( -direction , displacementEndToPoint ) <= 0 )
 	{
-		return GetNearstPointOnDisc2D(refPos,capsuleMidEnd,capsuleRadius);
+		return GetNearstPointOnDisc2D( refPos , capsuleMidEnd , capsuleRadius );
 	}
 	else
 	{
-		Vec2 pointProjectedOnCapsuleBone = GetProjectedOnto2D( displacementStartToPoint, displacementStartToEnd );
+		Vec2 pointProjectedOnCapsuleBone = GetProjectedOnto2D( displacementStartToPoint , displacementStartToEnd );
 		nearestPoint = capsuleMidStart + pointProjectedOnCapsuleBone;
 		Vec2 displacementNearestPointToPoint = refPos - nearestPoint;
 		displacementNearestPointToPoint.ClampLength( capsuleRadius );
@@ -532,19 +553,132 @@ const Vec2 GetNearestPointOnCapsule2D( const Vec2& refPos, const Vec2& capsuleMi
 	}
 }
 
-float GetAngleDegreesBetweenVectors2D( const Vec2& vectorA, const Vec2& vectorB )
+float GetAngleDegreesBetweenVectors2D( const Vec2& vectorA , const Vec2& vectorB )
 {
-	float cosAngle = DotProduct2D(vectorA,vectorB) / (vectorA.GetLength() * vectorB.GetLength());
-	float angle = acos(cosAngle);
-	angle = ConvertRadiansToDegrees(angle);
+	float cosAngle = DotProduct2D( vectorA , vectorB ) / ( vectorA.GetLength() * vectorB.GetLength() );
+	float angle = acos( cosAngle );
+	angle = ConvertRadiansToDegrees( angle );
 
 	return angle;
 }
 
-const Vec2 GetProjectedOnto2D( const Vec2& sourceVector, const Vec2& ontoVector )
+const Vec2 GetProjectedOnto2D( const Vec2& sourceVector , const Vec2& ontoVector )
 {
-	float length = DotProduct2D( sourceVector, ontoVector.GetNormalized() );
-	return ontoVector.GetNormalized()*length;
+	float length = DotProduct2D( sourceVector , ontoVector.GetNormalized() );
+	return ontoVector.GetNormalized() * length;
+}
+
+PolygonRacastResult RaycastToPolygon( Vec2 rayFwdVector , Vec2 rayStartPoint , Polygon2D& polygon )
+{
+	PolygonRacastResult toReturn;
+	std::vector<Plane2> planesInPoly;
+
+	int p1 = 0;
+	int p2 = 1;
+	int counter = 0;
+
+	while ( counter < polygon.m_points.size() )
+	{
+		Vec2 edge = polygon.m_points[ p2 ] - polygon.m_points[ p1 ];
+		Vec2 edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+
+		Plane2 plane = Plane2( edgeNormal , polygon.m_points[ p1 ] );
+		planesInPoly.push_back( plane );
+
+		p1 = ( p1 + 1 ) % polygon.m_points.size();
+		p2 = ( p2 + 1 ) % polygon.m_points.size();
+
+		counter++;
+	}
+
+	std::vector<PlaneRayCastResult> planeRaycastResults;
+
+	int c1 = 0;
+	int c2 = 1;
+
+	for ( int i = 0; i < planesInPoly.size(); i++ )
+	{
+
+		PlaneRayCastResult r = RaycastToPlane( rayFwdVector , rayStartPoint , planesInPoly[ i ] );
+		if ( r.didHit )
+		{
+			if ( IsPointOnLineSegement2D( r.impactPoint , polygon.m_points[ c1 ] , polygon.m_points[ c2 ] ) )
+			{
+				planeRaycastResults.push_back( r );
+			}
+		}
+
+		c1 = ( c1 + 1 ) % polygon.m_points.size();
+		c2 = ( c2 + 1 ) % polygon.m_points.size();
+	}
+
+	if ( planeRaycastResults.size() <= 0 )
+	{
+		return toReturn;
+	}
+	else
+	{
+		float minDistance = ( rayStartPoint - planeRaycastResults[ 0 ].impactPoint ).GetLengthSquared();
+		int index = 0;
+
+		for ( int i = 0; i < planeRaycastResults.size(); i++ )
+		{
+			float distance = ( rayStartPoint - planeRaycastResults[ i ].impactPoint ).GetLengthSquared();
+			if ( distance < minDistance )
+			{
+				minDistance = distance;
+				index = i;
+			}
+		}
+
+		toReturn.didHit = true;
+		toReturn.impactPoint = planeRaycastResults[ index ].impactPoint;
+		toReturn.hitDistance = minDistance;
+
+		return toReturn;
+	}
+
+}
+
+PlaneRayCastResult RaycastToPlane( Vec2 rayFwdVector , Vec2 rayStartPoing , Plane2& plane )
+{
+	PlaneRayCastResult toReturn;
+
+	if ( DotProduct2D( rayFwdVector , plane.m_normal ) > 0 )
+	{
+		if ( !plane.IsPointInFrontOfPlane( rayStartPoing ) )
+		{
+			float nearestDistance = abs( plane.GetSignedDistanceFromPlane( rayStartPoing ) );
+			float projectedVecLength = GetProjectedLength2D( rayFwdVector , plane.m_normal );
+
+			float rayHitDistance = nearestDistance / projectedVecLength;
+			toReturn.hitDistance = rayHitDistance;
+
+			toReturn.impactNormal = plane.m_normal;
+			toReturn.impactPoint = rayStartPoing + ( rayFwdVector * rayHitDistance );
+
+		}
+	}
+	else if ( DotProduct2D( rayFwdVector , plane.m_normal ) < 0 )
+	{
+		if ( plane.IsPointInFrontOfPlane( rayStartPoing ) )
+		{
+			float nearestDistance = abs( plane.GetSignedDistanceFromPlane( rayStartPoing ) );
+			float projectedVecLength = GetProjectedLength2D( rayFwdVector , plane.m_normal );
+
+			float rayHitDistance = nearestDistance / projectedVecLength;
+			toReturn.hitDistance = rayHitDistance;
+
+			toReturn.impactNormal = plane.m_normal;
+			toReturn.impactPoint = rayStartPoing + ( rayFwdVector * rayHitDistance );
+		}
+	}
+	else
+	{
+		toReturn.didHit = false;
+	}
+
+	return toReturn;
 }
 
 float SmoothStart2( float t )
@@ -609,14 +743,14 @@ Vec2 RotateAroundArbitartPoint( Vec2 arbitaryPoint , Vec2 point , float rotation
 	return vec;
 }
 
-float GetMomentOfInertiaOfTriangle( Polygon2D polygon , Vec2 point0 , Vec2 point1 , Vec2 point2, float mass )
+float GetMomentOfInertiaOfTriangle( Polygon2D polygon , Vec2 point0 , Vec2 point1 , Vec2 point2 , float mass )
 {
 	UNUSED( mass );
 	Vec2 u = point1 - point0;
 	Vec2 v = point2 - point0;
 	float area = GetAreaOfTriangele( point0 , point1 , point2 );
 	Vec2 center = ( ( point1 + point2 + point0 ) / 3.f ) - polygon.GetCentre();
-	float b = u.GetLengthSquared();																		
+	float b = u.GetLengthSquared();
 	float a = DotProduct2D( v , u );
 	Vec2 h = ( v - ( ( DotProduct2D( v , u ) / DotProduct2D( u , u ) ) * u ) );
 	float inertia = ( b - a + ( ( a * a ) / b ) + ( DotProduct2D( h , h ) ) );
@@ -654,7 +788,7 @@ float GetAreaOfPolygon( Polygon2D polygon )
 
 	while ( counter < totalTriangles )
 	{
-		
+
 		Vec2 nextVert1 = polygon.m_points[ i ];
 		Vec2 nextVert2 = polygon.m_points[ j ];
 
@@ -682,10 +816,10 @@ Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
 			index = i;
 		}
 	}
-	return vertices[index];
+	return vertices[ index ];
 }
 
-bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2, Vec2* outSimplex )
+bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 , Vec2* outSimplex )
 {
 	Vec2 dir1 = Vec2( 0.f , 1.f );
 	Vec2 dir2 = Vec2( 1.f , 0.f );
@@ -714,7 +848,7 @@ bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2, Vec2
 
 	GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
 
-	while ( !IsBothSimplexSame(sp1,sp2,sp3,currentSp1,currentSp2,currentSp3) )
+	while ( !IsBothSimplexSame( sp1 , sp2 , sp3 , currentSp1 , currentSp2 , currentSp3 ) )
 	{
 		if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
 		{
@@ -736,7 +870,7 @@ bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2, Vec2
 }
 
 
-void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3, Polygon2D poly1 , Polygon2D poly2 )
+void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3 , Polygon2D poly1 , Polygon2D poly2 )
 {
 	Vec2 pointOnEdgeS1S2 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS1 , outS2 );
 	Vec2 pointOnEdgeS1S3 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS1 , outS3 );
@@ -838,7 +972,7 @@ bool IsBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Ve
 	}
 
 	return false;
-	
+
 }
 
 Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
@@ -854,33 +988,33 @@ Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
 	finalListOfPoints.push_back( simplex[ 1 ] );
 	finalListOfPoints.push_back( simplex[ 2 ] );
 
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[0] , 3 );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , 3 );
 
 	int index1;
 	int index2;
 
-	Vec2 nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ),index1,index2 );
+	Vec2 nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ) , index1 , index2 );
 	Vec2 dir = nearestPoint.GetNormalized();
 
 	Plane2 currentPlane = Plane2( dir , nearestPoint );
 
 	const float nearZero = 0.0001f;
-					
-	Vec2 supportPoint =GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
-	
-	if (currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+
+	Vec2 supportPoint = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+
+	if ( currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
 	{
 		return toReturn;
 	}
 
 	finalListOfPoints.push_back( supportPoint );
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , (int)finalListOfPoints.size() );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &finalListOfPoints[ 0 ] , ( int ) finalListOfPoints.size() );
 
-	
+
 	nearestPoint = toReturn.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2( 0.f , 0.f ) , index1 , index2 );
 	dir = nearestPoint.GetNormalized();
 
-	Plane2 nextPlane= Plane2(dir,nearestPoint);
+	Plane2 nextPlane = Plane2( dir , nearestPoint );
 
 	supportPoint = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
 
@@ -917,7 +1051,7 @@ Polygon2D GetMinkowskiPolygonIfIntersects( Polygon2D poly1 , Polygon2D poly2 )
 
 void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D poly2 , Vec2& cp1 , Vec2& cp2 )
 {
-	Vec2 nearestPoint = minkowskiPoly.GetClosestPointOnTheEdges( Vec2(0.f,0.f) );
+	Vec2 nearestPoint = minkowskiPoly.GetClosestPointOnTheEdges( Vec2( 0.f , 0.f ) );
 
 	Vec2 normal = -nearestPoint.GetNormalized();
 
@@ -932,7 +1066,7 @@ void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D pol
 		Vec2 point;
 		float distace;
 	};
-	
+
 	std::vector<Temp> pointsAndDistance;
 
 	for ( int i = 0; i < poly2.m_points.size(); i++ )
@@ -990,27 +1124,27 @@ void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D pol
 			maxPoint = pointsAndDistance[ i ].point;
 		}
 	}
-	
+
 
 	cp1 = minPoint;
 	cp2 = maxPoint;
-	
+
 }
 
 Vec2 GetDirectionForNextPointInMinkowskiSpace( Polygon2D poly )
 {
-	Vec2 nearestPoint =poly.GetClosestPointOnTheEdges( Vec2( 0.f , 0.f ) );
+	Vec2 nearestPoint = poly.GetClosestPointOnTheEdges( Vec2( 0.f , 0.f ) );
 
 	return -nearestPoint.GetNormalized();
 }
 
-float GetProjectedLength2D( const Vec2& sourceVector, const Vec2& ontoVector )
+float GetProjectedLength2D( const Vec2& sourceVector , const Vec2& ontoVector )
 {
 	Vec2 temp = ontoVector.GetNormalized();
-	return DotProduct2D(sourceVector,temp);
+	return DotProduct2D( sourceVector , temp );
 }
 
-const Vec2 GetNearestPointOnLineSegment2D( const Vec2& refPos, const Vec2& start, const Vec2& end )
+const Vec2 GetNearestPointOnLineSegment2D( const Vec2& refPos , const Vec2& start , const Vec2& end )
 {
 	Vec2 direction = end - start;
 	direction.Normalize();
@@ -1032,13 +1166,13 @@ const Vec2 GetNearestPointOnLineSegment2D( const Vec2& refPos, const Vec2& start
 
 }
 
-const Vec2 GetNearestPointOnInfiniteLine2D( const Vec2& refPos, const Vec2& somePosition, const Vec2& anotherPosition )
+const Vec2 GetNearestPointOnInfiniteLine2D( const Vec2& refPos , const Vec2& somePosition , const Vec2& anotherPosition )
 {
-	Vec2 direction = anotherPosition-somePosition;
+	Vec2 direction = anotherPosition - somePosition;
 	direction.Normalize();
 
-	Vec2 displacementFromStartToRef = refPos-somePosition;
-	Vec2 result = GetProjectedOnto2D(displacementFromStartToRef,direction);
+	Vec2 displacementFromStartToRef = refPos - somePosition;
+	Vec2 result = GetProjectedOnto2D( displacementFromStartToRef , direction );
 	result = result + somePosition;
 	return result;
 }
@@ -1069,7 +1203,7 @@ void GetClosestEdgeFromRefrerencePointOnAABB2( const Vec2& refPos , const AABB2&
 	{
 		if ( refPos.y >= aabb.mins.y && refPos.y <= aabb.maxs.y )
 		{
-			outEdge1 = Vec2(aabb.maxs.x,aabb.mins.y);
+			outEdge1 = Vec2( aabb.maxs.x , aabb.mins.y );
 			outEdge2 = aabb.maxs;
 		}
 		else if ( refPos.y < aabb.mins.y )
@@ -1104,7 +1238,7 @@ Vec3 GetSphericalCoordinates( float theta , float phi , float r )
 {
 	Vec3 toReturn;
 	toReturn.x = CosDegrees( theta ) * CosDegrees( phi ) * r;
-	toReturn.y = SinDegrees( phi )*r;
+	toReturn.y = SinDegrees( phi ) * r;
 	toReturn.z = SinDegrees( theta ) * CosDegrees( phi ) * r;
 
 	return toReturn;
@@ -1134,7 +1268,7 @@ FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const V
 		if ( length < minLength )
 		{
 			minLength = length;
-			
+
 		}
 
 		if ( length > maxLength )
@@ -1149,9 +1283,9 @@ FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const V
 
 }
 
-float DotProduct2D( const Vec2& a, const Vec2& b )
+float DotProduct2D( const Vec2& a , const Vec2& b )
 {
-	return((a.x*b.x)+(a.y*b.y));
+	return( ( a.x * b.x ) + ( a.y * b.y ) );
 }
 
 float CrossProduct2D( const Vec2& a , const Vec2& b )
@@ -1174,8 +1308,8 @@ float DotProduct3D( const Vec3& a , const Vec3& b )
 	return( ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z ) );
 }
 
-float DotProduct4D( const Vec4& a , const Vec4& b)
+float DotProduct4D( const Vec4& a , const Vec4& b )
 {
-	return ( ( a.x * b.x ) + ( a.y * b.y) + ( a.z * b.z ) + ( a.w * b.w  ) );
+	return ( ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z ) + ( a.w * b.w ) );
 }
 

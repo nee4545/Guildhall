@@ -74,7 +74,7 @@ public:
 
 	float m_time = 0.f;
 
-	Vec2 m_nextMovePosition;
+	Vec2 m_nextMovePosition = Vec2(0.f,0.f);
 	Vec2 m_cachedNextPosition;
 	bool m_moveSet = false;
 	bool potentialFieldQueryDone = false;

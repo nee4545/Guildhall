@@ -18,17 +18,7 @@ enum AI_STATES
 	DEAD,
 };
 
-enum Moves
-{
-	MOVE_UP ,
-	MOVE_DOWN ,
-	MOVE_RIGHT ,
-	MOVE_LEFT ,
-	MOVE_TOPRIGHT ,
-	MOVE_TOPLEFT ,
-	MOVE_BOTLEFT ,
-	MOVE_BOTRIGHT ,
-};
+
 
 enum AI_TYPE
 {
@@ -49,38 +39,12 @@ enum AI_Behavior
 	CHASE_PLAYER,
 	INVETIGATE_SOUND,
 	SHOOT_PLAYER,
+	SEARCH_OCCUPANCY_MAP,
 };
 
 
 
-struct MovingHelper
-{
-	Moves move;
-	std::vector<int> path;
-	int currentIndex = 0;
 
-	int GetNextMove()
-	{
-		if ( currentIndex <0 )
-		{
-			Reset();
-			return -1;
-		}
-		return path[ currentIndex-- ];
-	}
-
-	void Reset()
-	{
-		currentIndex = -1;
-		path.clear();
-	}
-
-	bool DoesHavePath()
-	{
-		return path.size() > 0;
-	}
-
-};
 
 
 class MonsterAI :public Entity
@@ -136,6 +100,7 @@ public:
 	Timer* m_animTimer = nullptr;
 	Timer* m_rotation1Timer = nullptr;
 	Timer* m_rotation2Timer = nullptr;
+	Timer* m_occMovetimer = nullptr;
 
 	Timer* m_sectorRotationTimer = nullptr;
 
@@ -171,5 +136,7 @@ public:
 
 	bool m_moveWithoutPathfinding = false;
 	float directionMultiplier = 1.f;
+
+	IntVec2 m_currentMoveCoords;
 
 };

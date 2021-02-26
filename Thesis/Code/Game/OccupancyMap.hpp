@@ -17,6 +17,7 @@ class OccupancyMap
 {
 public:
 	OccupancyMap(Game* game,IntVec2 anchorPoint, IntVec2 dimensions, float maxValue);
+	OccupancyMap( Game* game , IntVec2 anchorPoint , IntVec2 dimensions );
 	~OccupancyMap();
 
 
@@ -32,8 +33,11 @@ public:
 	
 	
 	void Create();
+	void CreateForOccMapGame();
 	void PropgateInfluence();
 	IntVec2 GetMaxValueCoords();
+	std::vector<IntVec2> GetAllMaxValueCoords();
+	float GetMaxValue();
 	int  GetIndexForCoords( IntVec2 coords );
 	void SetValue( IntVec2 coords, float value );
 	void DebugRender();
