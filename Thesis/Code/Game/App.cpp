@@ -99,6 +99,12 @@ void App::Update(float deltaSeconds)
 	
 	g_theConsole.Update( deltaSeconds );
 
+	if ( g_theInput->WasKeyJustPressed( F8 ) )
+	{
+		delete thegame;
+		thegame = new Game();
+	}
+
 
 	if ( g_theWindow->m_quitRequested == true )
 	{

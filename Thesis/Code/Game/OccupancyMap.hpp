@@ -11,6 +11,7 @@ struct OccupancyMapNode
 	IntVec2 coords;
 	float value =0.f;
 	bool hasInfluence = false;
+	bool consideredForPropogation = true;
 };
 
 class OccupancyMap
@@ -41,7 +42,6 @@ public:
 	int  GetIndexForCoords( IntVec2 coords );
 	void SetValue( IntVec2 coords, float value );
 	void DebugRender();
-
-	
-	
+	bool IsCleared();
+	void Update();
 };

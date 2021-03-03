@@ -55,6 +55,7 @@ public:
 	bool m_isActive = false;
 	bool m_isMelee = true;
 
+	Timer* m_mapPropogateTimer = nullptr;
 	Timer* m_mapUpdateTimer = nullptr;
 
 	

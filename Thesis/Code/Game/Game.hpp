@@ -7,6 +7,7 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Core/Transform.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Game/OccupancyMapCollectable.hpp"
 
 
 class SpriteSheet;
@@ -29,6 +30,7 @@ class Timer;
 class SymmetricPotentialField;
 class OccAI;
 class BitmapFont;
+class MainGameMapCreator;
 
 enum GameMode
 {
@@ -37,7 +39,7 @@ enum GameMode
 	MAPCREATOR,
 	POTENTIALFIELD_CREATOR,
 	OCCUPANCY_MAP_GAME,
-	
+	INF_AND_PF_MAP_GAME,
 };
 
 struct PathFindingHelper
@@ -85,10 +87,11 @@ public:
 	void UpdateMousePosition();
 	void TogglePlayers();
 	void ToggleGameModes();
-	
+	void HandleOccGameObjectGarbageCollection();
+
 	void PopulateTiles();
 	void HandleBlockCollissions(Entity* entity);
-	bool IsTileSolid( IntVec2 tileCoords );
+	bool IsTileSolid( IntVec2 tileCoords, bool isInOccGame=false );
 	
 	void GetPathUsingAStarIgnoreDiagonalMovesOneStep(Vec2 startPos, Vec2 endPos,std::vector<int>& path, bool ignoreDiagonalMoves = false, bool considerInfluenceMaps = false);
 	void GetPathUsingAstarWithDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path );
@@ -117,9 +120,39 @@ public:
 
 	void LoadOccpancyGameDataFromXml();
 	void SaveOccupancyGameData();
+	void RenderOccUI();
+	Texture* GetGetTextureForNumber( int number );
+	void CheckForWinOrLoss();
+
+	MainGameMapCreator* m_mainMapCreator = nullptr;
 
 	GameMode m_currentMode = PATHFINDER;
 	StartScreen* m_startScreen = nullptr;
+
+	bool m_occMapGameOver = false;
+	bool m_didPlayerWinOccGame = false;
+	AABB2 m_objsTocollectBox;
+	AABB2 m_tenDigitbox;
+	AABB2 m_onesDigitBox;
+	AABB2 m_occGameOverBox;
+	AABB2 m_occwinbox;
+
+	Texture* m_objsToCollectTex = nullptr;
+	Texture* m_occGameOverTex = nullptr;
+	Texture* m_occGameWinTex = nullptr;
+	Texture* m_oneTex = nullptr;
+	Texture* m_zeroTex = nullptr;
+	Texture* m_twoTex = nullptr;
+	Texture* m_threeTex = nullptr;
+	Texture* m_fourTex = nullptr;
+	Texture* m_fiveTex = nullptr;
+	Texture* m_sixTex = nullptr;
+	Texture* m_sevenTex = nullptr;
+	Texture* m_eightTex = nullptr;
+	Texture* m_nineTex = nullptr;
+
+	int m_numObjectsToCollect = 0;
+
 
 	SpriteAnimDefinition* m_sample;
 
@@ -181,6 +214,7 @@ public:
 	Camera* m_devConsoleCamera;
 	Camera* m_hudCamera;
 	Vec2 m_mousePosition;
+	Camera* m_occHudCamera;
 
 	PotentialFieldCreator* m_potCreator = nullptr;
 
@@ -206,10 +240,12 @@ public:
 	SupportPlayer* m_supportPlayer;
 	std::vector<Tile> m_tiles;
 	std::vector<Tile> m_mainMapTiles;
+	std::vector<Tile> m_infAndPfTiles;
 
 
 	IntVec2 m_mapSize = IntVec2(160,90);
 
+	IntVec2 m_infAndPfGameSize = IntVec2( 80 , 45 );
 
 	std::vector<Vertex_PCU> m_sandTiles;
 	std::vector<Vertex_PCU> m_sandLeftTiles;
@@ -249,6 +285,9 @@ public:
 
 	std::vector<PathFindingHelper> openList1;
 	std::vector<PathFindingHelper> closedList1;
+
+	std::vector<OccMapCollectable*> m_collectables;
+
 	bool pathFound = false;
 
 	bool initDone = false;

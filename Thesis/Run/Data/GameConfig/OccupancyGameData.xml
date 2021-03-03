@@ -1047,3 +1047,25 @@
     <Tile index="3598"/>
     <Tile index="3599"/>
 </SolidTiles>
+
+<Collectables>
+    <Collectable positionX="10.5" positionY="38.5"/>
+    <Collectable positionX="14.5" positionY="42.5"/>
+    <Collectable positionX="23.5" positionY="39.5"/>
+    <Collectable positionX="27.5" positionY="41.5"/>
+    <Collectable positionX="30.5" positionY="35.5"/>
+    <Collectable positionX="26.5" positionY="31.5"/>
+    <Collectable positionX="18.5" positionY="29.5"/>
+    <Collectable positionX="8.5" positionY="32.5"/>
+    <Collectable positionX="1.5" positionY="30.5"/>
+    <Collectable positionX="4.5" positionY="24.5"/>
+    <Collectable positionX="12.5" positionY="24.5"/>
+    <Collectable positionX="17.5" positionY="25.5"/>
+    <Collectable positionX="12.5" positionY="22.5"/>
+    <Collectable positionX="21.5" positionY="22.5"/>
+    <Collectable positionX="15.5" positionY="36.5"/>
+    <Collectable positionX="6.5" positionY="37.5"/>
+    <Collectable positionX="20.5" positionY="35.5"/>
+    <Collectable positionX="9.5" positionY="27.5"/>
+    <Collectable positionX="24.5" positionY="27.5"/>
+</Collectables>

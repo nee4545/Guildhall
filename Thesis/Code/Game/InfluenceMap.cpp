@@ -43,7 +43,6 @@ void InfluenceMap::Create()
 		}
 	}
 
-
 	for ( int i = 0; i < m_nodes.size(); i++ )
 	{
 		if ( m_nodes[ i ].coords.x > 0 && m_nodes[ i ].coords.x < m_game->m_mapSize.x && m_nodes[ i ].coords.y>0 && m_nodes[ i ].coords.y < m_game->m_mapSize.y )

@@ -42,8 +42,11 @@ Player::Player( Game* game )
 
 	m_health = 10.f;
 
+	m_mapPropogateTimer = new Timer();
+	m_mapPropogateTimer->SetSeconds( 0.31f );
+
 	m_mapUpdateTimer = new Timer();
-	m_mapUpdateTimer->SetSeconds( 0.31f );
+	m_mapUpdateTimer->SetSeconds( 4.5f );
 }
 
 Player::~Player()
@@ -54,6 +57,14 @@ Player::~Player()
 void Player::Update( float deltaseconds )
 {
 	m_time += deltaseconds;
+
+	if ( m_game->m_currentMode == OCCUPANCY_MAP_GAME )
+	{
+		if ( m_game->m_occMapGameOver )
+		{
+			return;
+		}
+	}
 
 	if ( m_time > 1000.f )
 	{
@@ -68,11 +79,18 @@ void Player::Update( float deltaseconds )
 
 	if ( m_aiSharedMap != nullptr )
 	{
-		if ( m_mapUpdateTimer->HasElapsed() )
+		if ( m_mapPropogateTimer->HasElapsed() )
 		{
 			m_aiSharedMap->PropgateInfluence();
+			m_mapPropogateTimer->Reset();
+		}
+
+		if ( m_mapUpdateTimer->HasElapsed() )
+		{
+			m_aiSharedMap->Update();
 			m_mapUpdateTimer->Reset();
 		}
+
 	}
 
 	ToggleMeleeState();

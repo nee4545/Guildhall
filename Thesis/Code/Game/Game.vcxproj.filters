@@ -76,6 +76,15 @@
     <ClCompile Include="OccupancyMap.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="OccAI.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="OccupancyMapCollectable.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MainGameMapCreator.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -143,6 +152,13 @@
     </ClInclude>
     <ClInclude Include="Object.hpp">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="OccAI.hpp" />
+    <ClInclude Include="OccupancyMapCollectable.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="MainGameMapCreator.hpp">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

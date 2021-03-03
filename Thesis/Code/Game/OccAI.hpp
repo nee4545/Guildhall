@@ -3,6 +3,7 @@
 #include "Engine/Math/IntVec2.hpp"
 
 class SpriteAnimDefinition;
+class SpriteAnimDefTex;
 class Game;
 class Clock;
 class Timer;
@@ -37,17 +38,18 @@ public:
 	
 	void CheckPlayerInSight();
 	void UpdateBehavior();
+	void LoadAnimations();
 
 public:
 	Vertex_PCU m_vertices[ 6 ];
-	Vec2 m_minUV;
-	Vec2 m_maxUV;
+	
 
 	Game* m_game = nullptr;
 
 	Clock* m_animClock = nullptr;
 	Timer* m_animTimer = nullptr;
 
+	Timer* m_occupancyPropogateTimer = nullptr;
 	Timer* m_occupancyUpdateTimer = nullptr;
 	int tileIndex = -1;
 
@@ -66,5 +68,10 @@ public:
 	OccupancyMap* m_occupancyMap = nullptr;
 	bool initialUpdateDone = false;
 	bool m_mapCleared = false;
+
+	SpriteAnimDefTex* m_anims = nullptr;
+	Vec2 m_maxUV = Vec2( 1.f , 1.f );
+	Vec2 m_minUV = Vec2( 0.f , 0.f );
+
 
 };

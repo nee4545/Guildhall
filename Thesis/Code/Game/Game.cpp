@@ -23,6 +23,7 @@
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Game/OccAI.hpp"
+#include "Game/MainGameMapCreator.hpp"
 //#include "Engine/ThirdParty/IMGUI/imgui.h"
 
 extern ImGuiSystem* g_theGUI;
@@ -69,7 +70,34 @@ Game::Game()
 
 	m_hudCamera = new Camera();
 	m_hudCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 160.f , 90.f ) );
+	
 	//m_hudCamera->SetClearMode( CLEAR_COLOR_BIT /*| CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT*/ , Rgba8( 0 , 0 , 0 , 255 ) , 1.f , 0 );
+	m_occHudCamera = new Camera();
+	m_occHudCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 80.f , 45.f) );
+
+	m_objsTocollectBox = AABB2( Vec2( 30.f , 30.f ) , Vec2( 45.f , 33.f ) );
+	m_objsTocollectBox.Translate( Vec2(30.f,12.f) );
+	m_tenDigitbox = m_objsTocollectBox;
+	m_tenDigitbox.maxs.x -= 13.2f;
+	m_tenDigitbox.mins.y += 0.3f;
+	m_tenDigitbox.Translate( Vec2(15.f,0.f) );
+	m_onesDigitBox = m_tenDigitbox;
+	m_onesDigitBox.Translate( Vec2(1.2f,0.f) );
+
+	m_objsToCollectTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/objs.png" );
+	m_zeroTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/0.png" );
+	m_oneTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/1.png" );
+	m_twoTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/2.png" );
+	m_threeTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/3.png" );
+	m_fourTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/4.png" );
+	m_fiveTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/5.png" );
+	m_sixTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/6.png" );
+	m_sevenTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/7.png" );
+	m_eightTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/8.png" );
+	m_nineTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/9.png" );
+
+	m_occGameOverBox = AABB2( Vec2( 30.f , 20.f ) , Vec2( 45.f , 25.f ) );
+	m_occGameOverTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/gameover.png" );
 
 	g_theConsole.TakeCamera( m_devConsoleCamera );
 	g_theConsole.SetTextSize( 1.f );
@@ -93,7 +121,7 @@ Game::Game()
 	m_borderTopTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Tiles/Grass_tiles/grass_tiles_0003_Layer-52.png" );
 	m_borderBotTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Tiles/Grass_tiles/grass_tiles_0001_Layer-54.png" );
 
-	m_blockTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Tiles/Asphalt_tiles/asphalt_tiles_0012_Layer-0.png" );
+	m_blockTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Tiles/stones/block.png" );
 	m_player1HudTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/girl icon_no_bg.png" );
 	m_player2HudTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/UI/man icon_no_bg.png" );
 
@@ -175,10 +203,19 @@ Game::Game()
 	ai1->m_type = OCC_AI_SHARED_MAP;
 	ai1->m_game = this;
 
+	OccAI* ai = new OccAI();
+	ai->m_position = Vec2( 20.f , 30.5f );
+	ai->m_game = this;
+
 	OccAI* ai2 = new OccAI();
 	ai2->m_position = Vec2( 30.f , 20.f );
 	ai2->m_game = this;
 	ai2->m_type = OCC_AI_SHARED_MAP;
+
+	OccAI* ai5 = new OccAI();
+	ai5->m_position = Vec2( 38.f , 20.f );
+	ai5->m_game = this;
+	ai5->m_type = OCC_AI_SHARED_MAP;
 
 	OccAI* ai3 = new OccAI();
 	ai3->m_position = Vec2( 5.5f , 43.5f );
@@ -187,10 +224,13 @@ Game::Game()
 	m_occAIs.push_back( ai1 );
 	m_occAIs.push_back( ai2 );
 	m_occAIs.push_back( ai3 );
-
-
+	m_occAIs.push_back( ai );
+	//m_occAIs.push_back( ai5 );
 
 	LoadOccpancyGameDataFromXml();
+
+	m_mainMapCreator = new MainGameMapCreator();
+	m_mainMapCreator->m_game = this;
 }
 
 void Game::LoadAIAnimations()
@@ -430,6 +470,12 @@ void Game::Update( float deltaseconds )
 	ToggleDevConsole();
 	ToggleGameModes();
 	UpdateMousePosition();
+
+	if ( m_currentMode == INF_AND_PF_MAP_GAME )
+	{
+		m_mainMapCreator->Update( deltaseconds );
+	}
+	
 	if ( m_currentMode == PATHFINDER )
 	{
 		UpdatePathFinderMode();
@@ -511,6 +557,7 @@ void Game::Update( float deltaseconds )
 
 	if ( m_currentMode == OCCUPANCY_MAP_GAME )
 	{
+		CheckForWinOrLoss();
 		m_player->Update( deltaseconds );
 
 		if ( !m_inOccCreation )
@@ -518,10 +565,19 @@ void Game::Update( float deltaseconds )
 			for ( int i = 0; i < m_occAIs.size(); i++ )
 			{
 				m_occAIs[ i ]->Update( deltaseconds );
-				if ( !m_inOccCreation )
+				/*if ( !m_inOccCreation )
 				{
 					HandleBlockCollissions( m_occAIs[ i ] );
+				}*/
+			}
+
+			for ( int i = 0; i < m_collectables.size(); i++ )
+			{
+				if ( m_collectables[ i ] == nullptr )
+				{
+					continue;
 				}
+				m_collectables[ i ]->Update( deltaseconds );
 			}
 		}
 
@@ -548,6 +604,14 @@ void Game::Update( float deltaseconds )
 			m_occMapTiles[ index ].m_isSolid = false;
 		}
 
+		if ( g_theInput->WasKeyJustPressed( 'O' ) )
+		{
+			IntVec2 coords = IntVec2( ( int ) m_mousePosition.x , ( int ) m_mousePosition.y );
+
+			OccMapCollectable* collectable = new OccMapCollectable(this,Vec2(coords.x+0.5f,coords.y+0.5f));
+			m_collectables.push_back( collectable );
+		}
+
 		if ( g_theInput->WasKeyJustPressed( 'I' ) )
 		{
 			SaveOccupancyGameData();
@@ -556,6 +620,8 @@ void Game::Update( float deltaseconds )
 		{
 			HandleBlockCollissions( m_player );
 		}
+
+		HandleOccGameObjectGarbageCollection();
 	}
 
 
@@ -744,11 +810,30 @@ void Game::Render()
 				AppendAABB2( sandTiles , aabb , Rgba8() );
 			}
 
+			if ( m_occMapTiles[ i ].m_type == TILE_TYPE_STONE )
+			{
+				AABB2 aabb = AABB2( m_occMapTiles[ i ].m_tileCoords.x , m_occMapTiles[ i ].m_tileCoords.y , m_occMapTiles[ i ].m_tileCoords.x + 1 , m_occMapTiles[ i ].m_tileCoords.y + 1 );
+				AppendAABB2( blockTiles , aabb , Rgba8(150,150,150,255) );
+			}
+
 		}
+
+	
 
 		g_theRenderer->BindTexture( m_sandMainTex );
 		g_theRenderer->DrawVertexArray( sandTiles );
+		g_theRenderer->BindTexture( m_blockTex );
+		g_theRenderer->DrawVertexArray( blockTiles );
 		g_theRenderer->BindTexture( nullptr );
+
+		for ( int i = 0; i < m_collectables.size(); i++ )
+		{
+			if ( m_collectables[ i ] == nullptr )
+			{
+				continue;
+			}
+			m_collectables[ i ]->Render();
+		}
 
 		for ( int i = 0; i < m_occAIs.size(); i++ )
 		{
@@ -757,7 +842,13 @@ void Game::Render()
 
 		m_player->Render();
 
+		RenderOccUI();
 	
+	}
+
+	if ( m_currentMode == INF_AND_PF_MAP_GAME )
+	{
+		m_mainMapCreator->Render();
 	}
 	
 
@@ -841,6 +932,28 @@ void Game::ToggleGameModes()
 	if ( g_theInput->WasKeyJustPressed( '5' ) )
 	{
 		m_currentMode = OCCUPANCY_MAP_GAME;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '6' ) )
+	{
+		m_currentMode = INF_AND_PF_MAP_GAME;
+	}
+}
+
+void Game::HandleOccGameObjectGarbageCollection()
+{
+	for ( int i = 0; i < m_collectables.size(); i++ )
+	{
+		if ( m_collectables[ i ] == nullptr )
+		{
+			continue;
+		}
+		
+		if ( m_collectables[ i ]->m_isGarbage )
+		{
+			delete m_collectables[ i ];
+			m_collectables[ i ] = nullptr;
+		}
 	}
 }
 
@@ -1030,10 +1143,18 @@ void Game::HandleBlockCollissions( Entity* entity )
 	
 }
 
-bool Game::IsTileSolid( IntVec2 tileCoords )
+bool Game::IsTileSolid( IntVec2 tileCoords, bool isInoccGame )
 {
-	int index = GetTileIndexForOccGame(tileCoords);
-	return m_occMapTiles[ index ].m_isSolid;
+	if ( isInoccGame )
+	{
+		int index = GetTileIndexForOccGame( tileCoords );
+		return m_occMapTiles[ index ].m_isSolid;
+	}
+	else
+	{
+		int index = GetTileIndexForTileCoords( tileCoords , true );
+		return m_mainMapTiles[ index ].m_isSolid;
+	}
 }
 
 void Game::GetPathUsingAStarIgnoreDiagonalMovesOneStep( Vec2 startPos , Vec2 endPos , std::vector<int>& path, bool ignoreDiagonalMoves, bool considerInfluenceMaps )
@@ -3521,6 +3642,14 @@ void Game::GetPathInOccupancyGame( Vec2 startPos , Vec2 endPos , std::vector<int
 	IntVec2 sPos = IntVec2( RoundDownToInt( startPos.x ) , RoundDownToInt( startPos.y ) );
 	IntVec2 ePos = IntVec2( RoundDownToInt( endPos.x ) , RoundDownToInt( endPos.y ) );
 
+	int sIndex = GetTileIndexForOccGame( sPos );
+	int eIndex = GetTileIndexForOccGame( ePos );
+
+	if ( sIndex < 0 || eIndex < 0 || m_occMapTiles[ sIndex ].m_isSolid || m_occMapTiles[ eIndex ].m_isSolid )
+	{
+		return;
+	}
+
 	if ( sPos == ePos )
 	{
 		return;
@@ -4759,6 +4888,23 @@ void Game::LoadOccpancyGameDataFromXml()
 			m_occMapTiles[ index ].m_type = TILE_TYPE_STONE;
 		}
 	}
+
+	root = doc.FirstChildElement( "Collectables" );
+
+	if ( root == nullptr )
+	{
+		return;
+	}
+
+	for ( tinyxml2::XMLElement* ele = root->FirstChildElement( "Collectable" ); ele != nullptr; ele = ele->NextSiblingElement( "Collectable" ) )
+	{
+		float posX = ParseXmlAttribute( *ele , "positionX" , 0.f );
+		float posY = ParseXmlAttribute( *ele , "positionY" , 0.f );
+
+		OccMapCollectable* c = new OccMapCollectable(this, Vec2( posX , posY ) );
+		m_collectables.push_back( c );
+		m_numObjectsToCollect+=1;
+	}
 }
 
 void Game::SaveOccupancyGameData()
@@ -4784,7 +4930,75 @@ void Game::SaveOccupancyGameData()
 		}
 	}
 
+	tinyxml2::XMLNode* collectabledata = gameDoc.NewElement( "Collectables" );
+
+	gameDoc.InsertEndChild( collectabledata );
+
+	for ( int i = 0; i < m_collectables.size(); i++ )
+	{
+		tinyxml2::XMLElement* ele = gameDoc.NewElement( "Collectable" );
+		ele->SetAttribute( "positionX" , m_collectables[i]->m_position.x );
+		ele->SetAttribute( "positionY" , m_collectables[i]->m_position.y );
+		collectabledata->InsertEndChild( ele );
+	}
+
 	gameDoc.SaveFile( "Data/GameConfig/OccupancyGameData.xml" );
+}
+
+void Game::RenderOccUI()
+{
+	int number = m_numObjectsToCollect;
+	int onesDigit = number % 10;
+	number = number / 10;
+	int tensDigit = number % 10;
+
+	g_theRenderer->BeginCamera( *m_occHudCamera );
+	g_theRenderer->BindTexture( m_objsToCollectTex );
+	g_theRenderer->DrawAABB2D( m_objsTocollectBox,Rgba8() );
+	g_theRenderer->BindTexture( GetGetTextureForNumber( tensDigit ) );
+	g_theRenderer->DrawAABB2D( m_tenDigitbox, Rgba8() );
+	g_theRenderer->BindTexture( GetGetTextureForNumber(onesDigit) );
+	g_theRenderer->DrawAABB2D( m_onesDigitBox , Rgba8() );
+	if ( m_occMapGameOver )
+	{
+		g_theRenderer->BindTexture( m_occGameOverTex );
+		g_theRenderer->DrawAABB2D( m_occGameOverBox , Rgba8() );
+	}
+	g_theRenderer->EndCamera( *m_occHudCamera );
+}
+
+Texture* Game::GetGetTextureForNumber( int number )
+{
+	switch ( number )
+	{
+	
+	case 0:return m_zeroTex;
+	case 1:return m_oneTex;
+	case 2:return m_twoTex;
+	case 3:return m_threeTex;
+	case 4:return m_fourTex;
+	case 5:return m_fiveTex;
+	case 6:return m_sixTex;
+	case 7:return m_sevenTex;
+	case 8:return m_eightTex;
+	case 9:return m_nineTex;
+	default:return nullptr;
+	}
+}
+
+void Game::CheckForWinOrLoss()
+{
+	if ( m_occMapGameOver )
+	{
+		if ( m_numObjectsToCollect <= 0 )
+		{
+			m_didPlayerWinOccGame = true;
+		}
+		else
+		{
+			m_didPlayerWinOccGame = false;
+		}
+	}
 }
 
 void Game::LoadPlayerTextures()
@@ -5086,7 +5300,19 @@ void Game::UpdateCamera()
 	}
 	else if ( m_currentMode == OCCUPANCY_MAP_GAME )
 	{
-		m_gameCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( ( float ) m_occMapGameSize.x , ( float ) m_occMapGameSize.y ) );
+		if ( !m_inOccCreation )
+		{
+			Vec2 playerPos = m_player->m_position;
+			Vec2 camCoords;
+			camCoords.x = Clamp( playerPos.x , 8.f * 1.75f , 80.f - ( 8.f * 1.75f ) );
+			camCoords.y = Clamp( playerPos.y , 4.5f * 1.75f , 45.f - ( 4.5f * 1.75f ) );
+
+			m_gameCamera->SetOrthoView( camCoords - Vec2( 8.f * 1.75f , 4.5f * 1.75f ) , camCoords + Vec2( 8.f * 1.75f , 4.5f * 1.75f ) );
+		}
+		else
+		{
+			m_gameCamera->SetOrthoView( Vec2(0.f,0.f) , Vec2(80.f,45.f) );
+		}
 	}
 	else
 	{

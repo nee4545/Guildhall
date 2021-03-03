@@ -199,10 +199,12 @@
     <ClCompile Include="GreenBeret.cpp" />
     <ClCompile Include="Imap.cpp" />
     <ClCompile Include="InfluenceMap.cpp" />
+    <ClCompile Include="MainGameMapCreator.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="MapCreator.cpp" />
     <ClCompile Include="MonsterAI.cpp" />
     <ClCompile Include="OccAI.cpp" />
+    <ClCompile Include="OccupancyMapCollectable.cpp" />
     <ClCompile Include="OccupancyMap.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PotentialFieldCreator.cpp" />
@@ -224,11 +226,13 @@
     <ClInclude Include="GreenBeret.hpp" />
     <ClInclude Include="IMap.hpp" />
     <ClInclude Include="InfluenceMap.hpp" />
+    <ClInclude Include="MainGameMapCreator.hpp" />
     <ClInclude Include="MapCreator.hpp" />
     <ClInclude Include="MonsterAI.hpp" />
     <ClInclude Include="Object.hpp" />
     <ClInclude Include="OccAI.hpp" />
     <ClInclude Include="OccupancyMap.hpp" />
+    <ClInclude Include="OccupancyMapCollectable.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PotentialFieldCreator.hpp" />
     <ClInclude Include="PotentialFields.hpp" />

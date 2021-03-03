@@ -178,7 +178,7 @@ void OccupancyMap::PropgateInfluence()
 
 		if ( upIndex > 0 )
 		{
-			if ( m_nodes[ upIndex ].value < currentValue - 1.f && m_nodes[upIndex].hasInfluence )
+			if ( m_nodes[ upIndex ].value < currentValue - 1.f && m_nodes[upIndex].hasInfluence && m_nodes[upIndex].consideredForPropogation )
 			{
 				m_nodes[ upIndex ].value = currentValue-1.f;
 			}
@@ -186,7 +186,7 @@ void OccupancyMap::PropgateInfluence()
 
 		if ( downIndex > 0 )
 		{
-			if ( m_nodes[downIndex ].value < currentValue - 1.f && m_nodes[downIndex].hasInfluence )
+			if ( m_nodes[downIndex ].value < currentValue - 1.f && m_nodes[downIndex].hasInfluence && m_nodes[downIndex].consideredForPropogation )
 			{
 				m_nodes[ downIndex ].value = currentValue-1.f;
 			}
@@ -194,7 +194,7 @@ void OccupancyMap::PropgateInfluence()
 
 		if ( leftIndex > 0 )
 		{
-			if ( m_nodes[ leftIndex ].value < currentValue - 1.f && m_nodes[leftIndex].hasInfluence )
+			if ( m_nodes[ leftIndex ].value < currentValue - 1.f && m_nodes[leftIndex].hasInfluence && m_nodes[leftIndex].consideredForPropogation )
 			{
 				m_nodes[ leftIndex ].value = currentValue-1.f;
 			}
@@ -202,7 +202,7 @@ void OccupancyMap::PropgateInfluence()
 
 		if ( rightIndex > 0 )
 		{
-			if ( m_nodes[ rightIndex ].value < currentValue - 1.f && m_nodes[rightIndex].hasInfluence )
+			if ( m_nodes[ rightIndex ].value < currentValue - 1.f && m_nodes[rightIndex].hasInfluence && m_nodes[rightIndex].consideredForPropogation )
 			{
 				m_nodes[ rightIndex ].value = currentValue-1.f;
 			}
@@ -307,10 +307,53 @@ void OccupancyMap::SetValue( IntVec2 coords, float value )
 		{
 			m_nodes[ index ].hasInfluence = true;
 		}
+
+		if ( value == 0.f )
+		{
+			m_nodes[ index ].consideredForPropogation = false;
+		}
 	}
 }
 
 void OccupancyMap::DebugRender()
 {
 
+}
+
+bool OccupancyMap::IsCleared()
+{
+	int numNodes = m_nodes.size();
+	int currentNonZeroValues = 0;
+
+	for ( int i = 0; i < m_nodes.size(); i++ )
+	{
+		if ( m_nodes[ i ].value <= 0.f )
+		{
+			currentNonZeroValues += 1;
+		}
+	}
+
+	if ( currentNonZeroValues == numNodes )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void OccupancyMap::Update()
+{
+	for ( int i = 0; i < m_nodes.size(); i++ )
+	{
+		if ( m_nodes[ i ].value > 0.f )
+		{
+			if ( !m_game->m_occMapTiles[ i ].m_isSolid )
+			{
+				m_nodes[ i ].hasInfluence = true;
+			}
+		}
+		m_nodes[ i ].consideredForPropogation = true;
+	}
 }

@@ -7,15 +7,28 @@
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Renderer/SpriteAnimDefTex.hpp"
 
 OccAI::OccAI()
 {
 	m_helper = new MovingHelper();
 
 	m_animClock = new Clock();
+	m_occupancyPropogateTimer = new Timer();
 	m_occupancyUpdateTimer = new Timer();
 
-	m_occupancyUpdateTimer->SetSeconds( 0.38f );
+	m_occupancyPropogateTimer->SetSeconds( 0.38f );
+	m_occupancyUpdateTimer->SetSeconds( 4.5f );
+
+	LoadAnimations();
+
+	m_vertices[ 0 ] = Vertex_PCU( Vec3( -1.6f , -1.4f , 0.f ) , Rgba8(150 ,150 ,150 , 255 ) , m_minUV );
+	m_vertices[ 1 ] = Vertex_PCU( Vec3( 1.6f , -1.4f , 0.f ) , Rgba8( 150, 150, 150, 255 ) , Vec2( m_maxUV.x , m_minUV.y ) );
+	m_vertices[ 2 ] = Vertex_PCU( Vec3( -1.6f , 1.4f , 0.f ) , Rgba8( 150, 150, 150, 255 ) , Vec2( m_minUV.x , m_maxUV.y ) );
+
+	m_vertices[ 3 ] = Vertex_PCU( Vec3( 1.6f , -1.4f , 0.f ) , Rgba8(150 ,150 ,150 , 255 ) , Vec2( m_maxUV.x , m_minUV.y ) );
+	m_vertices[ 4 ] = Vertex_PCU( Vec3( 1.6f , 1.4f , 0.f ) , Rgba8( 150, 150, 150, 255 ) , m_maxUV );
+	m_vertices[ 5 ] = Vertex_PCU( Vec3( -1.6f , 1.4f , 0.f ) , Rgba8(150 ,150 ,150 , 255 ) , Vec2( m_minUV.x , m_maxUV.y ) );
 }
 
 OccAI::~OccAI()
@@ -25,16 +38,51 @@ OccAI::~OccAI()
 
 void OccAI::Update( float deltaseconds )
 {
+	m_time += deltaseconds;
+
+	if ( m_game->m_occMapGameOver )
+	{
+		return;
+	}
+
 	UpdateBehavior();
+
+	if ( DoDiscsOverlap( m_position , 0.5f , m_game->m_player->m_position , 0.5f ) )
+	{
+		m_game->m_occMapGameOver = true;
+	}
+
 
 	if ( m_type == OCC_AI_SHARED_MAP )
 	{
+		if ( m_state == OCC_IDLE )
+		{
+			if ( m_helper->DoesHavePath() )
+			{
+				m_helper->Reset();
+			}
+		}
 		if ( m_state == OCC_CHASE_PLAYER )
 		{
+			if ( m_helper->DoesHavePath() )
+			{
+				m_helper->Reset();
+			}
+
+			float distance = ( m_game->m_player->m_position - m_position ).GetLength();
 			Vec2 dir = ( m_game->m_player->m_position - m_position ).GetNormalized();
-			m_position += dir * 2.f * deltaseconds;
+
+			if ( distance <= 2.f )
+			{
+				m_position += dir * 6.f * deltaseconds;
+			}
+			else
+			{
+				m_position += dir * 2.f * deltaseconds;
+			}
 
 			m_lastSeenPosition = m_game->m_player->m_position;
+			m_orientationDegrees = dir.GetAngleDegrees();
 		}
 
 		if ( m_state == OCC_SEARCH_MAP )
@@ -46,6 +94,12 @@ void OccAI::Update( float deltaseconds )
 			}
 			else
 			{
+				if ( sharedMap->IsCleared() )
+				{
+					m_state == OCC_IDLE;
+					return;
+				}
+
 				for ( int i = 0; i < sharedMap->m_nodes.size(); i++ )
 				{
 					if ( sharedMap->m_nodes[ i ].value <= 0.f )
@@ -89,7 +143,7 @@ void OccAI::Update( float deltaseconds )
 					}
 
 
-					m_game->GetPathInOccupancyGame( m_position , Vec2( maxCoords.x , maxCoords.y ) , m_helper->path );
+					m_game->GetPathInOccupancyGame( m_position , Vec2( maxCoords.x , maxCoords.y ) , m_helper->path,false,true );
 					m_helper->currentIndex = m_helper->path.size() - 1;
 				}
 				else if ( ( m_nextMovePos - m_position ).GetLengthSquared() <= 0.1f )
@@ -104,17 +158,7 @@ void OccAI::Update( float deltaseconds )
 				{
 					Vec2 moveVec = ( m_nextMovePos - m_position ).GetNormalized();
 					m_position += moveVec * 4.5f * deltaseconds;
-
-					/*float maxValue = sharedMap->GetMaxValue();
-					int index = sharedMap->GetIndexForCoords( m_currentMaxCoords );
-					if ( index > -1 )
-					{
-						if ( (int)sharedMap->m_nodes[index].value != (int)maxValue )
-						{
-							m_helper->Reset();
-							tileIndex = -1;
-						}
-					}*/
+					m_orientationDegrees = moveVec.GetAngleDegrees();
 				}
 
 			
@@ -125,10 +169,35 @@ void OccAI::Update( float deltaseconds )
 	
 	if ( m_type == OCC_AI_SINGLE_MAP )
 	{
+
+		if ( m_state == OCC_IDLE )
+		{
+			if ( m_helper->DoesHavePath() )
+			{
+				m_helper->Reset();
+			}
+		}
+
 		if ( m_state == OCC_CHASE_PLAYER )
 		{
+			if ( m_helper->DoesHavePath() )
+			{
+				m_helper->Reset();
+			}
+			
+			float distance = ( m_game->m_player->m_position - m_position ).GetLength();
 			Vec2 dir = ( m_game->m_player->m_position - m_position ).GetNormalized();
-			m_position += dir * 2.f * deltaseconds;
+			//m_position += dir * 2.f * deltaseconds;
+			m_orientationDegrees = dir.GetAngleDegrees();
+
+			if ( distance <= 2.f )
+			{
+				m_position += dir * 6.f * deltaseconds;
+			}
+			else
+			{
+				m_position += dir * 2.f * deltaseconds;
+			}
 
 			m_lastSeenPosition = m_game->m_player->m_position;
 			m_lastSeenSet = true;
@@ -150,10 +219,22 @@ void OccAI::Update( float deltaseconds )
 
 			if ( m_occupancyMap != nullptr )
 			{
-				if ( m_occupancyUpdateTimer->HasElapsed() )
+				if ( m_occupancyPropogateTimer->HasElapsed() )
 				{
 					m_occupancyMap->PropgateInfluence();
+					m_occupancyPropogateTimer->Reset();
+				}
+
+				if ( m_occupancyUpdateTimer->HasElapsed() )
+				{
+					m_occupancyMap->Update();
 					m_occupancyUpdateTimer->Reset();
+				}
+
+				if ( m_occupancyMap->IsCleared() )
+				{
+					m_state == OCC_IDLE;
+					return;
 				}
 
 				for ( int i = 0; i < m_occupancyMap->m_nodes.size(); i++ )
@@ -231,6 +312,7 @@ void OccAI::Update( float deltaseconds )
 				{
 					Vec2 moveVec = ( m_nextMovePos - m_position ).GetNormalized();
 					m_position += moveVec * 5.2f * deltaseconds;
+					m_orientationDegrees = moveVec.GetAngleDegrees();
 				}
 			}
 		}
@@ -239,9 +321,12 @@ void OccAI::Update( float deltaseconds )
 
 void OccAI::Render()
 {
+	g_theRenderer->BindTexture( m_anims->GetSpriteTextureAtTime(m_time) );
+	Vertex_PCU vertCopy[ 6 ];
+	memcpy( vertCopy ,m_vertices, sizeof( Vertex_PCU ) * 6 );
+	TransformVertexArray( 6 , vertCopy , 0.5f , m_orientationDegrees+90.f , m_position );
+	g_theRenderer->DrawVertexArray( 6 , vertCopy );
 	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->DrawDisc( m_position , 0.5f , Rgba8( 0 , 0 , 100 , 255 ) );
-
 	DebugRender();
 }
 
@@ -398,4 +483,30 @@ void OccAI::UpdateBehavior()
 			}
 		}
 	}
+}
+
+void OccAI::LoadAnimations()
+{
+	std::vector<Texture*> aianims;
+
+	Texture* a1 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_000.png" );
+	Texture* a2 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_001.png" );
+	Texture* a3 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_002.png" );
+	Texture* a4 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_003.png" );
+	Texture* a5 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_004.png" );
+	Texture* a6 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_005.png" );
+	Texture* a7 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_006.png" );
+	Texture* a8 = g_theRenderer->GetOrCreateTextureFromFile( "Data/GameAssets/Monsters/5LVL/Walk/Walk_007.png" );
+
+	aianims.push_back( a1 );
+	aianims.push_back( a2 );
+	aianims.push_back( a3 );
+	aianims.push_back( a4 );
+	aianims.push_back( a5 );
+	aianims.push_back( a6 );
+	aianims.push_back( a7 );
+	aianims.push_back( a8 );
+
+	m_anims = new SpriteAnimDefTex( 0 , ( int ) aianims.size() - 1 , 1.f );
+	m_anims->m_animations = aianims;
 }
