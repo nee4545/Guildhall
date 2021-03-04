@@ -71,32 +71,6 @@ Game::Game()
 {
 	m_rng = RandomNumberGenerator();
 
-	TestJob* job1 = new TestJob();
-	TestJob* job2 = new TestJob();
-	TestJob* job3 = new TestJob();
-	TestJob* job4 = new TestJob();
-	TestJob* job5 = new TestJob();
-	TestJob* job6 = new TestJob();
-	TestJob* job7 = new TestJob();
-	TestJob* job8 = new TestJob();
-	TestJob* job9 = new TestJob();
-	TestJob* job10 = new TestJob();
-	TestJob* job11 = new TestJob();
-	TestJob* job12 = new TestJob();
-
-	g_theJobSystem->PostJob( job1 );
-	g_theJobSystem->PostJob( job2 );
-	g_theJobSystem->PostJob( job3 );
-	g_theJobSystem->PostJob( job4 );
-	g_theJobSystem->PostJob( job5 );
-	g_theJobSystem->PostJob( job6 );
-	g_theJobSystem->PostJob( job7 );
-	g_theJobSystem->PostJob( job8 );
-	g_theJobSystem->PostJob( job9 );
-	g_theJobSystem->PostJob( job10 );
-	g_theJobSystem->PostJob( job11 );
-	g_theJobSystem->PostJob( job12 );
-
 	tinyxml2::XMLDocument gameConfig;
 	gameConfig.LoadFile( "Data/XML/gameconfig.xml" );
 

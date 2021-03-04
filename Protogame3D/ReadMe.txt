@@ -6,15 +6,14 @@ How To Use:
 
 Open Folder:
 
- Run--> ProtoGame2D_x64.exe or
+ Run--> ProtoGame3D_x64.exe or
 
- Open ProtoGame2D.sln, Build and Run.
+ Open ProtoGame3D.sln, Build and Run.
 
 
-Deep Learning
-
-By solving this assignment I truly found out that I have become better at picking my battles. 
-I am able to imagine better how the code has to flow so that it writes itself.
-
+Controls:
+Press F1 for debugging info
+- you can see tile ray casts and entity ray casts if you posses and entity
+Press F3 to posses entitiles
 
 
