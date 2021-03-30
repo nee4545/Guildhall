@@ -64,6 +64,5 @@ private:
 	std::vector<std::string> m_commands;
 	std::vector<std::string> m_commandHistory;
 	Camera* m_devConsoleCamera = nullptr;
-	//std::mutex m_mutex;
 
 };

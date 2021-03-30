@@ -69,9 +69,7 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 	ColoredLine newLine;
 	newLine.lineColor = textColor;
 	newLine.text = devConsolePrintString;
-	//g_consoleMutex.lock();
 	m_lines.push_back( newLine );
-	//g_consoleMutex.unlock();
 }
 
 void DevConsole::PrintError( const std::string& errorMessage )
