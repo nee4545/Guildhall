@@ -89,13 +89,12 @@ const Vec2 GetNearstPointOnOBB2D( const Vec2& refPos , const OBB2& box );
 const Vec2 GetNearestPointOnCapsule2D( const Vec2& refPos , const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , float capsuleRadius );
 const Vec2 GetNearestPointOnLineSegment2D( const Vec2& refPos , const Vec2& start , const Vec2& end );
 const Vec2 GetNearestPointOnInfiniteLine2D( const Vec2& refPos , const Vec2& somePosition , const Vec2& anotherPosition );
-Vec2 GetClosestEdgeFromReferencePointOnAABB2( const Vec2& refPos , const AABB2& aabb );
 void GetClosestEdgeFromRefrerencePointOnAABB2( const Vec2& refPos , const AABB2& aabb , Vec2& outEdge1 , Vec2& outEdge2 );
 
 Vec3 GetSphericalCoordinates( float theta , float phi , float r );
-
 FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const Vec2& relativePosition , const Vec2& axisNormal );
 
+// Dot Product , Cross Product and Projections
 float DotProduct2D( const Vec2& a , const Vec2& b );
 float CrossProduct2D( const Vec2& a , const Vec2& b );
 Vec3 CrossProduct3D( Vec3 a , Vec3 b );
@@ -105,13 +104,11 @@ float GetAngleDegreesBetweenVectors2D( const Vec2& vectorA , const Vec2& vectorB
 float GetProjectedLength2D( const Vec2& sourceVector , const Vec2& ontoVector );
 const Vec2 GetProjectedOnto2D( const Vec2& sourceVector , const Vec2& ontoVector );
 
-
 //Polygon Ray cast
-
 PolygonRacastResult RaycastToPolygon( Vec2 rayFwdVector , Vec2 rayStartPoint , Polygon2D& polygon );
 PlaneRayCastResult RaycastToPlane( Vec2 rayFwdVector , Vec2 rayStartPoing , Plane2& plane );
-//Smooth steps
 
+//Smooth steps
 float SmoothStart2( float t );
 float SmoothStart3( float t );
 float SmoothStart4( float t );
@@ -121,18 +118,14 @@ float SmoothStop3( float t );
 float SmoothStop4( float t );
 float SmoothStop5( float t );
 float SmoothStep3( float t );
-
 float SignFloat( float val );
 
 Vec2 RotateAroundArbitartPoint( Vec2 arbitaryPoint , Vec2 point , float rotationDegrees );
-
 
 //Used by Physics System
 float GetMomentOfInertiaOfTriangle( Polygon2D polygon , Vec2 point0 , Vec2 point1 , Vec2 point2 , float mass );
 float GetAreaOfTriangele( Vec2 point0 , Vec2 point1 , Vec2 point2 );
 float GetAreaOfPolygon( Polygon2D polygon );
-
-
 Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction );
 bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 , Vec2* outSimplex );
 void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3 , Polygon2D poly1 , Polygon2D poly2 );
