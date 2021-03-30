@@ -311,5 +311,6 @@ bool NetworkSystem::CloseUDPPort( EventArgs& args )
 	UNUSED( args );
 	g_theNetwork->m_UDPlistner->Close();
 	return true;
+
 }
 

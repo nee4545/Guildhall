@@ -7,7 +7,6 @@
 #include <winsock2.h>
 #include "ws2tcpip.h"
 #include <string>
-//class SOCKET;
 
 #include "Engine/Core/EngineCommon.hpp"
 
@@ -59,6 +58,5 @@ public:
 
 	TCPServer* m_server;
 	TCPClient* m_client;
-
 	UDPListner* m_UDPlistner = nullptr;
 };

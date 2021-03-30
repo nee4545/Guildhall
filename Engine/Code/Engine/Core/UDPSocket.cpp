@@ -20,17 +20,7 @@ UDPSocket::UDPSocket( const std::string& host , int port ):m_socket(INVALID_SOCK
 
 UDPSocket::~UDPSocket()
 {
-	//if ( m_socket != INVALID_SOCKET )
-	//{
-	//	int result =closesocket( m_socket );
-	//	if ( result == INVALID_SOCKET )
-	//	{
-	//		//error
-	//	}
-	//}
-	//m_socket = INVALID_SOCKET;
 	Close();
-
 }
 
 void UDPSocket::Bind( int port )
