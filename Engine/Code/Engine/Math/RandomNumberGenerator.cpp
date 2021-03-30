@@ -13,14 +13,12 @@ int RandomNumberGenerator::GetRandomIntLessThan( int maxNotInclusive )
 	return (rand()%maxNotInclusive);
 }
 
-//Not included for grading in assignment 2
 float RandomNumberGenerator::GetRandomFloatZeroToOne()
 {
 	constexpr float scale= 1.f/ (float)RAND_MAX;
 	return scale * (float)rand();
 }
 
-//Not included in grading assignment 2
 float RandomNumberGenerator::GetRandomFloatInRange( float minInclusive, float maxInclusive )
 {
 	constexpr float scale= 1.f/ (float)RAND_MAX;
