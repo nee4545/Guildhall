@@ -45,9 +45,8 @@ public:
 	std::mutex m_jobsQueuedMutex;
 	std::mutex m_jobsRunningMutex;
 	std::mutex m_jobsCompletedMutex;
+	std::atomic<bool> m_isQuitting;
 
 	std::vector<JobSystemWorkerThread*> m_workerThreads;
-
-	std::atomic<bool> m_isQuitting;
 	
 };

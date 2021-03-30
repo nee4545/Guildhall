@@ -25,7 +25,6 @@ void JobSystem::StartUp()
 void JobSystem::ShutDown()
 {
 	m_isQuitting = true;
-
 	for ( int i = 0; i < m_workerThreads.size(); i++ )
 	{
 		m_workerThreads[ i ]->m_threadObject->join();
@@ -46,9 +45,7 @@ void JobSystem::CreateWorkerThread()
 
 void JobSystem::PostJob( Job* job )
 {
-	//m_jobsQueuedMutex.lock();
 	m_jobsQueued.push_back( job );
-	//m_jobsQueuedMutex.unlock();
 }
 
 void JobSystem::ClaimAndDeleteAllCompletedJobs()
@@ -81,7 +78,6 @@ void JobSystemWorkerThread::WorkerThreadMain()
 			g_theJobSystem->m_jobsRunning.push_back( jobAtFront );
 			g_theJobSystem->m_jobsRunningMutex.unlock();
 			jobAtFront->Execute();
-
 			g_theJobSystem->m_jobsCompleted.push_back( jobAtFront );
 
 		}
