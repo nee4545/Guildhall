@@ -18,8 +18,6 @@ VertexLit::VertexLit( Vec3 position , Vec4 color , Vec2 uv , Vec3 normal /*= Vec
 	m_normal = normal;
 }
 
-//  [4/12/2020 Neeraj Jairam]
-
 VertexLit::VertexLit( Vec3 position , Vec4 color , Vec2 uv , Vec3 normal /*= Vec3( 1.f , 0.f , 0.f ) */ , Vec4 tangent /*= Vec4( 1.f , 0.f , 0.f , 1.f ) */ )
 {
 	m_position = position;
