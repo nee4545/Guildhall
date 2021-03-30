@@ -97,23 +97,19 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		break;
 	}
 
-	// Raw physical keyboard "key-was-just-released" event (case-insensitive, not translated)
 	case WM_KEYUP:
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
 		InputSystem* ip = window->GetInputSystem();
 		ip->HandleKeyReleased( asKey );
-
-		//			#SD1ToDo: Tell the App and InputSystem about this key-released event...
 		break;
 	}
-
 
 	}
 	if ( g_theGUI != nullptr )
 	{
 		const ImGuiIO& IO = ImGui::GetIO();
-		if ( handled || IO.WantCaptureMouse )
+		if ( handled || IO.WantCaptureMouse)
 		{
 			// DO nothing
 		}

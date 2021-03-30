@@ -6,6 +6,7 @@
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/SymmetricPotentialField.hpp"
+#include "Game/InfluenceMap.hpp"
 
 Bomb::Bomb( Game* game , Vec2 position , SpriteAnimDefinition* idle , SpriteAnimDefinition* explode )
 {
@@ -25,7 +26,12 @@ Bomb::Bomb( Game* game , Vec2 position , SpriteAnimDefinition* idle , SpriteAnim
 	m_explosion = explode;
 	m_position = position;
 
-	m_symmetricPotentialField = new SymmetricPotentialField( game , IntVec2( RoundDownToInt( m_position.x ) , RoundDownToInt( m_position.y ) ),IntVec2(10,10) , 10.f , 1.f , false );
+	m_symmetricPotentialField = new SymmetricPotentialField( game , IntVec2( RoundDownToInt( m_position.x ) , RoundDownToInt( m_position.y ) ),IntVec2(4,4) , 4.f , 1.f , false );
+	m_symmetricPotentialField->Create();
+
+	m_infmap = new InfluenceMap( game , IntVec2( RoundDownToInt( m_position.x ) , RoundDownToInt( m_position.y ) ) , IntVec2( 4 , 4 ) , 4.f );
+	m_infmap->Create();
+	
 }
 
 Bomb::~Bomb()
@@ -65,12 +71,13 @@ void Bomb::Render()
 	Vertex_PCU vertCopy[ 6 ];
 	memcpy( vertCopy , m_vertices , sizeof( Vertex_PCU ) * 6 );
 
-	TransformVertexArray( 6 , vertCopy , 10.f , 0.f , m_position );
+	TransformVertexArray( 6 , vertCopy , 2.f , 0.f , m_position );
 
 	g_theRenderer->DrawVertexArray( 6 , vertCopy );
 
 	g_theRenderer->BindTexture( nullptr );
 
+	DebugRender();
 }
 
 void Bomb::Die()
@@ -80,7 +87,20 @@ void Bomb::Die()
 
 void Bomb::DebugRender()
 {
-	
+	std::vector<Vertex_PCU> potentialFieldVerts;
+
+	/*for ( int i = 0; i < m_symmetricPotentialField->m_nodes.size(); i++ )
+	{
+		if ( m_symmetricPotentialField->m_nodes[ i ].value > 0.f )
+		{
+			AABB2 aabb = AABB2( m_symmetricPotentialField->m_nodes[ i ].coords.x , m_symmetricPotentialField->m_nodes[ i ].coords.y , m_symmetricPotentialField->m_nodes[ i ].coords.x + 1 , m_symmetricPotentialField->m_nodes[ i ].coords.y + 1 );
+			AppendAABB2( potentialFieldVerts , aabb , Rgba8( 100 , 100 , 100 , 100 ) );
+		}
+	}*/
+
+	m_symmetricPotentialField->DebugRender();
+
+	g_theRenderer->DrawVertexArray( potentialFieldVerts );
 }
 
 void Bomb::Explode()

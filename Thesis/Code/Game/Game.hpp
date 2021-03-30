@@ -31,6 +31,7 @@ class SymmetricPotentialField;
 class OccAI;
 class BitmapFont;
 class MainGameMapCreator;
+class InfluenceMap;
 
 enum GameMode
 {
@@ -98,6 +99,7 @@ public:
 	void GetPathUsingAStarIgnoreDiagonalMoves( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfuenceMap = false , bool ignoreDiagonalMoves = false );
 	void GetPathInGame( Vec2 startPos , Vec2 endPos , std::vector<int>& path , bool considerInfluenceMap = false , bool ignoreDiagonalMoves = false );
 	void GetPathInOccupancyGame(Vec2 startPos,Vec2 endPos,std::vector<int>& path, bool considerInfueneMap = false, bool ignoreDiagonalMoves = false);
+	void GetPath( Vec2 startPos , Vec2 endPos , std::vector<Tile> tiles , std::vector<int>& path , bool considerInfulenceMap = false , bool ignoreDiagonalMoves = false , InfluenceMap* infMap = nullptr );
 	float GetManhattanDistance( IntVec2 currentPos , IntVec2 finalPos );
 
 	void CreateInfluenceMap( IntVec2 startCoords , bool isPositive , int initialValue );
@@ -107,6 +109,8 @@ public:
 
 	RayCastResult RayCast( Vec2 start , Vec2 direction , float distance );
 	RayCastResult RayCastInOccGame( Vec2 start , Vec2 direction , float distance );
+	RayCastResult RayCastFinal( Vec2 start , Vec2 direction , float distanc , std::vector<Tile> tilesToConsider );
+	
 
 	void ToggleDevConsole();
 
@@ -117,6 +121,7 @@ public:
 
 	void LoadDataFromXml();
 	void LoadPotentialFieldFromXML();
+	void UpdateTileState();
 
 	void LoadOccpancyGameDataFromXml();
 	void SaveOccupancyGameData();
@@ -256,6 +261,8 @@ public:
 	std::vector<Vertex_PCU> m_sandTopLeftTile;
 	std::vector<Vertex_PCU> m_sandBottomLeftTile;
 	std::vector<Vertex_PCU> m_sandBottomRightTile;
+
+
 
 	std::vector<Vertex_PCU> m_blockTiles;
 

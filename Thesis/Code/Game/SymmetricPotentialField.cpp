@@ -1,5 +1,6 @@
 #include "Game/SymmetricPotentialField.hpp"
 #include "Game/Game.hpp"
+#include "Game/MainGameMapCreator.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
 SymmetricPotentialField::SymmetricPotentialField( Game* game , IntVec2 startPos , IntVec2 dimensions , float startValue , float fallOff , bool isPositive )
@@ -35,10 +36,31 @@ void SymmetricPotentialField::Create()
 			if ( !m_isPositive )
 			{
 				node.direction = Vec2( node.coords - m_startPosition ).GetNormalized();
+				if ( ( node.direction - Vec2::MakeFromPolarDegrees( 90.f ) ).GetLength() <= 0.1f )
+				{
+					node.direction = Vec2::MakeFromPolarDegrees( 70.f );
+				}
+				else if ( ( node.direction - Vec2::MakeFromPolarDegrees( 180.f ) ).GetLength() <= 0.1f )
+				{
+					node.direction = Vec2::MakeFromPolarDegrees( 200.f );
+				}
+				else if ( ( node.direction - Vec2::MakeFromPolarDegrees( 0.f ) ).GetLength() <= 0.1f )
+				{
+					node.direction = Vec2::MakeFromPolarDegrees( 20.f );
+				}
+				else if ( ( node.direction - Vec2::MakeFromPolarDegrees( 270.f ) ).GetLength() <= 0.1f )
+				{
+					node.direction = Vec2::MakeFromPolarDegrees( 250.f );
+				}
+				
 			}
 			else
 			{
 				node.direction = Vec2( m_startPosition - node.coords ).GetNormalized();
+				if ( ( node.direction - Vec2::MakeFromPolarDegrees( 90.f )).GetLength() <= 0.1f )
+				{
+					node.direction = Vec2::MakeFromPolarDegrees( 85.f );
+				}
 			}
 
 			if ( node.value > 0.f )
@@ -48,7 +70,7 @@ void SymmetricPotentialField::Create()
 		}
 	}
 
-	SetToMapTiles();
+	//SetToMapTiles();
 }
 
 void SymmetricPotentialField::Clear()
@@ -70,11 +92,16 @@ void SymmetricPotentialField::DebugRender()
 	for ( int i = 0; i < m_nodes.size(); i++ )
 	{
 		AABB2 aabb = AABB2( Vec2( m_nodes[ i ].coords ) , Vec2( m_nodes[ i ].coords.x + 1 , m_nodes[ i ].coords.y + 1 ) );
-		AppendAABB2( verts , aabb , Rgba8( 100 , 0 , 0 , 150 ) );
+		AppendAABB2( verts , aabb , Rgba8( 100 , 0 , 0 , 100 ) );
+		Vec2 startPoint = aabb.GetCenter() + Vec2( 0.f , -0.4f );
+		Vec2 endPoint = startPoint + m_nodes[ i ].direction * 0.8f;
+		g_theRenderer->DrawLine( startPoint , endPoint , Rgba8( 0 , 0 , 0 , 255 ) , 0.05f );
+		g_theRenderer->DrawDisc( endPoint , 0.1f , Rgba8( 0 , 0 , 0 , 255 ) );
 	}
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->DrawVertexArray( verts );
+
 }
 
 bool SymmetricPotentialField::GetDirectionAndValueForCoords( const Vec2& position , Vec2& outDir , float& outValue )
@@ -99,12 +126,12 @@ void SymmetricPotentialField::SetToMapTiles()
 {
 	for ( int i = 0; i < m_nodes.size(); i++ )
 	{
-		if ( m_nodes[ i ].coords.x < m_game->m_mainMapSize.x && m_nodes[ i ].coords.x >0 && m_nodes[ i ].coords.y < m_game->m_mainMapSize.y && m_nodes[ i ].coords.y>0 )
+		if ( m_nodes[ i ].coords.x < m_game->m_occMapGameSize.x && m_nodes[ i ].coords.x >0 && m_nodes[ i ].coords.y < m_game->m_occMapGameSize.y && m_nodes[ i ].coords.y>0 )
 		{
-			m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( m_nodes[ i ].coords , true ) ].m_doesHaveDirection = true;
-			m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( m_nodes[ i ].coords , true ) ].m_isDirectionPositive = m_isPositive;
-			m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( m_nodes[ i ].coords , true ) ].m_direction = m_nodes[i].direction.GetAngleDegrees();
-			m_game->m_mainMapTiles[ m_game->GetTileIndexForTileCoords( m_nodes[ i ].coords , true ) ].m_directionIntensity = m_nodes[i].value;
+			m_game->m_mainMapCreator->m_tiles[ m_game->GetTileIndexForOccGame( m_nodes[ i ].coords) ].m_doesHaveDirection = true;
+			m_game->m_mainMapCreator->m_tiles[ m_game->GetTileIndexForOccGame( m_nodes[ i ].coords) ].m_isDirectionPositive = m_isPositive;
+			m_game->m_mainMapCreator->m_tiles[ m_game->GetTileIndexForOccGame( m_nodes[ i ].coords) ].m_direction = m_nodes[i].direction.GetAngleDegrees();
+			m_game->m_mainMapCreator->m_tiles[ m_game->GetTileIndexForOccGame( m_nodes[ i ].coords) ].m_directionIntensity = m_nodes[i].value;
 		}
 	}
 }

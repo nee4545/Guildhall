@@ -1,6 +1,9 @@
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Input/InputSystem.hpp"
+
+extern InputSystem* g_theInput;
 
 Clock Clock::gMasterClock = Clock(nullptr);
 
@@ -131,6 +134,11 @@ void Clock::BeginFrame()
 
 	double dt = timeThisFrame - timePreviousFrame;
 	timePreviousFrame = timeThisFrame;
+
+	if ( g_theInput->IsKeyPressed( 'T' ) )
+	{
+		dt = dt * 0.1f;
+	}
 
 	gMasterClock.Update( dt );
 }	

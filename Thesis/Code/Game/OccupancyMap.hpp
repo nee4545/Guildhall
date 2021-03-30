@@ -9,7 +9,7 @@ class Game;
 struct OccupancyMapNode
 {
 	IntVec2 coords;
-	float value =0.f;
+	float value = 0.f;
 	bool hasInfluence = false;
 	bool consideredForPropogation = true;
 };
@@ -36,6 +36,8 @@ public:
 	void Create();
 	void CreateForOccMapGame();
 	void PropgateInfluence();
+	void Propogate();
+	void PropogateInnerInfluence();
 	IntVec2 GetMaxValueCoords();
 	std::vector<IntVec2> GetAllMaxValueCoords();
 	float GetMaxValue();

@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/Entity.hpp"
 #include "Engine/Math/IntVec2.hpp"
+#include "Game/EntityCommon.hpp"
 
 class SpriteAnimDefinition;
 class SpriteAnimDefTex;
@@ -8,20 +9,6 @@ class Game;
 class Clock;
 class Timer;
 class OccupancyMap;
-
-enum OCCAI_States
-{
-	OCC_IDLE,
-	OCC_CHASE_PLAYER,
-	OCC_SEARCH_MAP,
-};
-
-enum OCCAI_Type
-{
-	OCC_AI_SINGLE_MAP ,
-	OCC_AI_SHARED_MAP ,
-};
-
 
 class OccAI :public Entity
 {
@@ -35,10 +22,14 @@ public:
 	virtual void Die() override;
 
 	void SetVerticesBasedOnAspect( Vec2 aspect );
-	
+	void UpdateAndClearSingleOccupancyMap();
 	void CheckPlayerInSight();
 	void UpdateBehavior();
+	void ExecuteIdleBehavior();
+	void ExecuteChaseBehavior();
 	void LoadAnimations();
+	void SetDestinationForSharedAI(OccupancyMap* sharedMap);
+	void Move( float deltaSeconds ,float speed ,Vec2 dirVec );
 
 public:
 	Vertex_PCU m_vertices[ 6 ];
@@ -59,6 +50,8 @@ public:
 
 	MovingHelper* m_helper = nullptr;
 
+	float m_visionRadius = 15.f;
+
 	Vec2 m_lastSeenPosition;
 	Vec2 m_nextMovePos;
 	bool m_lastSeenSet = false;
@@ -68,6 +61,7 @@ public:
 	OccupancyMap* m_occupancyMap = nullptr;
 	bool initialUpdateDone = false;
 	bool m_mapCleared = false;
+	bool m_destinationSet = false;
 
 	SpriteAnimDefTex* m_anims = nullptr;
 	Vec2 m_maxUV = Vec2( 1.f , 1.f );

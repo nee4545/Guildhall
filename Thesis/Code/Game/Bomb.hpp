@@ -6,6 +6,7 @@ class SpriteAnimDefinition;
 class Timer;
 class Game;
 class SymmetricPotentialField;
+class InfluenceMap;
 
 class Bomb : public Entity
 {
@@ -28,6 +29,7 @@ public:
 	Timer* m_explosionTimer = nullptr;
 	Game* m_game;
 	SymmetricPotentialField* m_symmetricPotentialField = nullptr;
+	InfluenceMap* m_infmap = nullptr;
 
 	bool m_isExploding = false;
 	float m_explosionRadius = 4.f;

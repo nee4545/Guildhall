@@ -208,6 +208,7 @@
     <ClCompile Include="OccupancyMap.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PotentialFieldCreator.cpp" />
+    <ClCompile Include="PotentialFieldPathFinder.cpp" />
     <ClCompile Include="PotentialFields.cpp" />
     <ClCompile Include="StartScreen.cpp" />
     <ClCompile Include="SupportPlayer.cpp" />
@@ -216,11 +217,13 @@
     <ClCompile Include="Turret.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIManager.hpp" />
     <ClInclude Include="App.hpp" />
     <ClInclude Include="Bomb.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="EntityCommon.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="GreenBeret.hpp" />
@@ -235,6 +238,7 @@
     <ClInclude Include="OccupancyMapCollectable.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PotentialFieldCreator.hpp" />
+    <ClInclude Include="PotentialFieldPathFinder.hpp" />
     <ClInclude Include="PotentialFields.hpp" />
     <ClInclude Include="StartScreen.hpp" />
     <ClInclude Include="SupportPlayer.hpp" />

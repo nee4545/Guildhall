@@ -55,6 +55,10 @@ void App:: Startup()
 	{
 		thegame = new Game();
 	}
+
+	/*SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GWL_STYLE ,
+		WS_POPUP );
+	ShowWindow( ( HWND ) g_theWindow->m_hwnd , SW_SHOWMAXIMIZED );*/
 }
 
 App::~App()
@@ -85,7 +89,6 @@ void App::Shutdown() //Not used right now
 void App::Update(float deltaSeconds)
 {
 
-	g_theRenderer->UpdateFrameTime( deltaSeconds );
 	DebugRenderSystem::sDebugRenderer->Update();
 
 	g_theInput->UpdateMouse();
@@ -95,16 +98,24 @@ void App::Update(float deltaSeconds)
 		g_theInput->UpdateRelativeMode();
 	}
 
+	if ( g_theInput->IsKeyPressed( 'T' ) )
+	{
+		deltaSeconds = deltaSeconds * 0.1f;
+	}
+
+
 	thegame->Update( deltaSeconds );
-	
 	g_theConsole.Update( deltaSeconds );
+	g_theRenderer->UpdateFrameTime( deltaSeconds );
+
+	Clock::BeginFrame();
+	
 
 	if ( g_theInput->WasKeyJustPressed( F8 ) )
 	{
 		delete thegame;
 		thegame = new Game();
 	}
-
 
 	if ( g_theWindow->m_quitRequested == true )
 	{
@@ -116,8 +127,6 @@ void App::Update(float deltaSeconds)
 	{
 		HandleQuitRequested();
 	}
-
-
 }
 
 void App::RunFrame()
@@ -156,7 +165,7 @@ void App::BeginFrame()
 	g_theAudio->BeginFrame();
 	g_theJobSystem->BeginFrame();
 	g_theNetwork->BeginFrame();
-	Clock::BeginFrame();
+
 	
 	g_theGUI->BeginFrame();
 

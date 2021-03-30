@@ -1,0 +1,2 @@
+E:\Git\SuckerPunchProblem\Debug\SuckerPunchProblem.exe
+E:\Git\SuckerPunchProblem\Debug\SuckerPunchProblem.pdb

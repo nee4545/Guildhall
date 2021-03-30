@@ -5,9 +5,13 @@
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Game/Game.hpp"
+#include "Game/MainGameMapCreator.hpp"
 #include "Game/OccupancyMap.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+
+//constexpr float PLAYER_SPEED = 4.f;
+constexpr float SHARED_MAP_UPDATE_SPEED = 2.f;
 
 Player::Player()
 {
@@ -43,10 +47,10 @@ Player::Player( Game* game )
 	m_health = 10.f;
 
 	m_mapPropogateTimer = new Timer();
-	m_mapPropogateTimer->SetSeconds( 0.31f );
+	m_mapPropogateTimer->SetSeconds( 1/PLAYER_SPEED );
 
 	m_mapUpdateTimer = new Timer();
-	m_mapUpdateTimer->SetSeconds( 4.5f );
+	m_mapUpdateTimer->SetSeconds( SHARED_MAP_UPDATE_SPEED );
 }
 
 Player::~Player()
@@ -57,14 +61,6 @@ Player::~Player()
 void Player::Update( float deltaseconds )
 {
 	m_time += deltaseconds;
-
-	if ( m_game->m_currentMode == OCCUPANCY_MAP_GAME )
-	{
-		if ( m_game->m_occMapGameOver )
-		{
-			return;
-		}
-	}
 
 	if ( m_time > 1000.f )
 	{
@@ -97,6 +93,11 @@ void Player::Update( float deltaseconds )
 	MovePlayer( deltaseconds );
 	MeleeAttack();
 	Shoot();
+
+	if ( g_theInput->WasKeyJustPressed( SPACE ) )
+	{
+		m_game->m_mainMapCreator->SpawnBomb( m_position );
+	}
 
 	if ( m_lockAnimState )
 	{
@@ -177,7 +178,9 @@ void Player::CreateMap()
 {
 	if ( m_aiSharedMap == nullptr )
 	{
-		m_aiSharedMap = new OccupancyMap( m_game , IntVec2( m_position.x , m_position.y ) , IntVec2( 50 , 30 ) , 50.f );
+		m_aiSharedMap = new OccupancyMap( m_game , IntVec2( m_position.x , m_position.y ) , IntVec2( 80 , 45 ) , 50.f );
+		m_aiSharedMap->PropgateInfluence();
+		m_mapPropogateTimer->Reset();
 	}
 }
 
@@ -192,8 +195,6 @@ void Player::DeleteMap()
 
 void Player::MovePlayer(float deltaseconds)
 {
-	
-
 	if ( g_theInput->IsKeyPressed( 'W' ) )
 	{
 		m_position.y += PLAYER_SPEED * deltaseconds;

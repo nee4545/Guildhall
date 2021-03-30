@@ -29,6 +29,7 @@ public:
 
 	void CreateMap();
 	void DeleteMap();
+	//void SpawnBomb();
 
 	void MovePlayer( float deltaseconds );
 	void ToggleMeleeState();

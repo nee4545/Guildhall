@@ -35,6 +35,7 @@ enum AI_TYPE
 
 enum AI_Behavior
 {
+	AI_IDLE,
 	PATROL,
 	CHASE_PLAYER,
 	INVETIGATE_SOUND,
@@ -66,9 +67,11 @@ public:
 	void ChangeBehavior( AI_Behavior newBehavior );
 	void CheckPlayerInSight();
 	Vec2 GetPatrolPoint();
+	void UpdateAndClearSingleOccupancyMap();
 
 	void FindPathToRandomTile();
 	void ChangeBehavior();
+	void GetPath();
 
 public:
 
@@ -102,12 +105,16 @@ public:
 	Timer* m_rotation2Timer = nullptr;
 	Timer* m_occMovetimer = nullptr;
 
+	Timer* m_occupancyPropogateTimer = nullptr;
+	Timer* m_occupancyUpdateTimer = nullptr;
+
 	Timer* m_sectorRotationTimer = nullptr;
 
 	bool m_hasRangeAttack = false;
 	bool m_hasMultipleRangeAttack = false;
 
 	float m_time = 0.f;
+	float m_senseRadius = 3.f;
 
 	MovingHelper* m_helper = nullptr;
 
@@ -124,12 +131,13 @@ public:
 	bool roationTimerStarted = false;
 	bool initialClearDone = false;
 
-	InfluenceMap* m_occupancyMap = nullptr;
-	OccupancyMap* m_occMap = nullptr;
+	OccupancyMap* m_occupancyMap = nullptr;
+	//OccupancyMap* m_occMap = nullptr;
 
 	std::vector<Vec2> m_patrolPoints;
 	float m_soundRadius = 10.f;
 	float m_shootingRadius = 35.f;
+	float m_visionRadius = 20.f;
 
 	int m_currentPatrolIndex = 0;
 	bool m_hasPatrolPoint = false;

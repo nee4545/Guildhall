@@ -13,6 +13,19 @@ enum TileType
 
 };
 
+enum TileSubType
+{
+	TILE_TYPE_NONE,
+	TILE_TYPE_UP,
+	TILE_TYPE_DOWN,
+	TILE_TYPE_LEFT,
+	TILE_TYPE_RIGHT,
+	TILE_TYPE_TOP_LEFT,
+	TILE_TYPE_BOT_LEFT,
+	TILE_TYPE_BOT_RIGHT,
+	TILE_TYPE_TOP_RIGHT,
+};
+
 enum TileTextureType
 {
 	TILE_INVALID,
@@ -37,6 +50,7 @@ public:
 	Tile( int tileX , int tileY , TileType tileType = TILE_TYPE_SAND );
 	IntVec2 m_tileCoords;
 	TileType m_type;
+	TileSubType m_subType = TILE_TYPE_NONE;
 	TileTextureType m_textureType = TILE_INVALID;
 	bool m_isSolid = false;
 	bool inPath = false;

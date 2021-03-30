@@ -96,8 +96,6 @@ Vec3 GetSphericalCoordinates( float theta , float phi , float r );
 
 FloatRange GetRangeOnProjectedAxis( int numPoints , const Vec2* points , const Vec2& relativePosition , const Vec2& axisNormal );
 
-//Dot Product
-
 float DotProduct2D( const Vec2& a , const Vec2& b );
 float CrossProduct2D( const Vec2& a , const Vec2& b );
 Vec3 CrossProduct3D( Vec3 a , Vec3 b );

@@ -85,6 +85,9 @@
     <ClCompile Include="MainGameMapCreator.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="PotentialFieldPathFinder.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -159,6 +162,15 @@
     </ClInclude>
     <ClInclude Include="MainGameMapCreator.hpp">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="PotentialFieldPathFinder.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityCommon.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="AIManager.hpp">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
