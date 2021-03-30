@@ -33,34 +33,12 @@ public:
 
 };
 
-//template <typename T>
-//class TypedProperty<T*> : public TypedPropertyBase
-//{
-//public:
-//	
-//	void const* GetUniqueID() override { return StaticUniqueID(); }
-//
-//	static void const* const StaticUniqueID()
-//	{
-//		static int s_local = 0;
-//		return &s_local;
-//	}
-//public:
-//	T* m_value;
-//};
-
 
 template <typename T>
 bool TypedPropertyBase::Is()
 {
 	return GetUniqueID() == TypedProperty<T>::StaticUniqueID();
 }
-
-//template<typename T>
-//bool TypedPropertyBase::IsPointer()
-//{
-//	return GetUniqueID() == TypedProperty<T*>::StaticUniqueID();
-//}
 
 class NamedProperties
 {
@@ -91,41 +69,6 @@ public:
 		}
 
 	};
-
-	/*template<typename T>
-	void SetValue(std::string const&keyName,T* const& value )
-	{
-		TypedPropertyBase* base = FindInMap( keyName );
-		if(base== nullptr )
-		{
-			TypedProperty<T*> prop = TypedProperty<T*>();
-			prop.m_value = value;
-			m_keyValuePairs[ keyName ] = &prop;
-		}
-		else
-		{
-			delete base;
-
-			TypedProperty<T*> prop = TypedProperty<T*>();
-			prop.m_value = value;
-			m_keyValuePairs[ keyName ] = &prop;
-		}
-	}*/
-
-	/*template<typename T>
-	T* GetValue(std::string const& keyName, T* const defValue)
-	{
-		TypedPropertyBase* base = FindInMap( keyName );
-		if ( base != nullptr )
-		{
-			if(base->IsPointer<T*>() )
-			{
-				TypedProperty<T*>* prop = ( TypedProperty<T>* )base;
-				return prop->m_value;
-			}
-		}
-		return defValue;
-	}*/
 
 	template<typename T>
 	T GetValue( std::string const& keyName , T const& defValue ) const
