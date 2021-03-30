@@ -5,8 +5,7 @@
 class Polygon2D
 {
 public:
-	bool IsValid() const; // must have at least 3 points to be considered a polygon
-
+	bool IsValid() const; 
 	bool IsConvex() const;
 	bool Contains( Vec2 point ) const;
 	float GetDistance( Vec2 point ) const;
@@ -25,13 +24,12 @@ public:
 	std::vector<Vec2> m_points;
 	Vec2 m_localPos;
 
-public: // static constructors (feel free to just use a constructor - I just like descriptive names)
-		// in this case, these two take the same parameters but behave differently
-
+public: 
+		
 	// construct from a counter-clockwise line loop
 	static Polygon2D MakeFromLineLoop( Vec2 const* points , unsigned int pointCount );
 
-	// create a convex wrapping of a collection of points;  
+	// create a convex wrapping of a collection of points
 	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points , int pointCount );
 	static bool IsPointPartOfPolygon(Vec2 point, Polygon2D &polygon);
 	void Translate2D( Vec2 translation2D );
