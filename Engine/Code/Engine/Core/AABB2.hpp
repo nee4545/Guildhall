@@ -17,7 +17,6 @@ public:
 	explicit AABB2(float minX, float minY, float maxX, float maxY);
 	explicit AABB2( int minX , int minY , int maxX , int maxY );
 
-
 	bool IsPointInside(const Vec2& point)const;
 	const Vec2 GetCenter()const;
 	const Vec2 GetDimensions()const;
@@ -27,11 +26,12 @@ public:
 	float GetOuterRadius() const;
 	float GetInnerRadius() const;
 	void GetCornerPositions( Vec2* outFourPoints ) const;
+
 	AABB2 GetBoxAtLeft( float fractionOfWidth , float additionalWidth = 0.f ) const;
 	AABB2 GetBoxAtRight( float fractionOfWidth , float additionalWidth = 0.f ) const;
 	AABB2 GetBoxAtBottom( float fractionOfHeight , float additionalHeight = 0.f ) const;
 	AABB2 GetBoxAtTop( float fractionOfHeight , float additionalHeight = 0.f ) const;
-
+	AABB2 GetPercentageOfAABB( float percentage );
 
 	void Translate(const Vec2& translation);
 	void SetCenter(const Vec2& newCenter);
@@ -41,10 +41,6 @@ public:
 	void CarveBoxOffRight( float fractionOfWidth , float additionalWidth = 0.f );
 	void CarveBoxOffTop( float fractionOfHeight , float additionalHeight = 0.f );
 	void CarveBoxOffBottom( float fractionOfHeight , float additionalHeight = 0.f );
-	AABB2 GetPercentageOfAABB( float percentage );
-
-
-
 
 	bool operator==(const AABB2& compareWith)const;
 	void operator=(const AABB2& assignFrom);
