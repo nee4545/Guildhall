@@ -771,17 +771,7 @@ void Game::Render()
 		RenderOccUI();
 	
 	}
-
-	
-
-	if ( g_theConsole.IsOpen() )
-	{
-		g_theConsole.Render( *g_theRenderer , *m_devConsoleCamera , 2.f , 1.f );
-	}
 	//g_theRenderer->EndCamera( *m_gameCamera );
-
-
-	
 
 	if ( m_currentMode == GAME )
 	{
@@ -800,18 +790,11 @@ void Game::Render()
 		g_theRenderer->BindTexture( m_greenBeretActiveAnims->GetSpriteTextureAtTime((float)secondsRemainig) );
 		g_theRenderer->DrawAABB2D( m_player1Box, Rgba8() );
 		
-	
 		//g_theRenderer->BindTexture( m_player2HudTex );
-	
 	
 		g_theRenderer->BindTexture( nullptr );
 		g_theRenderer->EndCamera( *m_hudCamera );
 	}
-
-	
-
-	
-
 }
 
 void Game::UpdateMousePosition()
